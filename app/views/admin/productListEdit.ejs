@@ -1,0 +1,373 @@
+<%- include('../partials/header'); -%>
+
+
+<section class="content-main">
+
+<style>
+  .form-container {
+    flex: 2;
+    margin-right: 10px;
+    width: 100%;
+  }
+
+  .image-row {
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+
+  .image-box {
+    width: calc(25% - 8px);
+    margin: 4px;
+    overflow: hidden;
+    position: relative;
+    float: left;
+  }
+
+  .image-box img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  .delete-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: #fff;
+    color: red;
+    border: 1px solid red;
+    padding: 3px 8px;
+    cursor: pointer;
+  }
+
+  .add-btn {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #fff;
+    color: green;
+    border: 1px solid green;
+    padding: 3px 8px;
+    cursor: pointer;
+  }
+
+  @media (max-width: 992px) {
+    .image-box {
+      width: calc(50% - 8px);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .image-box {
+      width: 100%;
+    }
+  }
+</style>
+ <div class="col-md-15 mr-auto ">
+  <form
+    id="myForm"
+    action="/admin/productListEdit"
+    method="post"
+    enctype="multipart/form-data"
+  >
+    <div class="row">
+      <div class="col-6">
+        <div class="content-header">
+          <h2 class="content-title">Add New Product</h2>
+          <div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="card mb-4">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-3">
+                <h6>1. General info</h6>
+              </div>
+              <div class="col-md-9">
+                <div class="mb-4">
+                  <label class="form-label">Product title</label>
+                  <input
+                    type="text"
+                    placeholder="Type here"
+                    class="form-control"
+                    id="productName"
+                    name="productName"
+                    value="<%= products.productName %>"
+                  />
+                </div>
+                <div class="mb-4">
+                  <label class="form-label">Description</label>
+                  <textarea
+                    placeholder="Type here"
+                    class="form-control"
+                    rows="4"
+                    id="description"
+                    name="description"  
+                  >
+               <%= products.description%></textarea>
+                </div>
+                <div class="mb-4">
+                  <label class="form-label">Brand name</label>
+                  <select class="form-select" id="brand" name="brand" >
+                    
+                     <option value="<%=products.brand%>"><%=products.brand%></option>
+                    <option>Himalaya Wellness</option>
+                    <option>Baidyanath</option>
+                    <option>Dabur</option>
+                    <option>Patanjali Ayurved</option>
+                    <option>Zandu Ayurveda</option>
+                    <option>Sri Sri Tattva</option>
+                    <option>Hamdard</option>
+                    <option>Charak Pharma</option>
+                    <option>Vicco Laboratories</option>
+
+                    <option>Pfizer</option>
+                    <option>GlaxoSmithKline (GSK)</option>
+                    <option>Johnson & Johnson</option>
+                    <option>Novartis</option>
+                    <option>AstraZeneca</option>
+                    <option>Sanofi</option>
+                    <option>Merck</option>
+                    <option>Bayer</option>
+                    <option>Roche</option>
+
+                    <option>SBL Homeopathy</option>
+                    <option>Dr. Reckeweg</option>
+                    <option>Bakson's Homeopathy</option>
+                    <option>Schwabe India</option>
+                    <option>Allen Laboratories</option>
+                    <option>Biochemic Phosphates (BCP)</option>
+                    <option>Hahnemann Scientific Laboratory (HSL)</option>
+                    <option>Wheezal Homeopathy</option>
+                    <option>Willmar Schwabe India</option>
+                  </select>
+                </div>
+              </div>
+              <!-- col.// -->
+            </div>
+            <!-- row.// -->
+            <hr class="mb-4 mt-0" />
+            <div class="row">
+              <div class="col-md-3">
+                <h6>2. Pricing</h6>
+              </div>
+              <div class="col-md-9">
+                <div class="mb-4">
+                  <label class="form-label">Cost in USD</label>
+                  <input
+                    type="text"
+                    placeholder="$00.0"
+                    class="form-control"
+                    id="price"
+                    name="price"
+                    value="<%= products.price %>"
+                  />
+                </div>
+              </div>
+              <!-- col.// -->
+            </div>
+            <!-- row.// -->
+            <hr class="mb-4 mt-0" />
+            <div class="row">
+              <div class="col-md-3">
+                <h6>3. Category</h6>
+              </div>
+
+              <div class="col-md-9">
+                <div class="mb-4">
+                  <input type="text"value="<%=products.categorys%>" class="form-control" readonly>
+                  <% category.forEach(category => { %>
+                  <label
+                    class="mb-2 form-check form-check-inline"
+                    style="width: 45%"
+                  >
+                    <input
+                      class="form-check-input"
+                      name="mycategory"
+                      type="radio"
+                      id="category"
+                      value="<%= category._category_name%>"
+                    />
+                    <span class="form-check-label">
+                      <%= category.category_name %>
+                    </span>
+                  </label>
+                  <% }); %>
+                </div>
+              </div>
+              <!-- col.// -->
+            </div>
+            <!-- row.// -->
+            <hr class="mb-4 mt-0" />
+            <div class="row">
+              <div class="col-md-3">
+                <h6>4. Quantity</h6>
+              </div>
+              <div class="col-md-9">
+                <div class="mb-4">
+                  <label class="form-label">Available Quantity</label>
+                  <input
+                    type="number"
+                    min="1"
+                    placeholder="Enter quantity"
+                    class="form-control"
+                    id="quantity"
+                    name="quantity"
+                    value="<%= products.quantity %>"
+                  />
+                </div>
+              </div>
+              <!-- col.// -->
+            </div>
+            <!-- .row end// -->
+
+            <!-- Added Quantity field -->
+            <hr class="mb-4 mt-0" />
+            <div class="row">
+              <div class="col-md-3">
+                               <h6>5. Media</h6>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="mb-4">
+                                    <label class="form-label">Images</label>
+                                    <input
+                                        id="images"
+                                        name="images"
+                                        multiple
+                                        class="form-control"
+                                        type="file"
+                                        
+                                        onchange="handleImage()"
+                                    />
+                                </div>
+
+                                <!-- <div class="d-flex align-items-start">
+                                    <div class="mb-4 me-4">
+                                        Display the original image
+                                        <img id="output" class="img-fluid" alt="Original Image" />
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <button
+                                            id="cropImgBtn"
+                                            class="btn btn-md rounded font-sm hover-up"
+                                            disabled
+                                        >
+                                            Crop image
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div id="croppedOutputContainer" class="mb-4 text-end">
+                                    Display the cropped image on the right side
+                                    <img id="croppedOutput" class="img-fluid" alt="Cropped Image" />
+                                </div> -->
+
+                                <!-- Moved the submit button to the end -->
+                                <div class="row">
+                                    <div class="col-md-12 text-end">
+                                        <button class="btn btn-md rounded font-sm hover-up" onclick="submitForm()">
+                                            Submit
+                                        </button>
+                                          <!-- <input type="hidden" id="croppedImageData" name="croppedImageData" /> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+    </form>
+     <div class="col-md-6 bg-light">
+  <h6 class="text-center">Image Preview</h6>
+  <div id="imagePreviewContainers" class="image-container">
+    <!-- Image previews will be displayed here -->
+  </div>
+</div>
+
+
+<div class="image-container">
+  <h6 class="text-center">Uploaded Image</h6>
+  <div id="imagePreviewContainer">
+    <% if (products.images && products.images.length > 0) { %>
+      <% products.images.forEach((imageUrl, index) => { %>
+        <div class="image-box" id="imageBox<%= index %>">
+          <img src="<%= imageUrl %>" class="img-fluid" alt="Product Image" />
+          <!-- Add any additional functionality or buttons here if needed -->
+        </div>
+      <% }); %>
+    <% } else { %>
+      <p>No images available for this product.</p>
+    <% } %>
+  </div>
+  <!-- Hidden file input for image replacement -->
+  <input type="file" id="fileInput" style="display: none;" />
+</div>
+
+
+
+<script>
+  function handleImage() {
+    var input = document.getElementById('images');
+    var realTimePreviewContainer = document.getElementById('imagePreviewContainers');
+    realTimePreviewContainer.innerHTML = ''; // Clear existing previews
+
+    for (var i = 0; i < input.files.length; i++) {
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        var div = document.createElement('div');
+        div.className = 'image-box';
+        var img = document.createElement('img');
+        img.src = e.target.result;
+        img.className = 'img-fluid';
+        div.appendChild(img);
+        realTimePreviewContainer.appendChild(div);
+      };
+      reader.readAsDataURL(input.files[i]);
+    }
+  }
+
+</script>
+
+
+<script>
+  // Function to handle image deletion
+  function deleteImage(productId, imageUrl) {
+    // Send an AJAX request to the server to delete the image
+    var xhr = new XMLHttpRequest();
+    xhr.open('DELETE', `/admin/productEditDeleteImage/${productId}?imageUrl=${encodeURIComponent(imageUrl)}`, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+          // Update the UI or handle the response as needed
+          console.log('Image deleted successfully');
+          // Remove the image from the UI
+          var imageElement = document.querySelector(`[src="${imageUrl}"]`).closest('.image-box');
+          imageElement.remove();
+        } else {
+          // Handle errors
+          console.error('Error deleting image');
+        }
+      }
+    };
+    xhr.send();
+  }
+
+  // Function to open file input when the "Add" button is clicked
+  function openFileInput(index) {
+    // You can use the index to identify the specific image you want to replace
+    console.log('Add button clicked for image index:', index);
+    document.getElementById('fileInput').click();
+  }
+</script>
+
+
+</section>
+
+<%- include('../partials/footer'); -%>

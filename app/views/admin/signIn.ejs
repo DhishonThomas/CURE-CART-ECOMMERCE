@@ -1,0 +1,43 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="/styles/adminlogin.css"> <!-- Link to your custom CSS file -->
+</head>
+<body>
+
+<div class="container login-container">
+    <div class="card login-card">
+
+<h2 class="login-heading">Admin Login</h2>
+<form class="login-form" action="/signin" method="post">
+
+    <div class="form-group">
+        <label for="email" class="lg">Email:</label>
+        <input type="email" name="email"  class="form-control" id="email" placeholder="Enter admin email" required>
+    </div>
+    <div class="form-group">
+        <label for="password" class="lg">Password:</label>
+        <input type="password" name="password" class="form-control" id="password" placeholder="Enter admin password" required>
+    </div>
+    <button type="submit" class="btn login-button">Login</button>
+</form>
+
+    </div>
+</div>
+
+<!-- Bootstrap JS and Popper.js (Optional) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>
+
+
