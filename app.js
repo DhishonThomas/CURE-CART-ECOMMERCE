@@ -7,6 +7,7 @@ const adminRoutes = require("./routes/adminRoutes");
 const path = require('path')
 const Product = require("./app/models/product");
 const morgan = require('morgan')
+const userRoutes = require('./routes/userRoutes')
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -44,7 +45,7 @@ mongoose.connect("mongodb://localhost:27017/Cure-Cart", {
 });
 
 app.use("/admin", adminRoutes);
-
+app.use("/", userRoutes)
 // Other middleware and routes can be added as needed
 
 app.listen(PORT, () => {

@@ -47,19 +47,13 @@ router.get("/productListEdit/:id", adminController.productListEdit);
 
 router.post("/productListEdit",adminController.productListEdit)
 
-// router.delete("/productEditDeleteImage:/:productId",adminController.productEditDeleteImage);
-
+router.delete(
+  "/productListEdit/:productId/images/:imageIndex",
+  adminController.productEditDeleteImage
+);
 
 router.get("/productListDelete/:id", adminController.productListDelete);
 
 router.get("/productListUlist/:id", adminController.productListUlist);
 
-
- 
-
-
-
-
-
-
-module.exports = router;
+module.exports = router; 

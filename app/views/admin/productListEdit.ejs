@@ -97,7 +97,7 @@
                     class="form-control"
                     id="productName"
                     name="productName"
-                    value="<%= products.productName %>"
+                    value="<%= products && products.productName ? products.productName : '' %>"
                   />
                 </div>
                 <div class="mb-4">
@@ -109,13 +109,13 @@
                     id="description"
                     name="description"  
                   >
-               <%= products.description%></textarea>
+               <%= products && products.description ? products.description : '' %></textarea>
                 </div>
                 <div class="mb-4">
                   <label class="form-label">Brand name</label>
                   <select class="form-select" id="brand" name="brand" >
                     
-                     <option value="<%=products.brand%>"><%=products.brand%></option>
+                     <option value="<%= products && products.brand ? products.brand : '' %>"><%= products && products.brand ? products.brand : '' %></option>
                     <option>Himalaya Wellness</option>
                     <option>Baidyanath</option>
                     <option>Dabur</option>
@@ -165,7 +165,7 @@
                     class="form-control"
                     id="price"
                     name="price"
-                    value="<%= products.price %>"
+                    value="<%= products && products.price ? products.price : '' %>"
                   />
                 </div>
               </div>
@@ -180,7 +180,7 @@
 
               <div class="col-md-9">
                 <div class="mb-4">
-                  <input type="text"value="<%=products.categorys%>" class="form-control" readonly>
+                  <input type="text"value="<%= products && products.categorys ? products.categorys : '' %>" class="form-control" readonly>
                   <% category.forEach(category => { %>
                   <label
                     class="mb-2 form-check form-check-inline"
@@ -218,7 +218,7 @@
                     class="form-control"
                     id="quantity"
                     name="quantity"
-                    value="<%= products.quantity %>"
+                    value="<%= products && products.quantity ? products.quantity : '' %>"
                   />
                 </div>
               </div>
@@ -283,32 +283,108 @@
     </div>
     </div>
     </form>
-     <div class="col-md-6 bg-light">
+     <!-- <div class="col-md-6 bg-light">
   <h6 class="text-center">Image Preview</h6>
   <div id="imagePreviewContainers" class="image-container">
-    <!-- Image previews will be displayed here -->
+    Image previews will be displayed here
   </div>
-</div>
+</div> -->
 
 
-<div class="image-container">
+<!-- <div class="image-container">
   <h6 class="text-center">Uploaded Image</h6>
   <div id="imagePreviewContainer">
     <% if (products.images && products.images.length > 0) { %>
       <% products.images.forEach((imageUrl, index) => { %>
         <div class="image-box" id="imageBox<%= index %>">
           <img src="<%= imageUrl %>" class="img-fluid" alt="Product Image" />
-          <!-- Add any additional functionality or buttons here if needed -->
+          Add any additional functionality or buttons here if needed
         </div>
       <% }); %>
     <% } else { %>
       <p>No images available for this product.</p>
     <% } %>
   </div>
-  <!-- Hidden file input for image replacement -->
+  Hidden file input for image replacement
   <input type="file" id="fileInput" style="display: none;" />
+</div> -->
+
+
+<div class="image-container">
+  <h6 class="text-center">Uploaded Image</h6>
+  <div id="imagePreviewContainer">
+    <% if (products && products.images && products.images.length > 0) { %>
+      <% products.images.forEach((imageUrl, index) => { %>
+        <div class="image-box" id="imageBox<%= index %>">
+          <img src="<%= imageUrl %>" class="img-fluid" alt="Product Image" />
+          <div class="image-buttons">
+            <button class="delete-btn" data-imageindex="<%= index %>">Delete</button>
+            <button class="replace-btn" data-imageindex="<%= index %>">Replace</button>
+          </div>
+        </div>
+      <% }); %>
+    <% } else { %>
+      <p>No images available for this product.</p>
+    <% } %>
+  </div>
 </div>
 
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+  const deleteButtons = document.querySelectorAll('.delete-btn');
+  const replaceButtons = document.querySelectorAll('.replace-btn');
+  const productId = '<%=products._id%>'
+
+  deleteButtons.forEach(button => {
+    button.addEventListener('click', function () {
+      const imageIndex = this.getAttribute('data-imageindex');
+
+      // Make an AJAX request to delete the image
+fetch(`/admin/productListEdit/${productId}/images/${imageIndex}`, {
+  method: 'DELETE',
+})
+  .then(response => response.json())
+  .then(data => {
+    console.log(data.message);
+    document.getElementById('imageBox' + imageIndex).remove();
+     window.location.href = '/admin/productListEdit/<%=products._id%>';
+  })
+  .catch(error => console.error('Error:', error));
+    })
+  });
+
+  replaceButtons.forEach(button => {
+    button.addEventListener('click', function () {
+      const imageIndex = this.getAttribute('data-imageindex');
+
+      // Trigger an input file element to select a new image
+      const inputFile = document.createElement('input');
+      inputFile.type = 'file';
+      inputFile.accept = 'image/*';
+      inputFile.addEventListener('change', function () {
+        const formData = new FormData();
+        formData.append('newImage', this.files[0]);
+
+        // Make an AJAX request to replace the existing image
+        fetch(`/products/${productId}/images/${imageIndex}`, {
+          method: 'PUT',
+          body: formData,
+        })
+          .then(response => response.json())
+          .then(data => {
+            console.log(data.message);
+// to send the data to 
+            // Update the src attribute of the image element
+            const newImageUrl = URL.createObjectURL(this.files[0]);
+            document.querySelector('#imageBox' + imageIndex + ' img').src = newImageUrl;
+          })
+          .catch(error => console.error('Error:', error));
+      });
+      inputFile.click();
+    });
+  });
+});
+</script>
 
 
 <script>
@@ -335,7 +411,7 @@
 </script>
 
 
-<script>
+<!-- <script>
   // Function to handle image deletion
   function deleteImage(productId, imageUrl) {
     // Send an AJAX request to the server to delete the image
@@ -365,7 +441,7 @@
     console.log('Add button clicked for image index:', index);
     document.getElementById('fileInput').click();
   }
-</script>
+</script> -->
 
 
 </section>
