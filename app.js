@@ -27,7 +27,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(morgan("tiny"));
+// app.use(morgan("tiny"));
 
 app.set("view engine","ejs");
 app.set("views", path.join(__dirname, "app/views"));
@@ -51,3 +51,4 @@ app.use("/", userRoutes)
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+ 
