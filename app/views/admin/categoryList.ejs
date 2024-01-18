@@ -20,23 +20,23 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-3">
-                                <form action="/admin/newCategory" method="post">
+                                <form action="/admin/newCategory" method="post" id="formblock">
                                     <div class="mb-4">
                                          <div class="message-container">
                                              <p><%= message %></p>
                                                 </div>
                                         <label for="product_name" class="form-label">Name</label>
-                                        <input type="text" placeholder="Enter category name" class="form-control" name="category_name" />
+                                        <input type="text" placeholder="Enter category name" class="form-control" id="categoryname" name="category_name" />
                                    
                                          <label for="product_name" class="form-label">About</label>
-                                        <input type="text" placeholder="Enter About category" class="form-control" name="about" />
+                                        <input type="text" placeholder="Enter About category" class="form-control" id="about" name="about" />
                                    
 
                                         <label class="form-label">Description</label>
-                                        <textarea placeholder="Enter description" class="form-control" name="description"></textarea>
+                                        <textarea placeholder="Enter description" class="form-control" id="description" name="description"></textarea>
                                     </div>
                                     <div class="d-grid">
-                                        <button class="btn btn-primary">Create category</button>
+                                        <button class="btn btn-primary" onclick="validateForm()">Create category</button>
                                     </div>
                                 </form>
                             </div>
@@ -132,3 +132,30 @@
         });
     });
 </script>
+<script>
+  function validateForm(){
+  const categoryName = document.getElementById("categoryname").value
+  const description  = document.getElementById("description").value
+  const aboutCategory = document.getElementById("about").value
+
+  if(!categoryName || !description ||!aboutCategory){
+    alert("Please fill all the required fields")
+    return false
+  }
+  if(/\s/.test(categoryName)){
+    alert("Category name cannot contain spaces")
+    return false
+  }
+
+   if(/\s/.test(description)){
+    alert("Description cannot contain spaces")
+    return false
+  }
+   if(/\s/.test(aboutCategory)){
+    alert("About category cannot contain spaces")
+    return false
+  }
+      document.getElementById("formblock").submit();
+
+  }
+  </script>

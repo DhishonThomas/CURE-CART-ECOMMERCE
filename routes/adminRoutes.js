@@ -7,6 +7,10 @@ const path = require('path')
 
 router.get("/admin", adminAuthMiddileware,adminController.admin);
 
+router.get("/usersList", adminAuthMiddileware, adminController.usersList);
+
+router.get("/userUlist/:id", adminAuthMiddileware, adminController.userUlist);
+
 // Admin sign-in route
 router.post("/signin", adminController.signIn);
 
@@ -41,7 +45,7 @@ router.get(
   adminAuthMiddileware,adminController.categoryEdit
 );
 
-router.post("/categoryEdit/:id", adminController.categoryEdit);
+router.post("/categoryEdit/:id", adminController.categoryEditUpdate);
 
 router.get("/categoryUlist/:id",adminAuthMiddileware, adminController.categoryUlist);
 

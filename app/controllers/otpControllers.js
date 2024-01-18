@@ -3,6 +3,8 @@ const nodemailer = require('nodemailer');
 const speakeasy = require('speakeasy');
 const User = require("../models/user");
 
+// const userOtp = require('../models/userOtp');
+
 
 // Function to send OTP via email
 async function sendOTPByEmail(email, otp) {
@@ -50,8 +52,21 @@ const otpController = {
         secret: secret.base32,
         encoding: "base32",
       });
+const useremail = await User.findOne({email:email})
+if(useremail){
+       return  res.json({ exists: true, message: "Email already exsist" });
 
-      // Save the OTP details to the database
+}
+
+
+const userotp = await Userotp.findOne({ email: email });
+
+if (userotp && email === userotp.email) {
+  await Userotp.findOneAndDelete({ email: email });
+}
+
+
+      
       const otpTimestamp = Date.now();
       const newUserotp = new Userotp({
         email,

@@ -1,9 +1,11 @@
-const userAuthMiddileware = (req, res, next) => {
+const userAuthMiddleware = (req, res, next) => {
   if (req.session.isUserAuth) {
+    res.locals.user = true;
     next();
   } else {
-    res.render("/signIn");
+    res.locals.user = false;
+    next();
   }
 };
 
-module.exports = userAuthMiddileware;
+module.exports = userAuthMiddleware;

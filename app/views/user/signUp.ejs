@@ -26,7 +26,7 @@
 							</ul>
 					
 							    <div class="tab-pane fade show active" id="register-2" role="tabpanel" aria-labelledby="register-tab-2">
-						<form action="/signUp" method="post" onsubmit="return validateEmail()" id="formblock">
+						<form action="/signUp" method="post"  id="formblock">
 
               <div class="form-group">
 							    			<label for="register-email-2">Username*</label>
@@ -48,10 +48,14 @@
                         <input type="tel" class="form-control" id="phonenumber" name="phonenumber"  placeholder="Format: 123-456-7890" required>
 							    		</div><!-- End .form-group -->
 
-							    		<div class="form-group">
-							    			<label for="register-password-2">Password *</label>
-							    			<input type="password" class="form-control" id="password" name="password" required>
-							    		</div><!-- End .form-group -->
+							    	<div class="form-group">
+    <label for="register-password-2">Password *</label>
+    <input type="password" class="form-control" id="password" name="password" oninput="checkPasswordStrength()" required>
+    <div id="password-strength"></div>
+</div><!-- End .form-group -->
+<span id="current-time"></span>
+
+
                                         <div class="form-group">
   <button type="button" class="btn btn-outline-primary-2" id="sendOtpButton" disabled>
     <span>Send OTP</span>
@@ -74,7 +78,7 @@
 
 
 <div class="form-group">
-  <button type="button" class="btn btn-outline-primary-2" onclick="return validateForm()" id="verifyOtpButton" disabled>
+  <button type="button" class="btn btn-outline-primary-2"  id="verifyOtpButton" disabled>
     <span>Verify OTP</span>
     <i class="icon-long-arrow-right"></i>
   </button>
@@ -83,7 +87,7 @@
 
 
                                           <div class="form-footer">
-							    			<button type="submit" class="btn btn-outline-primary-2" id="signUpButton" disabled>
+							    			<button type="submit" class="btn btn-outline-primary-2" onclick="return validateForm()" id="signUpButton" disabled>
 			                					<span>SIGN UP</span>
 			            						<i class="icon-long-arrow-right"></i>
 			                				</button>
@@ -91,29 +95,7 @@
                                             </div>
                                             </form>
                                             </div>
-<!--
-			                				<div class="custom-control custom-checkbox">
-												<input type="checkbox" class="custom-control-input" id="register-policy-2" required>
-												<label class="custom-control-label" for="register-policy-2">I agree to the <a href="#">privacy policy</a> *</label>
-											</div>End .custom-checkbox
-							    		</div>End .form-footer
-							    	</form>
-							    	<div class="form-choice">
-								    	<p class="text-center">or sign in with</p>
-								    	<div class="row">
-								    		<div class="col-sm-6">
-								    			<a href="#" class="btn btn-login btn-g">
-								    				<i class="icon-google"></i>
-								    				Login With Google
-								    			</a>
-								    		</div>End .col-6
-								    		<div class="col-sm-6">
-								    			<a href="#" class="btn btn-login  btn-f">
-								    				<i class="icon-facebook-f"></i>
-								    				Login With Facebook
-								    			</a>
-								    		</div>End .col-6
-								    	</div>End .row -->
+
 							    	</div><!-- End .form-choice -->
 							    </div><!-- .End .tab-pane -->
 							</div><!-- End .tab-content -->
@@ -132,6 +114,7 @@ function validateForm() {
     var password = document.getElementById("password").value;
     var email = document.getElementById("email").value;
     var phonenumber = document.getElementById("phonenumber").value;
+    var otp         = document.getElementById("otp").value
 
     if (!username || !password || !email || !phonenumber) {
         alert("Please fill in all required fields.");
@@ -149,6 +132,51 @@ function validateForm() {
         return false;
     }
 
+
+      const isPasswordStrong = checkPasswordStrength();
+        if (!isPasswordStrong) {
+            alert('Please choose a strong password.');
+            return false;
+        }
+
+
+
+// fetch('/signUp', {
+//     method: 'POST',
+//     headers: {
+//         'Content-Type': 'application/json'
+//     },
+//     body: JSON.stringify({
+//         email: email,
+//         otp: otp,
+//         phonenumber: phonenumber,
+//         username: username,
+//         password: password 
+//     })
+// })
+
+  // .then(response => response.json())
+  // .then(data => {
+  //   if (data.exists) {
+  //     usernameError.innerText = 'Username already taken';
+  //   } else {
+  //     otpSended.innerText = `OTP sent to ${email}`;
+  //      sendOtpButton.setAttribute("disabled", true);
+  //     enableOtpSection();
+  //     startTimer();
+  //   }
+  // })
+  // .catch(error => {
+  //   console.error("Error checking email:", error);
+     // Enable email and OTP fields before submitting the form
+    document.getElementById("email").removeAttribute("disabled");
+    document.getElementById("otp").removeAttribute("disabled");
+
+    // Submit the form
+    document.getElementById("formblock").submit();
+  // });
+   
+
     return true;
 }
 
@@ -158,6 +186,41 @@ function isValidPhoneNumber(phonenumber) {
     var phoneNumberRegex = /^\d{10}$/;
     return phoneNumberRegex.test(phonenumber);
 }
+
+
+
+
+    // function updateTime() {
+    //     const currentTimeElement = document.getElementById('current-time');
+    //     const currentTime = new Date().toLocaleTimeString();
+    //     // currentTimeElement.textContent = 'Current Time: ' + currentTime;
+    // }
+
+    function checkPasswordStrength() {
+        // updateTime(); // Update the current time
+
+        const password = document.getElementById('password').value;
+        const strengthIndicator = document.getElementById('password-strength');
+
+        // Check password strength
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        const isStrong = regex.test(password);
+
+        // Display password strength feedback
+        if (isStrong) {
+
+            strengthIndicator.style.color = 'green';
+            strengthIndicator.innerHTML = 'Strong password';
+            return isStrong
+        } else {
+            strengthIndicator.style.color = 'red';
+            strengthIndicator.innerHTML = 'Password should be at least 8 characters long and include at least one lowercase letter, one uppercase letter, one digit, and one special character.';
+            return  !isStrong
+        }
+    }
+
+    // setInterval(updateTime, 1000); // Update the time every second
+
 
 
 
@@ -203,7 +266,7 @@ function isValidPhoneNumber(phonenumber) {
   .then(response => response.json())
   .then(data => {
     if (data.exists) {
-      usernameError.innerText = 'Username already taken';
+      usernameError.innerText = 'Email already exsist';
     } else {
       otpSended.innerText = `OTP sent to ${email}`;
        sendOtpButton.setAttribute("disabled", true);
@@ -237,8 +300,8 @@ function isValidPhoneNumber(phonenumber) {
         otpSended.innerText ="";
         resendOtpButton.textContent = "Verified Successfully";
         resendOtpButton.setAttribute=("disabled",true)
-        otpInput.setAttribute("disabled", true); 
-        emailInput.setAttribute("disabled", true);
+      
+       
        
         
             alert("OTP Verified Successfully");

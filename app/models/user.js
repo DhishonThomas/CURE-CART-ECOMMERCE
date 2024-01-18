@@ -23,7 +23,11 @@ const userShcema = new mongoose.Schema({
   isVerified:{
     type:Boolean,
     default:true
+  },
+  isBlocked:{
+    type:Boolean,
+    default:true
   }
 });
-
-module.exports = mongoose.model('User',userShcema)
+const User = mongoose.model('User',userShcema)
+module.exports = User

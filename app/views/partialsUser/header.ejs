@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Molla - Bootstrap eCommerce Template</title>
+    <title>CURE CART</title>
     <meta name="keywords" content="HTML5 Template">
     <meta name="description" content="Molla - Bootstrap eCommerce Template">
     <meta name="author" content="p-themes">
@@ -46,50 +46,22 @@
 
 
 </head>
+<style>
+    /* Add your custom styles for the Login and Logout buttons */
+    .btn-outline-primary {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    /* Add more styles as needed */
+</style>
 
 <body>
     <div class="page-wrapper">
         <header class="header header-intro-clearance header-4">
             <div class="header-top">
                 <div class="container">
-                    <!-- <div class="header-left">
-                        <a href="tel:#"><i class="icon-phone"></i>Call: +0123 456 789</a>
-                    </div>End .header-left -->
-<!-- 
-                    <div class="header-right">
-
-                        <ul class="top-menu">
-                            <li>
-                                <a href="#">Links</a>
-                                <ul>
-                                    <li>
-                                        <div class="header-dropdown">
-                                            <a href="#">USD</a>
-                                            <div class="header-menu">
-                                                <ul>
-                                                    <li><a href="#">Eur</a></li>
-                                                    <li><a href="#">Usd</a></li>
-                                                </ul>
-                                            </div>End .header-menu
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="header-dropdown">
-                                            <a href="#">English</a>
-                                            <div class="header-menu">
-                                                <ul>
-                                                    <li><a href="#">English</a></li>
-                                                    <li><a href="#">French</a></li>
-                                                    <li><a href="#">Spanish</a></li>
-                                                </ul>
-                                            </div>End .header-menu
-                                        </div>
-                                    </li>
-                                    <li><a href="#signin-modal" data-toggle="modal">Sign in / Sign up</a></li>
-                                </ul>
-                            </li>
-                        </ul>End .top-menu -->
-                    <!-- </div>End .header-right -->
+                  
 
                 </div><!-- End .container -->
             </div><!-- End .header-top -->
@@ -120,109 +92,74 @@
                         </div><!-- End .header-search -->
                     </div>
 
-                    <div class="header-right">
-                        <div class="dropdown compare-dropdown">
-                            <a href="#" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static" title="Compare Products" aria-label="Compare Products">
-                                <div class="icon">
-                                    <i class="icon-random"></i>
-                                </div>
-                                <p>Compare</p>
-                            </a>
+                   <div class="header-right">
+    <div class="dropdown compare-dropdown">
+        <a href="#" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static" title="Compare Products" aria-label="Compare Products">
+            <div class="icon">
+                <i class="icon-random"></i>
+            </div>
+            <p>Compare</p>
+        </a>
+        <!-- Compare Dropdown Content -->
+        <div class="dropdown-menu dropdown-menu-right">
+            <ul class="compare-products">
+                <!-- List of compared products goes here -->
+            </ul>
+            <div class="compare-actions">
+                <a href="#" class="action-link">Clear All</a>
+                <a href="#" class="btn btn-outline-primary-2"><span>Compare</span><i class="icon-long-arrow-right"></i></a>
+            </div>
+        </div><!-- End .dropdown-menu -->
+    </div><!-- End .compare-dropdown -->
 
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <ul class="compare-products">
-                                    <li class="compare-product">
-                                        <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a>
-                                        <h4 class="compare-product-title"><a href="product.html">Blue Night Dress</a></h4>
-                                    </li>
-                                    <li class="compare-product">
-                                        <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a>
-                                        <h4 class="compare-product-title"><a href="product.html">White Long Skirt</a></h4>
-                                    </li>
-                                </ul>
+    <div class="wishlist">
+        <a href="wishlist.html" title="Wishlist">
+            <div class="icon">
+                <i class="icon-heart-o"></i>
+                <span class="wishlist-count badge">3</span>
+            </div>
+            <p>Wishlist</p>
+        </a>
+    </div><!-- End .wishlist -->
 
-                                <div class="compare-actions">
-                                    <a href="#" class="action-link">Clear All</a>
-                                    <a href="#" class="btn btn-outline-primary-2"><span>Compare</span><i class="icon-long-arrow-right"></i></a>
-                                </div>
-                            </div><!-- End .dropdown-menu -->
-                        </div><!-- End .compare-dropdown -->
+    <div class="dropdown cart-dropdown">
+        <a href="#" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
+            <div class="icon">
+                <i class="icon-shopping-cart"></i>
+                <span class="cart-count">2</span>
+            </div>
+            <p>Cart</p>
+        </a>
+        <!-- Cart Dropdown Content -->
+        <div class="dropdown-menu dropdown-menu-right">
+            <div class="dropdown-cart-products">
+                <!-- List of cart products goes here -->
+            </div><!-- End .cart-product -->
+            <div class="dropdown-cart-total">
+                <span>Total</span>
+                <span class="cart-total-price">$160.00</span>
+            </div><!-- End .dropdown-cart-total -->
+            <div class="dropdown-cart-action">
+                <a href="cart.html" class="btn btn-primary">View Cart</a>
+                <a href="checkout.html" class="btn btn-outline-primary-2"><span>Checkout</span><i class="icon-long-arrow-right"></i></a>
+            </div><!-- End .dropdown-cart-total -->
+        </div><!-- End .dropdown-menu -->
+    </div><!-- End .cart-dropdown -->
 
-                        <div class="wishlist">
-                            <a href="wishlist.html" title="Wishlist">
-                                <div class="icon">
-                                    <i class="icon-heart-o"></i>
-                                    <span class="wishlist-count badge">3</span>
-                                </div>
-                                <p>Wishlist</p>
-                            </a>
-                        </div><!-- End .compare-dropdown -->
+ <div class="header-login">
+    <% if (user) { %>
+        <a href="/logout" class="btn btn-outline-primary" style="margin-left: 20px">Logout</a>
+    <% } else { %>
+        <a href="/signIn" class="btn btn-outline-primary" style="margin-left: 20px">Login</a>
+    <% } %>
+</div>
 
-                        <div class="dropdown cart-dropdown">
-                            <a href="#" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
-                                <div class="icon">
-                                    <i class="icon-shopping-cart"></i>
-                                    <span class="cart-count">2</span>
-                                </div>
-                                <p>Cart</p>
-                            </a>
+    <!-- Uncomment the following lines if you want to include a logout button -->
+    <!-- <div class="header-logout" style="display: none;">
+        <a href="#" class="btn btn-outline-primary">Logout</a>
+    </div> -->
+</div><!-- End .header-right -->
 
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <div class="dropdown-cart-products">
-                                    <div class="product">
-                                        <div class="product-cart-details">
-                                            <h4 class="product-title">
-                                                <a href="product.html">Beige knitted elastic runner shoes</a>
-                                            </h4>
-
-                                            <span class="cart-product-info">
-                                                <span class="cart-product-qty">1</span>
-                                                x $84.00
-                                            </span>
-                                        </div><!-- End .product-cart-details -->
-
-                                        <figure class="product-image-container">
-                                            <a href="product.html" class="product-image">
-                                                <img src="/userCss/images/products/cart/product-1.jpg" alt="product">
-                                            </a>
-                                        </figure>
-                                        <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a>
-                                    </div><!-- End .product -->
-
-                                    <div class="product">
-                                        <div class="product-cart-details">
-                                            <h4 class="product-title">
-                                                <a href="product.html">Blue utility pinafore denim dress</a>
-                                            </h4>
-
-                                            <span class="cart-product-info">
-                                                <span class="cart-product-qty">1</span>
-                                                x $76.00
-                                            </span>
-                                        </div><!-- End .product-cart-details -->
-
-                                        <figure class="product-image-container">
-                                            <a href="product.html" class="product-image">
-                                                <img src="/userCss/images/products/cart/product-2.jpg" alt="product">
-                                            </a>
-                                        </figure>
-                                        <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a>
-                                    </div><!-- End .product -->
-                                </div><!-- End .cart-product -->
-
-                                <div class="dropdown-cart-total">
-                                    <span>Total</span>
-
-                                    <span class="cart-total-price">$160.00</span>
-                                </div><!-- End .dropdown-cart-total -->
-
-                                <div class="dropdown-cart-action">
-                                    <a href="cart.html" class="btn btn-primary">View Cart</a>
-                                    <a href="checkout.html" class="btn btn-outline-primary-2"><span>Checkout</span><i class="icon-long-arrow-right"></i></a>
-                                </div><!-- End .dropdown-cart-total -->
-                            </div><!-- End .dropdown-menu -->
-                        </div><!-- End .cart-dropdown -->
-                    </div><!-- End .header-right -->
                 </div><!-- End .container -->
             </div><!-- End .header-middle -->
 
@@ -258,82 +195,11 @@
                         <nav class="main-nav">
                             <ul class="menu sf-arrow">
                                 <li class="megamenu-container active">
-                                    <a href="index.html" class="sf-with-ul">Home</a>
+                                    <a href="/" class="sf-with-ul">Home</a>
 
                                     
 
-                                                <!-- <div class="demo-item">
-                                                    <a href="index-2.html">
-                                                        <span class="demo-bg" style="background-image: url(/userCss/images/menu/demos/2.jpg);"></span>
-                                                        <span class="demo-title">02 - furniture store</span>
-                                                    </a>
-                                                </div>End .demo-item
-
-                                                <div class="demo-item">
-                                                    <a href="index-3.html">
-                                                        <span class="demo-bg" style="background-image: url(/userCss/images/menu/demos/3.jpg);"></span>
-                                                        <span class="demo-title">03 - electronic store</span>
-                                                    </a>
-                                                </div>End .demo-item
-
-                                                <div class="demo-item">
-                                                    <a href="index-4.html">
-                                                        <span class="demo-bg" style="background-image: url(/userCss/images/menu/demos/4.jpg);"></span>
-                                                        <span class="demo-title">04 - electronic store</span>
-                                                    </a>
-                                                </div>End .demo-item
-
-                                                <div class="demo-item">
-                                                    <a href="index-5.html">
-                                                        <span class="demo-bg" style="background-image: url(/userCss/images/menu/demos/5.jpg);"></span>
-                                                        <span class="demo-title">05 - fashion store</span>
-                                                    </a>
-                                                </div>End .demo-item
-
-                                                <div class="demo-item">
-                                                    <a href="index-6.html">
-                                                        <span class="demo-bg" style="background-image: url(/userCss/images/menu/demos/6.jpg);"></span>
-                                                        <span class="demo-title">06 - fashion store</span>
-                                                    </a>
-                                                </div>End .demo-item
-
-                                                <div class="demo-item">
-                                                    <a href="index-7.html">
-                                                        <span class="demo-bg" style="background-image: url(/userCss/images/menu/demos/7.jpg);"></span>
-                                                        <span class="demo-title">07 - fashion store</span>
-                                                    </a>
-                                                </div>End .demo-item
-
-                                                <div class="demo-item">
-                                                    <a href="index-8.html">
-                                                        <span class="demo-bg" style="background-image: url(/userCss/images/menu/demos/8.jpg);"></span>
-                                                        <span class="demo-title">08 - fashion store</span>
-                                                    </a>
-                                                </div>End .demo-item
-
-                                                <div class="demo-item">
-                                                    <a href="index-9.html">
-                                                        <span class="demo-bg" style="background-image: url(/userCss/images/menu/demos/9.jpg);"></span>
-                                                        <span class="demo-title">09 - fashion store</span>
-                                                    </a>
-                                                </div>End .demo-item
-
-                                                <div class="demo-item">
-                                                    <a href="index-10.html">
-                                                        <span class="demo-bg" style="background-image: url(/userCss/images/menu/demos/10.jpg);"></span>
-                                                        <span class="demo-title">10 - shoes store</span>
-                                                    </a> -->
-                                                <!-- </div>End .demo-item -->
-<!-- <>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
-                    
-
-                                            <!-- End .demo-list
-
-                                            <div class="megamenu-action text-center">
-                                                <a href="#" class="btn btn-outline-primary-2 view-all-demos"><span>View All Demos</span><i class="icon-long-arrow-right"></i></a>
-                                            </div>End .text-center
-                                        </div>End .menu-col
-                                    </div>End .megamenu -->
+                                               
                                 </li>
                                 <li>
                                     <a href="/shop" class="sf-with-ul">Shop</a>
@@ -525,3 +391,23 @@
                 </div><!-- End .container -->
             </div><!-- End .header-bottom -->
         </header><!-- End .header -->
+<script>
+    // Add this script at the end of your HTML body or in a separate JS file
+    document.addEventListener('DOMContentLoaded', function () {
+        // Check if the user is logged in (you can replace this condition with your actual authentication logic)
+        const isLoggedIn = false; // Set to true if the user is logged in
+
+        // Select the login and logout buttons
+        const loginButton = document.querySelector('.header-login');
+        const logoutButton = document.querySelector('.header-logout');
+
+        // Show/hide the buttons based on the user's login status
+        if (isLoggedIn) {
+            loginButton.style.display = 'none';
+            logoutButton.style.display = 'block';
+        } else {
+            loginButton.style.display = 'block';
+            logoutButton.style.display = 'none';
+        }
+    });
+</script>

@@ -1,5 +1,10 @@
 <%- include('../partials/header'); -%>
-
+<style>
+    .message-container{
+    color: crimson;
+    
+    }
+</style>
 <section class="content-main">
   <div class="row">
     <div class="col-6">
@@ -14,7 +19,7 @@
       </div>
     </div>
   </div>
-  <form action="/admin/categoryEdit/<%=category._id%>" method="post">
+  <form action="/admin/categoryEdit/<%=category._id%>" method="post" id="formblock">
   <div class="row">
     <div class="col-lg-6">
       <div class="card mb-4">
@@ -25,28 +30,31 @@
             </div>
             <div class="col-md-9">
               <!-- Removed the category_id field -->
+              <div class="message-container">
+                                             <p><%= message %></p>
+                                                </div>
               <div class="mb-4">
                 <label class="form-label">Category Name</label>
-                <input type="text" placeholder="Enter category name" class="form-control" name="category_name" value="<%=category.category_name%>">
+                <input type="text" placeholder="Enter category name" class="form-control" id="categoryname" name="category_name" value="<%=category.category_name%>" required>
               </div>
 
                  <div class="mb-4">
                 <label class="form-label">  About Category</label>
-                <input type="text" placeholder="Enter About Category" class="form-control" name="about" value="<%=category.about%>">
+                <input type="text" placeholder="Enter About Category" class="form-control" id="about" name="about" value="<%=category.about%>" required>
               </div>
 
               <div class="mb-4">
                 <label class="form-label">Description</label>
-                <textarea placeholder="Enter description" class="form-control" rows="4" name="description"><%=category.description%></textarea>
+                <textarea placeholder="Enter description" class="form-control" rows="4"  id="description" name="description" required><%=category.description%></textarea>
               </div>
             </div> <!-- col.// -->
           </div> <!-- row.// -->
           <hr class="mb-4 mt-0">
 
-          <!-- Moved the submit button to the end -->
+         
           <div class="row">
             <div class="col-md-12 text-end">
-              <button class="btn btn-md rounded font-sm hover-up">Update Category</button>
+              <button class="btn btn-md rounded font-sm hover-up" onclick="validateForm()">Update Category</button>
             </div>
           </div>
         </div>
@@ -55,5 +63,33 @@
   </div>
   </form>
 </section>
+
+<script>
+  function validateForm(){
+  const categoryName = document.getElementById("categoryname").value
+  const description  = document.getElementById("description").value
+  const aboutCategory = document.getElementById("about").value
+
+  if(!categoryName || !description ||!aboutCategory){
+    alert("Please fill all the required fields")
+    return false
+  }
+  if(/\s/.test(categoryName)){
+    alert("Category name cannot contain spaces")
+    return false
+  }
+
+   if(/\s/.test(description)){
+    alert("Description cannot contain spaces")
+    return false
+  }
+   if(/\s/.test(aboutCategory)){
+    alert("About category cannot contain spaces")
+    return false
+  }
+      document.getElementById("formblock").submit();
+
+  }
+  </script>
 
 <%- include('../partials/footer'); -%>

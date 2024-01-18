@@ -9,6 +9,8 @@ const bcrypt = require("bcrypt");
 const fs = require("fs").promises;
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+const uploads = multer({ storage: storage }).array("images", 5); 
+const User = require("../models/user")
 // exports.adminSave = async(req,res)=>{
 //   const { email, password } = req.body;
 //   const hashPassword=await bcrypt.hash(password,10);
@@ -87,16 +89,48 @@ async function processAndSaveImages(files) {
 }
 exports.admin = (req, res) => {
   
+  const users = await 
+
     res.render("admin/adminDashboard");
    
 };
+
+
+
+exports.usersList =async (req,res)=>{
+
+const users = await User.find()
+  res.render("admin/userList", { users });
+}
+
+exports.userUlist = async (req,res) =>{
+  const userId = req.params.id;
+   try{
+    const user = await User.findById(userId)
+    if(user){
+      user.isBlocked = !user.isBlocked
+      const updatedUser = await user.save()
+      if(updatedUser){
+        res.redirect("/admin/userList")
+      }else{
+        res.status(404).send("User not found");
+      }
+    }
+   }catch(error){
+ console.error(error);
+    res.status(500).send("Internal Server Error");
+   }
+}
+
+
 // <....................................................................................................................>
 exports.signIn = async (req, res) => {
   const { email, password } = req.body;
   try {
     const admin = await Admin.findOne({ email });
     if (admin && (await bcrypt.compare(password, admin.password))) {
-      req.session.isAdminAuth = true;
+      req.session.isAdminAuth =true ;
+      console.log(req.session.isAdminAuth);
       res.render("admin/adminDashboard");
     } else {
       res.redirect("/admin");
@@ -108,7 +142,6 @@ exports.signIn = async (req, res) => {
 };
 // <....................................................................................................................>
 exports.logout = (req, res) => {
-  req.session.isAdminAuth = false;
   req.session.destroy(() => {
     res.redirect("/admin/admin");
   });
@@ -123,41 +156,96 @@ exports.addProduct = async (req, res) => {
   res.render("admin/addProduct", { category });
 };
 // <....................................................................................................................>
+// exports.createProduct = async (req, res) => {
+//   upload.array("images", 5)(req, res, async (err) => {
+//     if (err) {
+//       console.error("Multer error:", err);
+//       return res.status(500).send("Error uploading file.");
+//     }
+//     const originalImages = req.files
+//       ? req.files.map((file) => file.buffer)
+//       : [];
+//     if (originalImages.length === 0) {
+//       return res.status(400).send("At least one image is required.");
+//     }
+//     try {
+//       const processedImages = await processAndSaveImages(req.files);
+//       const { productName, description, brand, price, quantity } = req.body;
+//       const categorys = req.body.mycategory;
+//       const products = new Product({
+//         productName,
+//         description,
+//         brand,
+//         price,
+//         categorys,
+//         quantity,
+//         images: processedImages,
+//       });
+//       await products.save();
+//       const category = await Category.find({ isListed: true });
+//       res.render("admin/addProduct", { category });
+//     } catch (sharpError) {
+//       console.error("Sharp error:", sharpError);
+//       res.status(500).send("Error processing and saving the images.");
+//     }
+//   });
+// };
+// <....................................................................................................................>
+
 exports.createProduct = async (req, res) => {
-  upload.array("images", 5)(req, res, async (err) => {
+  uploads(req, res, async (err) => {
+    var filenames = [];
     if (err) {
       console.error("Multer error:", err);
-      return res.status(500).send("Error uploading file.");
+      return res.status(500).send("Error uploading files.");
     }
-    const originalImages = req.files
-      ? req.files.map((file) => file.buffer)
-      : [];
-    if (originalImages.length === 0) {
-      return res.status(400).send("At least one image is required.");
-    }
+
     try {
-      const processedImages = await processAndSaveImages(req.files);
       const { productName, description, brand, price, quantity } = req.body;
+
+      // Use Sharp to process and save the images
+      const sharpPromises = req.files.map(async (file, index) => {
+        const filename = `image_${index + 1}.${file.originalname}.jpg`;
+        const imagePath = `public/uploads/${filename}`;
+
+        await sharp(file.buffer)
+          .resize(300, 300, {
+            fit: "contain",
+            withoutEnlargement: true,
+            background: "white",
+          })
+          .toFile(imagePath,{ quality: 90 });
+
+        filenames.push(filename);
+      });
+
+      // Wait for all sharpPromises to resolve before creating the Product
+      await Promise.all(sharpPromises);
+
       const categorys = req.body.mycategory;
-      const products = new Product({
+      const product = new Product({
         productName,
         description,
         brand,
         price,
         categorys,
         quantity,
-        images: processedImages,
+        images: filenames.map((filename) => `/uploads/${filename}`),
       });
-      await products.save();
-      const category = await Category.find({ isListed: true });
-      res.render("admin/addProduct", { category });
-    } catch (sharpError) {
-      console.error("Sharp error:", sharpError);
-      res.status(500).send("Error processing and saving the images.");
+
+      await product.save();
+
+     const products = await Product.find();
+
+     res.render("admin/productList", { products });
+    } catch (error) {
+      console.error("Error:", error);
+      res.status(500).send("Internal Server Error");
     }
   });
 };
-// <....................................................................................................................>
+
+
 
 exports.createCategory = async (req, res) => {
   const categories = await Category.find();
@@ -234,11 +322,41 @@ exports.categoryEdit = async (req, res) => {
     });
     const category = await Category.findById(categoryEditId);
     console.log(category);
-    res.render("admin/categoryEdit", { category });
+    res.render("admin/categoryEdit", { category ,message:""});
   } catch (error) {
     console.log(error);
   }
 };
+exports.categoryEditUpdate = async (req,res) =>{
+   try {
+
+     const categoryEditId = req.params.id;
+     const { category_name, about, description } = req.body;
+     console.log(categoryEditId);
+    const categoryExist = await Category.findOne({ category_name });
+    if (categoryExist) {
+      console.log(categoryExist);
+    const category = await Category.findById(categoryEditId);
+      res.render("admin/categoryEdit", {
+        category,
+        message: "Category alraedy exists",
+      });
+      return;
+    }
+
+     await Category.findByIdAndUpdate(categoryEditId, {
+       category_name,
+       about,
+       description,
+     });
+     const category = await Category.findById(categoryEditId);
+     console.log(category);
+     res.redirect("/admin/categoryList");
+   } catch (error) {
+     console.log(error);
+   }
+}
+
 // <.........................................................................................................>
 exports.categoryUlist = async (req, res) => {
   const categoryId = req.params.id;
@@ -310,7 +428,7 @@ if(req.files){
           // Logging to check the structure of the retrieved product document
           console.log(products);
 
-          res.render("admin/productListEdit", { products, category });
+          res.render("admin/productList", { products, category });
         } catch (sharpError) {
           console.error("Sharp error:", sharpError);
           res.status(500).send("Error processing and saving the images.");
