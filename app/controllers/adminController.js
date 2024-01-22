@@ -89,16 +89,16 @@ async function processAndSaveImages(files) {
 }
 exports.admin = (req, res) => {
   
-  const users = await 
+
 
     res.render("admin/adminDashboard");
    
 };
-
+ 
 
 
 exports.usersList =async (req,res)=>{
-
+ 
 const users = await User.find()
   res.render("admin/userList", { users });
 }
@@ -111,7 +111,7 @@ exports.userUlist = async (req,res) =>{
       user.isBlocked = !user.isBlocked
       const updatedUser = await user.save()
       if(updatedUser){
-        res.redirect("/admin/userList")
+        res.redirect("/admin/usersList")
       }else{
         res.status(404).send("User not found");
       }
@@ -145,7 +145,7 @@ exports.logout = (req, res) => {
   req.session.destroy(() => {
     res.redirect("/admin/admin");
   });
-};
+}; 
 // <....................................................................................................................>
 exports.adminDashboard = (req, res) => {
   res.render("admin/adminDashboard");
@@ -205,7 +205,7 @@ exports.createProduct = async (req, res) => {
 
       // Use Sharp to process and save the images
       const sharpPromises = req.files.map(async (file, index) => {
-        const filename = `image_${index + 1}.${file.originalname}.jpg`;
+        const filename = `image_${index + 1}.${file.originalname},${Date.now()}.jpg`;
         const imagePath = `public/uploads/${filename}`;
 
         await sharp(file.buffer)
@@ -396,70 +396,85 @@ exports.productCategory = async (req, res) => {
 // <.........................................................................................................>
 exports.productListEdit = async (req, res) => {
   
-  try {
-     const productEditId = req.params.id;
-    console.log("product list>", productEditId);
-    const { productName, description, brand, price, categorys, quantity } =
-      req.body;
-if(req.files){
-      upload.array("images", 5)(req, res, async (err) => {
-        if (err) {
-          console.log("Multer error", err);
-          return res.status(500).send("Error uploading file");
-        }
- 
-        try {
-          // Remove the redundant re-definition of productEditId
-          const processedImages = await processAndSaveImages(req.files);
-          const products = await Product.findByIdAndUpdate(productEditId, {
-            productName,
-            description,
-            brand,
-            price,
-            categorys,
-            quantity,
-            images: processedImages,
-          });
+try{
+   const productEditId = req.params.id;
+ const category = await Category.find();
+   // Logging to check the structure of the retrieved product document
 
-          // Remove the redundant save operation, as `findByIdAndUpdate` already saves the changes
-          // await products.save();
+   const products = await Product.findById({ _id: productEditId });
+   console.log(products);
+   res.render("admin/productListEdit", { products, category });
+}catch(error){
+  console.log(error);
+}
+};
 
-          const category = await Category.find();
-          // Logging to check the structure of the retrieved product document
-          console.log(products);
+exports.productListEditUpdate = async (req, res) => {
+  uploads(req, res, async (err) => {
+    var filenames = [];
+    if (err) {
+      console.error("Multer error:", err);
+      return res.status(500).send("Error uploading files.");
+    }
 
-          res.render("admin/productList", { products, category });
-        } catch (sharpError) {
-          console.error("Sharp error:", sharpError);
-          res.status(500).send("Error processing and saving the images.");
-        }
+    try {
+      const { productName, description, brand, price, quantity } =
+        req.body;
+        console.log(req.body);
+    const productId = req.params.id
+        const existingProduct = await Product.findById(productId);
+        console.log("Existing Product:", existingProduct);
+
+
+      // Use Sharp to process and save the images
+      const sharpPromises = req.files.map(async (file, index) => {
+        const filename = `image_${index + 1}.${file.originalname}.jpg`;
+        const imagePath = `public/uploads/${filename}`;
+
+        await sharp(file.buffer)
+          .resize(300, 300, {
+            fit: "contain",
+            withoutEnlargement: true,
+            background: "white",
+          })
+          .toFile(imagePath, { quality: 90 });
+
+        filenames.push(filename);
       });
 
-}else{
-    const category = await Category.find();
-    // Logging to check the structure of the retrieved product document
-    
-    const products = await Product.findById({_id:productEditId})
-console.log(products);
-    res.render("admin/productListEdit", { products, category });
-}
+      // Wait for all sharpPromises to resolve before updating the Product
+      await Promise.all(sharpPromises);
 
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).send("Internal Server Error");
-  }
+      const categorys = req.body.mycategory;
+
+      // Find the product by ID and update it
+      await Product.findByIdAndUpdate(productId, {
+        productName,
+        description,
+        brand,
+        price,
+        categorys,
+        quantity,
+        $push: {
+          images: {
+            $each: filenames.map((filename) => `/uploads/${filename}`),
+          },
+        },
+      });
+
+      const products = await Product.find();
+
+      res.render("admin/productList", { products });
+    } catch (error) {
+      console.error("Error:", error);
+      res.status(500).send("Internal Server Error");
+    }
+  });
 };
 
 
-// exports.productEditDeleteImage = async (req,res)=>{
 
-// const {productImageId} = req.params
-//     const  imageUrl = req.query.imageUrl;
-//   const productImageDelete = await Product.findByIdAndDelete(
-//     productImageId,
-//     {$pull:{images:imageUrl}},
-//     {new:true}
-//   );
+
 exports.productEditDeleteImage = async (req, res) => {
   const { productId, imageIndex } = req.params;
 
@@ -543,6 +558,18 @@ exports.productListDelete = async (req, res) => {
     res.redirect("/admin/productList");
   }
 };
+
+// exports.productEditAddImage = async (req,res) =>{
+//   try{
+// const {productId ,imageIndex} = req.params
+// const product = await Product.findById({_id:productId})
+// if(!product){
+//         return res.status(404).json({ message: "Product not found" });
+// }
+//   }catch(error){
+
+//   }
+// }
 // <....................................................................................................................>
 exports.productListUlist = async (req, res) => {
   try {

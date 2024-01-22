@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="/userCss/css/plugins/owl-carousel/owl.carousel.css">
     <link rel="stylesheet" href="/userCss/css/plugins/magnific-popup/magnific-popup.css">
     <link rel="stylesheet" href="/userCss/css/plugins/jquery.countdown.css">
+
     <!-- Include Magnify.js CSS -->
 <link rel="stylesheet" href="/userCss/css/magnify.css">
 
@@ -39,6 +40,10 @@
     <link rel="stylesheet" href="/userCss/css/style.css">
     <link rel="stylesheet" href="/userCss/css/skins/skin-demo-4.css">
     <link rel="stylesheet" href="/userCss/css/demos/demo-4.css">
+<!-- Include SweetAlert2 CSS and JS separately -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.0/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.0/dist/sweetalert2.all.min.js"></script>
+
     <!-- <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   Add this to your HTML
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
@@ -140,7 +145,7 @@
                 <span class="cart-total-price">$160.00</span>
             </div><!-- End .dropdown-cart-total -->
             <div class="dropdown-cart-action">
-                <a href="cart.html" class="btn btn-primary">View Cart</a>
+                <a href="/cart" class="btn btn-primary">View Cart</a>
                 <a href="checkout.html" class="btn btn-outline-primary-2"><span>Checkout</span><i class="icon-long-arrow-right"></i></a>
             </div><!-- End .dropdown-cart-total -->
         </div><!-- End .dropdown-menu -->
@@ -149,6 +154,7 @@
  <div class="header-login">
     <% if (user) { %>
         <a href="/logout" class="btn btn-outline-primary" style="margin-left: 20px">Logout</a>
+        
     <% } else { %>
         <a href="/signIn" class="btn btn-outline-primary" style="margin-left: 20px">Login</a>
     <% } %>

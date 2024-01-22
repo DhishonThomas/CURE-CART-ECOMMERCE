@@ -2,7 +2,8 @@
   const bcrypt = require("bcrypt");
   const Userotp = require("../models/userOtp");
   const Product = require("../models/product");
-  const mongoose = require("mongoose")
+  const mongoose = require("mongoose");
+const cartController = require("./cartController");
 
   const userControllers = {
     home: async (req, res) => {
@@ -10,9 +11,10 @@
         const user = await User.find();
         const products = await Product.find();
         if (req.session.isUserAuth) {
-          res.render("user/home", { products, user: true });
+          console.log("home reached");
+          res.render("user/home", { products, user: req.session.isUserAuth });
         } else {
-          res.render("user/home", { products, user: false });
+          res.render("user/home", { products, user: null });
         }
         //  res.render("user/home", { products, user});
       } catch (error) {
@@ -24,7 +26,7 @@
 
     signUp: async (req, res) => {
       try {
-        res.render("user/signUp");
+        res.render("user/signUp", { message: "" });
       } catch (error) {
         console.log(error);
       }
@@ -33,7 +35,11 @@
 
     signIn: (req, res) => {
       try {
-        res.render("user/signIn");
+        if (req.session.isUserAuth) {
+          res.redirect("/");
+        } else {
+          res.render("user/signIn");
+        }
       } catch (error) {
         console.log(error);
       }
@@ -44,19 +50,36 @@
         const { email, password } = req.body;
         const user = await User.findOne({ email });
 
-        if (user && (await bcrypt.compare(password, user.password))) {
-          req.session.isUserAuth = true;
-          console.log(req.session.isUserAuth);
-          res.locals.user= user
-          res.redirect("/");
+        if (user) {
+          // Check if the user is blocked
+          if (!user.isBlocked) {
+            console.log(user.isBlocked);
+            // If blocked, send a message to the user
+            return res
+              .status(401)
+              .send("Your account is blocked. Contact support for assistance.");
+          }
+
+          if (await bcrypt.compare(password, user.password)) {
+            req.session.isUserAuth = user._id;
+            console.log("password is correct", req.session.isUserAuth);
+            // res.locals.user = user;
+
+            res.redirect("/");
+          } else {
+            // Incorrect password
+            res.redirect("/signIn");
+          }
         } else {
+          // No user found
           res.redirect("/signIn");
         }
       } catch (error) {
-        console.log("error in user login", error);
+        console.error("Error in user login", error);
         res.redirect("/signIn");
       }
     },
+
     // <..........................................................................................................>
 
     signUpSignIn: async (req, res, next) => {
@@ -68,7 +91,9 @@
         console.log("useremail", userOtp);
 
         if (!userOtp) {
-          return res.json({ success: false, message: "Invalid Email" });
+          return res.render("user/signUp", {
+            message: "Submit the verified email",
+          });
         }
 
         if (parseInt(otp, 10) === userOtp.otp && userOtp.isVerified == true) {
@@ -92,7 +117,9 @@
             });
           }
         } else {
-          return res.json({ success: false, message: "Invalid OTP" });
+          return res.render("user/signUp", {
+            message: "Submit the verified opt",
+          });
         }
       } catch (error) {
         console.error(error.message);
@@ -138,11 +165,75 @@
     },
     logout: (req, res) => {
       // req.session.isAuthenticated = false;
-      res.locals.user = '';
+      res.locals.user = "";
 
-      req.session.destroy()
-        res.redirect("/");
-      
+      req.session.destroy();
+      res.redirect("/");
     },
+    addToCart: async (req, res) => {
+      const { quantity } = req.body;
+      const productId = req.params.id;
+      const userId = res.locals.user;
+      console.log("1 quantity", req.body);
+      console.log("2 productid", req.params.id);
+      console.log("3 userId", userId);
+
+      try {
+        console.log("worked");
+        const result = await cartController.addToCart(
+          userId,
+          productId,
+          quantity
+        );
+        if (result) {
+          res.status(200).json({ message: "Item added to cart successfully" });
+        } else {
+          res.status(500).json({ error: "Error adding item to cart" });
+        }
+      } catch (error) {
+        res.status(500).json({ error: "Internal Server Error" });
+      }
+    },
+
+      getCart: async (req, res) => {
+        // const userId = req.query.userId;
+        const userId = res.locals.user
+        console.log(userId);
+        try {
+          const result = await cartController.getCart({ userId });
+          // res.json(result);
+
+          if(result){
+            res.render("user/cart")
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      },
+    updateQuantity: async (req,res)=>{
+      const {userId,productId,quantity} = req.body
+      try {
+        const result = await cartController.updateQuantity({
+          userId,
+          productId,
+          quantity,
+        });
+      } catch (error) {
+        console.log(error)
+
+      }
+
+    },
+    removeFromCart: async(req,res)=>{
+      const {userId,productId} = req.body
+
+      try{
+        const result = await cartController.removeFromCart({userId,productId})
+        res.json(result)
+      }catch(error){
+        console.log(error);
+      }
+    }
+
   };
   module.exports = userControllers;

@@ -67,7 +67,7 @@
  <div class="col-md-15 mr-auto ">
   <form
     id="myForm"
-    action="/admin/productListEdit"
+    action="/admin/productListEdit/<%=products._id%>"
     method="post"
     enctype="multipart/form-data"
   >
@@ -271,7 +271,7 @@
                                 <!-- Moved the submit button to the end -->
                                 <div class="row">
                                     <div class="col-md-12 text-end">
-                                        <button class="btn btn-md rounded font-sm hover-up" onclick="submitForm()">
+                                        <button class="btn btn-md rounded font-sm hover-up" onclick="return validateForm()">
                                             Submit
                                         </button>
                                           <!-- <input type="hidden" id="croppedImageData" name="croppedImageData" /> -->
@@ -387,6 +387,8 @@ fetch(`/admin/productListEdit/${productId}/images/${imageIndex}`, {
 </script>
 
 
+
+
 <script>
   function handleImage() {
     var input = document.getElementById('images');
@@ -445,5 +447,44 @@ fetch(`/admin/productListEdit/${productId}/images/${imageIndex}`, {
 
 
 </section>
+
+
+<script>
+  function validateForm(){
+  const productName = document.getElementById("productName").value
+  const description  = document.getElementById("description").value
+  const brand = document.getElementById("brand").value
+  const price = document.getElementById("price").value
+  const quantity = document.getElementById("quantity").value
+   const images = document.getElementById("images").value
+
+
+  
+  if(!/^(?!\s+$)[A-Za-z\d. ']+$/.test(productName)){
+    alert("Product name cannot contain spaces")
+    return false
+  }
+
+   if(!/^(?!\s+$)[A-Za-z\d. ']+$/.test(description)){
+    alert("Description cannot contain spaces")
+    return false
+  }
+   if(!/^(?!\s+$)[A-Za-z\d. ']+$/.test(brand)){
+    alert("Brand cannot contain spaces")
+    return false
+  }
+     if(/\s/.test(price)){
+    alert("Price cannot contain spaces")
+    return false
+  }
+     if(/\s/.test(quantity)){
+    alert("Quantity cannot contain spaces")
+    return false
+  }
+ 
+      document.getElementById("formblock").submit();
+
+  }
+  </script>
 
 <%- include('../partials/footer'); -%>

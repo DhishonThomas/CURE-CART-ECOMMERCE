@@ -55,7 +55,7 @@ router.get("/productCategory/:id",adminAuthMiddileware, adminController.productC
 
 router.get("/productListEdit/:id",adminAuthMiddileware, adminController.productListEdit);
 
-router.post("/productListEdit",adminController.productListEdit)
+router.post("/productListEdit/:id",adminController.productListEditUpdate)
 
 router.delete(
   "/productListEdit/:productId/images/:imageIndex",

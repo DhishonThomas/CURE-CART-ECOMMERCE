@@ -99,7 +99,7 @@
             </a>
           </td>
           <td>
-            <a href="/admin/productListDelete/<%= product._id%>" class="btn btn-sm font-sm btn-light rounded">
+            <a href="#" class="btn btn-sm font-sm btn-light rounded"  onclick="confirmDelete('<%= product._id%>')">
               <i class="material-icons md-delete_forever"></i> Delete
             </a>
           </td>
@@ -163,6 +163,26 @@
                 </div> -->
             </section>
             <!-- content-main end// -->
+
+             <script>
+  // Your JavaScript code using Swal
+  function confirmDelete(productId) {
+    Swal.fire({
+      title: '<span style="color: red;">Are you sure?</span>',
+      html: '<span style="color: white;">You won\'t be able to revert this!</span>',
+      icon: 'warning',
+      background: 'RGB(46, 46, 46)',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = `/admin/productListDelete/${productId}`;
+      }
+    });
+  }
+</script>
         
 
             <%- include('../partials/footer'); -%>

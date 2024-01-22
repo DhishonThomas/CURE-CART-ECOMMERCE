@@ -2,6 +2,8 @@
 <style>
     #product-zoom-container {
     cursor: default;
+
+
 }
 </style>
  <main class="main">
@@ -111,25 +113,25 @@
                                     </div><!-- End .rating-container -->
 
                                     <div class="product-price">
-                                        $84.00
+                                       &#8377;<%= product.price %>
                                     </div><!-- End .product-price -->
 
                                     <div class="product-content">
-                                        <p>Sed egestas, ante et vulputate volutpat, eros pede semper est, vitae luctus metus libero eu augue. Morbi purus libero, faucibus adipiscing. Sed lectus. </p>
+                                        <p><%= product.description %></p>
                                     </div><!-- End .product-content -->
 
-                                    <div class="details-filter-row details-row-size">
-                                        <label>Color:</label>
+                                    <!-- <div class="details-filter-row details-row-size">
+                                        <label>Color:</label> -->
 
-                                        <div class="product-nav product-nav-thumbs">
+                                        <!-- <div class="product-nav product-nav-thumbs">
                                             <a href="#" class="active">
                                                 <img src="/userCss/images/products/single/1-thumb.jpg" alt="product desc">
                                             </a>
                                             <a href="#">
                                                 <img src="/userCss/images/products/single/2-thumb.jpg" alt="product desc">
                                             </a>
-                                        </div><!-- End .product-nav -->
-                                    </div><!-- End .details-filter-row -->
+                                        </div>End .product-nav
+                                    </div>End .details-filter-row -->
 
                                     <div class="details-filter-row details-row-size">
                                         <label for="size">Size:</label>
@@ -149,19 +151,20 @@
                                     <div class="details-filter-row details-row-size">
                                         <label for="qty">Qty:</label>
                                         <div class="product-details-quantity">
-                                            <input type="number" id="qty" class="form-control" value="1" min="1" max="10" step="1" data-decimals="0" required>
+                                            <input type="number" id="qty" class="form-control" value="1" min="1" max="<%= product.quantity %>" step="1" data-decimals="0" required>
                                         </div><!-- End .product-details-quantity -->
                                     </div><!-- End .details-filter-row -->
 
                                     <div class="product-details-action">
-                                        <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
+                                        <!-- Inside your HTML template -->
+                                      <a href="#" class="btn-cart" data-product-id="<%= product._id %>"><span>Add to Cart</span></a>
 
                                         <div class="details-action-wrapper">
                                             <a href="#" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a>
                                             <a href="#" class="btn-product btn-compare" title="Compare"><span>Add to Compare</span></a>
                                         </div><!-- End .details-action-wrapper -->
                                     </div><!-- End .product-details-action -->
-
+`
                                     <div class="product-details-footer">
                                         <div class="product-cat">
                                             <span>Category:</span>
@@ -572,6 +575,56 @@
         });
     });
  </script> 
+
+ <script>
+
+document.addEventListener("DOMContentLoaded", function (){
+    const addToCartButtons = document.querySelectorAll(".btn-cart")
+
+
+    addToCartButtons.forEach(button => {
+
+        button.addEventListener('click', function (event){
+            event.preventDefault()
+
+
+            const productId = button.getAttribute('data-product-id')
+            const quantity = 1;
+
+            fetch(`/add-to-cart/${productId}`,{
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json',
+                },
+                body:JSON.stringify({quantity}),
+            })
+            .then(response =>response.json())
+            .then(data =>{
+                 if (data && data.message) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Item added to cart!',
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      } else {
+        // Handle other cases as needed
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to add item to cart!',
+        });
+      }
+            })
+            .catch(error =>{
+                console.log("Error",error)
+            })
+        })
+        
+    });
+})
+
+ </script>
 
 
 

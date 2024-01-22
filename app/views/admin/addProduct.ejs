@@ -5,30 +5,42 @@
 
 <section class="content-main">
 
-<style>
-  .image-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: flex-start; /* Align items at the start of the container */
-  }
+  <style>
+        .image-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start; /* Align items at the start of the container */
+        }
 
-  .image-box {
-    flex: 0 0 calc(33.33% - 8px); /* Adjust the width as needed, considering margin */
-    margin: 4px; /* Add margin between image boxes */
-    overflow: hidden;
-  }
+        .image-box {
+            flex: 0 0 calc(33.33% - 8px); /* Adjust the width as needed, considering margin */
+            margin: 4px; /* Add margin between image boxes */
+            overflow: hidden;
+            position: relative;
+        }
 
-  .image-box img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-</style>
+        .image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .delete-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
  <div class="col-md-15 mr-auto ">
   <form
     id="myForm"
-    action="/admin/createProduct"
+    action=""
     method="post"
     enctype="multipart/form-data"
   >
@@ -58,6 +70,7 @@
                     class="form-control"
                     id="productName"
                     name="productName"
+                    required
                   />
                 </div>
                 <div class="mb-4">
@@ -68,6 +81,7 @@
                     rows="4"
                     id="description"
                     name="description"
+                    required
                   ></textarea>
                 </div>
                 <div class="mb-4">
@@ -78,6 +92,7 @@
                     class="form-control"
                     id="brand"
                     name="brand"
+                    required
                   />
                 </div>
               </div>
@@ -98,6 +113,7 @@
                     class="form-control"
                     id="price"
                     name="price"
+                    required
                   />
                 </div> 
               </div>
@@ -123,6 +139,7 @@
                       type="radio"
                       id="category"
                       value="<%=category.category_name%>"
+                      required
                      
                     />
                     <span class="form-check-label">
@@ -150,6 +167,7 @@
                     class="form-control"
                     id="quantity"
                     name="quantity"
+                    required
                   />
                 </div>
               </div>
@@ -174,6 +192,7 @@
                                         type="file"
                                          accept="image/*"
                                         onchange="handleImage()"
+                                        required
                                     />
                                 </div>
 
@@ -202,7 +221,7 @@
                                 <!-- Moved the submit button to the end -->
                                 <div class="row">
                                     <div class="col-md-12 text-end">
-                                        <button class="btn btn-md rounded font-sm hover-up" onclick="submitForm()">
+                                        <button class="btn btn-md rounded font-sm hover-up" onclick="return sendForm()">
                                             Submit
                                         </button>
                                           <!-- <input type="hidden" id="croppedImageData" name="croppedImageData" /> -->
@@ -224,27 +243,135 @@
 </section>
 
 <script>
-  function handleImage() {
+function handleImage() {
     var input = document.getElementById('images');
     var realTimePreviewContainer = document.getElementById('imagePreviewContainer');
-    realTimePreviewContainer.innerHTML = ''; // Clear existing previews
+    var selectedImages = []; // To keep track of selected images
 
     for (var i = 0; i < input.files.length; i++) {
-      var reader = new FileReader();
-      reader.onload = function (e) {
-        var div = document.createElement('div');
-        div.className = 'image-box';
-        var img = document.createElement('img');
-        img.src = e.target.result;
-        img.className = 'img-fluid';
-        div.appendChild(img);
-        realTimePreviewContainer.appendChild(div);
-      };
-      reader.readAsDataURL(input.files[i]);
+        var reader = new FileReader();
+
+        reader.onload = (function (index) {
+            return function (e) {
+                var div = document.createElement('div');
+                div.className = 'image-box';
+
+                var img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'img-fluid';
+                div.appendChild(img);
+                 selectedImages.push(img.src); // Add the selected image to the array
+
+                var deleteButton = document.createElement('button');
+                deleteButton.className = 'delete-button';
+                deleteButton.innerHTML = 'Delete';
+                deleteButton.onclick = function () {
+                    var deletedSrc = img.src;
+                    var index = selectedImages.indexOf(deletedSrc);
+                    console.log("deleted image",selectedImages);
+                    if (index !== -1) {
+                        selectedImages.splice(index, 1); // Remove the selected image from the array
+                    }
+                    div.remove(); // Remove the image box when the delete button is clicked
+                };
+
+                div.appendChild(deleteButton);
+
+               
+                console.log("selected ima", selectedImages);
+                realTimePreviewContainer.appendChild(div);
+            };
+        })(i);
+
+        reader.readAsDataURL(input.files[i]);
     }
-  }
+
+    return selectedImages;
+}
 
 </script>
+
+<script>
+    function sendForm() {
+        const selectedImages = handleImage();
+        if (validateForm(selectedImages)) {
+            const productName = document.getElementById("productName").value;
+            const description = document.getElementById("description").value;
+            const brand = document.getElementById("brand").value;
+            const price = document.getElementById("price").value;
+            const quantity = document.getElementById("quantity").value;
+
+            fetch("/admin/createProduct", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    images: selectedImages,
+                    productName: productName,
+                    description: description,
+                    brand: brand,
+                    price: price,
+                    quantity: quantity
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Server response:', data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    }
+</script>
+
+<script>
+    function validateForm(selectedImages) {
+        const productName = document.getElementById("productName").value;
+        const description = document.getElementById("description").value;
+        const brand = document.getElementById("brand").value;
+        const price = document.getElementById("price").value;
+        const quantity = document.getElementById("quantity").value;
+
+        if (!productName || !description || !brand || !price || !quantity || selectedImages.length === 0) {
+            alert("Please fill all the required fields and select at least one image");
+            return false;
+        }
+
+        if (!/^(?!\s+$)[A-Za-z\d. ']+$/.test(productName)) {
+            alert("Product name cannot contain spaces");
+            return false;
+        }
+
+        if (!/^(?!\s+$)[A-Za-z\d. ']+$/.test(description)) {
+            alert("Description cannot contain spaces");
+            return false;
+        }
+
+        if (!/^(?!\s+$)[A-Za-z\d. ']+$/.test(brand)) {
+            alert("Brand cannot contain spaces");
+            return false;
+        }
+
+        if (!/^(?!\s+$)[A-Za-z\d. ']+$/.test(price)) {
+            alert("Price cannot contain spaces");
+            return false;
+        }
+
+        if (/\s/.test(quantity)) {
+            alert("Quantity cannot contain spaces");
+            return false;
+        }
+
+        // You can add more validation if needed
+
+        return true;
+    }
+</script>
+
+
+
 
 <!-- <script>
   let cropper; // Define cropper as a global variable

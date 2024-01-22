@@ -24,7 +24,7 @@
 							        <a class="nav-link active" id="register-tab-2" data-toggle="tab" href="#register-2" role="tab" aria-controls="register-2" aria-selected="true">Register</a>
 							    </li>
 							</ul>
-					
+					<span style="color: red;"> <%= message %> </span>
 							    <div class="tab-pane fade show active" id="register-2" role="tabpanel" aria-labelledby="register-tab-2">
 						<form action="/signUp" method="post"  id="formblock">
 
@@ -38,12 +38,12 @@
 							    		<div class="form-group">
 							    			<label for="register-email-2">Your email address *</label>
 							    			<input type="email" class="form-control" id="email" name="email" required>
-                                         <span id="usernameError" style="color: red;"></span><br>
+                                         <span id="usernameError" style="color: red;"></span>
 
 							    		</div><!-- End .form-group -->
 
 
-                                            <div class="form-group">
+ <div class="form-group">
 							    			<label for="register-password-2">Phonenumber *</label>
                         <input type="tel" class="form-control" id="phonenumber" name="phonenumber"  placeholder="Format: 123-456-7890" required>
 							    		</div><!-- End .form-group -->
@@ -56,7 +56,7 @@
 <span id="current-time"></span>
 
 
-                                        <div class="form-group">
+  <div class="form-group">
   <button type="button" class="btn btn-outline-primary-2" id="sendOtpButton" disabled>
     <span>Send OTP</span>
     <i class="icon-long-arrow-right"></i>
@@ -64,20 +64,21 @@
 </div>
  <span id="otpSended" style="color: rgb(3, 225, 85);"></span><br>
 
-					<div class="form-group">
-  <button type="button" class="btn btn-outline-primary-2" id="resendOtpButton" disabled>
+					<div class="form-group" style="display: none;"  id="resendDispaly">
+  <button type="button" class="btn btn-outline-primary-2" id="resendOtpButton"  disabled>
     <span id="timer">Resend OTP</span>
   </button>
 </div>
-		    		
+		    		 <span id="otpInvalid" style="color: rgb(129, 5, 5);"></span><br>
 
-                   <div class="form-group">
+
+                   <div class="form-group hide" style="display: none;" id="otpDisplay">
   <label for="otp">OTP *</label>
   <input type="text" class="form-control" id="otp" name="otp" disabled required>
 </div><!-- End .form-group -->
 
 
-<div class="form-group">
+<div class="form-group hide" style="display: none;" id="verifyDisplay">
   <button type="button" class="btn btn-outline-primary-2"  id="verifyOtpButton" disabled>
     <span>Verify OTP</span>
     <i class="icon-long-arrow-right"></i>
@@ -86,7 +87,7 @@
 
 
 
-                                          <div class="form-footer">
+                                          <div class="form-footer hide" style="display: none;" id="signupDispaly"> 
 							    			<button type="submit" class="btn btn-outline-primary-2" onclick="return validateForm()" id="signUpButton" disabled>
 			                					<span>SIGN UP</span>
 			            						<i class="icon-long-arrow-right"></i>
@@ -104,6 +105,60 @@
             	</div><!-- End .container -->
             </div><!-- End .login-page section-bg -->
         </main><!-- End .main -->
+
+
+
+
+
+
+
+
+<script>
+
+
+//   document.getElementById('signUpButton').addEventListener('click', function (event) {
+//           event.preventDefault();
+  
+//           if (validateForm()) {
+//               validateOTP();
+//           }
+//       });
+  
+//       function validateOTP() {
+//           var email = document.getElementById('email').value;
+//           var otpInput = document.getElementById('otp').value;
+  
+//           // Make an HTTP request to the server to validate the OTP
+//           fetch('/verify', {
+//               method: 'POST',
+//               headers: {
+//                   'Content-Type': 'application/json',
+//               },
+//               body: JSON.stringify({ otp: otpInput, email: email }),
+//           })
+//               .then(response => response.json())
+//               .then(data => {
+//                   if (!data.success) {
+//                      alert('Invalid Email. Please try again.');
+                      
+//                   } if(!data.otp) {
+//                      alert('Invalid OTP. Please try again.');
+//                   }else{
+//  document.getElementById('formblock').submit();
+//                   }
+//               })
+//               .catch(error => {
+//                   console.error('Error validating OTP:', error);
+//               });
+//       }
+   
+
+   
+
+
+</script>
+
+
 
 
 
@@ -140,52 +195,14 @@ function validateForm() {
         }
 
 
-
-// fetch('/signUp', {
-//     method: 'POST',
-//     headers: {
-//         'Content-Type': 'application/json'
-//     },
-//     body: JSON.stringify({
-//         email: email,
-//         otp: otp,
-//         phonenumber: phonenumber,
-//         username: username,
-//         password: password 
-//     })
-// })
-
-  // .then(response => response.json())
-  // .then(data => {
-  //   if (data.exists) {
-  //     usernameError.innerText = 'Username already taken';
-  //   } else {
-  //     otpSended.innerText = `OTP sent to ${email}`;
-  //      sendOtpButton.setAttribute("disabled", true);
-  //     enableOtpSection();
-  //     startTimer();
-  //   }
-  // })
-  // .catch(error => {
-  //   console.error("Error checking email:", error);
-     // Enable email and OTP fields before submitting the form
-    document.getElementById("email").removeAttribute("disabled");
-    document.getElementById("otp").removeAttribute("disabled");
-
-    // Submit the form
-    document.getElementById("formblock").submit();
-  // });
-   
-
-    return true;
-}
-
+   return true
 
 function isValidPhoneNumber(phonenumber) {
     
     var phoneNumberRegex = /^\d{10}$/;
     return phoneNumberRegex.test(phonenumber);
 }
+
 
 
 
@@ -220,7 +237,7 @@ function isValidPhoneNumber(phonenumber) {
     }
 
     // setInterval(updateTime, 1000); // Update the time every second
-
+  }
 
 
 
@@ -245,6 +262,10 @@ function isValidPhoneNumber(phonenumber) {
     const resendOtpButton = document.getElementById("resendOtpButton");
     const timerDisplay = document.getElementById("timer");
     const signUpButton = document.getElementById("signUpButton")
+    const resendDispaly = document.getElementById("resendDispaly")
+    const verifyDisplay = document.getElementById("verifyDisplay")
+    const otpDisplay = document.getElementById("otpDisplay")
+    const signupDispaly = document.getElementById("signupDispaly")
 
 
     let timer;
@@ -267,8 +288,12 @@ function isValidPhoneNumber(phonenumber) {
   .then(data => {
     if (data.exists) {
       usernameError.innerText = 'Email already exsist';
+      sendOtpButton.removeAttribute("disabled");
+        
     } else {
       otpSended.innerText = `OTP sent to ${email}`;
+      
+      otpDisplay.style.display="block"
        sendOtpButton.setAttribute("disabled", true);
       enableOtpSection();
       startTimer();
@@ -298,15 +323,17 @@ function isValidPhoneNumber(phonenumber) {
              verifyOtpButton.setAttribute("disabled", true);
          signUpButton.removeAttribute("disabled");
         otpSended.innerText ="";
+        otpInvalid.innerText = ""
         resendOtpButton.textContent = "Verified Successfully";
+        signupDispaly.style.display="block"
         resendOtpButton.setAttribute=("disabled",true)
       
        
        
         
-            alert("OTP Verified Successfully");
+          
           } else {
-            alert("Invalid OTP. Please try again.");
+           otpInvalid.innerText = "Invalid OTP. Please try again."
           }
         })
         .catch((error) => {
@@ -316,7 +343,7 @@ function isValidPhoneNumber(phonenumber) {
 
     resendOtpButton.addEventListener("click", function () {
 
-    
+     resendOtpButton.setAttribute("disabled", true);
       const email = emailInput.value;
       fetch(`/resendOtp`, {
   method: 'POST',
@@ -348,6 +375,7 @@ function isValidPhoneNumber(phonenumber) {
       otpInput.removeAttribute("disabled");
       verifyOtpButton.removeAttribute("disabled");
       sendOtpButton.setAttribute("disabled", true);
+
     }
 
     function startTimer() {
@@ -356,7 +384,9 @@ function isValidPhoneNumber(phonenumber) {
 
         if (timeLeft > 0) {
           timerDisplay.textContent = `Time Left: ${timeLeft}s`;
+          resendDispaly.style.display="block"
           resendOtpButton.setAttribute("disabled", true);
+          verifyDisplay.style.display="block"
         } else {
           clearInterval(timer);
           timerDisplay.textContent = "Resend OTP";
