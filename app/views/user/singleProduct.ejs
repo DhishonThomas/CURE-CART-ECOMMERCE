@@ -605,7 +605,7 @@ document.addEventListener("DOMContentLoaded", function (){
           icon: 'success',
           title: 'Item added to cart!',
           showConfirmButton: false,
-          timer: 1500,
+          timer: 2500,
         });
       } else {
         // Handle other cases as needed
@@ -613,6 +613,13 @@ document.addEventListener("DOMContentLoaded", function (){
           icon: 'error',
           title: 'Error',
           text: 'Failed to add item to cart!',
+        });
+      }
+      if(data.success==false){
+         Swal.fire({
+          icon: 'info',
+          title: 'Login Required',
+          text: 'Please Login To Add Items To Cart',
         });
       }
             })

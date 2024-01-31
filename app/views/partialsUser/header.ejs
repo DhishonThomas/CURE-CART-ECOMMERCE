@@ -43,6 +43,7 @@
 <!-- Include SweetAlert2 CSS and JS separately -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.0/dist/sweetalert2.min.css">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.0/dist/sweetalert2.all.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" />
 
     <!-- <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   Add this to your HTML
@@ -99,22 +100,14 @@
 
                    <div class="header-right">
     <div class="dropdown compare-dropdown">
-        <a href="#" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static" title="Compare Products" aria-label="Compare Products">
+        <a href="/profile" class="dropdown-toggle" role="button"  aria-haspopup="true" aria-expanded="false" data-display="static" title="Compare Products" aria-label="Compare Products">
             <div class="icon">
-                <i class="icon-random"></i>
+            <i class="fas fa-user"></i> <!-- Font Awesome user icon -->
             </div>
-            <p>Compare</p>
+            <p>Profile</p>
         </a>
         <!-- Compare Dropdown Content -->
-        <div class="dropdown-menu dropdown-menu-right">
-            <ul class="compare-products">
-                <!-- List of compared products goes here -->
-            </ul>
-            <div class="compare-actions">
-                <a href="#" class="action-link">Clear All</a>
-                <a href="#" class="btn btn-outline-primary-2"><span>Compare</span><i class="icon-long-arrow-right"></i></a>
-            </div>
-        </div><!-- End .dropdown-menu -->
+        
     </div><!-- End .compare-dropdown -->
 
     <div class="wishlist">
@@ -128,27 +121,14 @@
     </div><!-- End .wishlist -->
 
     <div class="dropdown cart-dropdown">
-        <a href="#" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
+        <a href="/cart" class="dropdown-toggle" role="button"  aria-haspopup="true" aria-expanded="false" data-display="static">
             <div class="icon">
                 <i class="icon-shopping-cart"></i>
                 <span class="cart-count">2</span>
             </div>
             <p>Cart</p>
         </a>
-        <!-- Cart Dropdown Content -->
-        <div class="dropdown-menu dropdown-menu-right">
-            <div class="dropdown-cart-products">
-                <!-- List of cart products goes here -->
-            </div><!-- End .cart-product -->
-            <div class="dropdown-cart-total">
-                <span>Total</span>
-                <span class="cart-total-price">$160.00</span>
-            </div><!-- End .dropdown-cart-total -->
-            <div class="dropdown-cart-action">
-                <a href="/cart" class="btn btn-primary">View Cart</a>
-                <a href="checkout.html" class="btn btn-outline-primary-2"><span>Checkout</span><i class="icon-long-arrow-right"></i></a>
-            </div><!-- End .dropdown-cart-total -->
-        </div><!-- End .dropdown-menu -->
+       
     </div><!-- End .cart-dropdown -->
 
  <div class="header-login">
@@ -183,14 +163,7 @@
                                         <li class="item-lead"><a href="#">Daily offers</a></li>
                                         <li class="item-lead"><a href="#">Gift Ideas</a></li>
                                         <li><a href="#">Beds</a></li>
-                                        <li><a href="#">Lighting</a></li>
-                                        <li><a href="#">Sofas & Sleeper sofas</a></li>
-                                        <li><a href="#">Storage</a></li>
-                                        <li><a href="#">Armchairs & Chaises</a></li>
-                                        <li><a href="#">Decoration </a></li>
-                                        <li><a href="#">Kitchen Cabinets</a></li>
-                                        <li><a href="#">Coffee & Tables</a></li>
-                                        <li><a href="#">Outdoor Furniture </a></li>
+                                 
                                     </ul><!-- End .menu-vertical -->
                                 </nav><!-- End .side-nav -->
                             </div><!-- End .dropdown-menu -->
@@ -210,13 +183,13 @@
                                 <li>
                                     <a href="/shop" class="sf-with-ul">Shop</a>
 
-                                    <div class="megamenu megamenu-md">
+                                    <!-- <div class="megamenu megamenu-md">
                                         <div class="row no-gutters">
                                             <div class="col-md-8">
                                                 <div class="menu-col">
                                                     <div class="row">
                                                         <div class="col-md-6">
-                                                            <div class="menu-title">Shop with sidebar</div><!-- End .menu-title -->
+                                                            <div class="menu-title">Shop with sidebar</div>End .menu-title
                                                             <ul>
                                                                 <li><a href="category-list.html">Shop List</a></li>
                                                                 <li><a href="category-2cols.html">Shop Grid 2 Columns</a></li>
@@ -225,20 +198,20 @@
                                                                 <li><a href="category-market.html"><span>Shop Market<span class="tip tip-new">New</span></span></a></li>
                                                             </ul>
 
-                                                            <div class="menu-title">Shop no sidebar</div><!-- End .menu-title -->
+                                                            <div class="menu-title">Shop no sidebar</div>End .menu-title
                                                             <ul>
                                                                 <li><a href="category-boxed.html"><span>Shop Boxed No Sidebar<span class="tip tip-hot">Hot</span></span></a></li>
                                                                 <li><a href="category-fullwidth.html">Shop Fullwidth No Sidebar</a></li>
                                                             </ul>
-                                                        </div><!-- End .col-md-6 -->
+                                                        </div>End .col-md-6
 
                                                         <div class="col-md-6">
-                                                            <div class="menu-title">Product Category</div><!-- End .menu-title -->
+                                                            <div class="menu-title">Product Category</div>End .menu-title
                                                             <ul>
                                                                 <li><a href="product-category-boxed.html">Product Category Boxed</a></li>
                                                                 <li><a href="product-category-fullwidth.html"><span>Product Category Fullwidth<span class="tip tip-new">New</span></span></a></li>
                                                             </ul>
-                                                            <div class="menu-title">Shop Pages</div><!-- End .menu-title -->
+                                                            <div class="menu-title">Shop Pages</div>End .menu-title
                                                             <ul>
                                                                 <li><a href="cart.html">Cart</a></li>
                                                                 <li><a href="checkout.html">Checkout</a></li>
@@ -246,10 +219,10 @@
                                                                 <li><a href="dashboard.html">My Account</a></li>
                                                                 <li><a href="#">Lookbook</a></li>
                                                             </ul>
-                                                        </div><!-- End .col-md-6 -->
-                                                    </div><!-- End .row -->
-                                                </div><!-- End .menu-col -->
-                                            </div><!-- End .col-md-8 -->
+                                                        </div>End .col-md-6
+                                                    </div>End .row
+                                                </div>End .menu-col
+                                            </div>End .col-md-8
 
                                             <div class="col-md-4">
                                                 <div class="banner banner-overlay">
@@ -257,13 +230,13 @@
                                                         <img src="/userCss/images/menu/banner-1.jpg" alt="Banner">
 
                                                         <div class="banner-content banner-content-top">
-                                                            <div class="banner-title text-white">Last <br>Chance<br><span><strong>Sale</strong></span></div><!-- End .banner-title -->
-                                                        </div><!-- End .banner-content -->
+                                                            <div class="banner-title text-white">Last <br>Chance<br><span><strong>Sale</strong></span></div>End .banner-title
+                                                        </div>End .banner-content
                                                     </a>
-                                                </div><!-- End .banner banner-overlay -->
-                                            </div><!-- End .col-md-4 -->
-                                        </div><!-- End .row -->
-                                    </div><!-- End .megamenu megamenu-md -->
+                                                </div>End .banner banner-overlay
+                                            </div>End .col-md-4
+                                        </div>End .row
+                                    </div>End .megamenu megamenu-md -->
                                 </li>
                                 <li>
                                     <a href="product.html" class="sf-with-ul">Product</a>

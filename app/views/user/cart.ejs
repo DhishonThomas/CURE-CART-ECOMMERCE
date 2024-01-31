@@ -1,10 +1,18 @@
 <%- include('../partialsUser/header'); -%>
 
+<style>
 
+</style>
 <main class="main">
+	<%
+  function escapeSingleQuotes(str) {
+    return str.replace(/'/g, '&apos;');
+  }
+%>
+
         	<div class="page-header text-center" style="background-image: url('userCss/images/page-header-bg.jpg')">
         		<div class="container">
-        			<h1 class="page-title">Cure Cart<span>Shop</span></h1>
+        			<h1 class="page-title">Cure Cart<span>Cart</span></h1>
         		</div><!-- End .container -->
         	</div><!-- End .page-header -->
             <nav aria-label="breadcrumb" class="breadcrumb-nav">
@@ -23,65 +31,58 @@
 	                	<div class="row">
 	                		<div class="col-lg-9">
 	                			<table class="table table-cart table-mobile">
-									<thead>
-										<tr>
-											<th>Product</th>
-											<th>Price</th>
-											<th>Quantity</th>
-											<th>Total</th>
-											<th></th>
-										</tr>
-									</thead>
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Total</th>
+            <th></th>
+        </tr>
+    </thead>
 
-									<tbody>
-										<tr>
-											<td class="product-col">
-												<div class="product">
-													<figure class="product-media">
-														<a href="#">
-															<img src="<%= product.images[0] %>" alt="Product image">
-														</a>
-													</figure>
+    <tbody>
+        <% cartItems.forEach(cartItem => { %>
+            <tr>
+                <td class="product-col">
+                    <div class="product">
+                        <figure class="product-media">
+                            <a href="#">
+                                <img src="<%= cartItem.productId.images[0] %>" alt="Product image">
+                            </a>
+                        </figure>
 
-													<h3 class="product-title">
-														<a href="#"><%= product.productName %></a>
-													</h3><!-- End .product-title -->
-												</div><!-- End .product -->
-											</td>
-											<td class="price-col"><%= product.price %></td>
-											<td class="quantity-col">
-                                                <div class="cart-product-quantity">
-                                                    <input type="number" class="form-control" value="1" min="1" max="<%= product.quantity %>" step="1" data-decimals="0" required>
-                                                </div><!-- End .cart-product-quantity -->
-                                            </td>
-											<td class="total-col">$84.00</td>
-											<td class="remove-col"><button class="btn-remove"><i class="icon-close"></i></button></td>
-										</tr>
-										<!-- <tr>
-											<td class="product-col">
-												<div class="product">
-													<figure class="product-media">
-														<a href="#">
-															<img src="userCss/images/products/table/product-2.jpg" alt="Product image">
-														</a>
-													</figure>
-
-													<h3 class="product-title">
-														<a href="#">Blue utility pinafore denim dress</a>
-													</h3>End .product-title
-												</div>End .product
-											</td>
-											<td class="price-col">$76.00</td>
-											<td class="quantity-col">
-                                                <div class="cart-product-quantity">
-                                                    <input type="number" class="form-control" value="1" min="1" max="10" step="1" data-decimals="0" required>
-                                                </div>End .cart-product-quantity -->                                 
-                                            <!-- </td>
-											<td class="total-col">$76.00</td>
-											<td class="remove-col"><button class="btn-remove"><i class="icon-close"></i></button></td> -->
-										<!-- </tr> --> 
-									</tbody>
-								</table><!-- End .table table-wishlist -->
+                        <h3 class="product-title">
+                            <a href="#"><%= cartItem.productId.productName %></a>
+                        </h3><!-- End .product-title -->
+                    </div><!-- End .product -->
+                </td>
+                <td class="price-col"><%= cartItem.productId.price %></td>
+                <td class="quantity-col">
+                    <div class="cart-product-quantity">
+<input
+  type="number"
+  class="form-control"
+  value="<%= cartItem.quantity %>"
+  min="1"
+  max="<%= cartItem.productId.quantity %>"
+  step="1"
+  data-decimals="0"
+   id="quantityInput_<%= cartItem._id %>"
+  required
+onchange="handleQuantityChange('<%= locals.user %>', '<%= cartItem._id %>')"
+>                    </div><!-- End .cart-product-quantity -->
+                </td>
+<td class="total-col" id="total_<%= cartItem._id %>">₹<%= (cartItem.productId.price * cartItem.quantity) %></td>
+				
+                <td class="remove-col">
+<button class="btn-remove" onclick="confirmDelete('<%=cartItem._id%>', '<%= escapeSingleQuotes(cartItem.productId.productName) %>')"><i class="icon-close"></i></button>
+                </td>
+            </tr>
+     <% }) %>
+    </tbody>
+</table><!-- End .table table-wishlist -->
+  
 
 	                			<div class="cart-bottom">
 			            			<div class="cart-discount">
@@ -98,73 +99,193 @@
 			            			<a href="#" class="btn btn-outline-dark-2"><span>UPDATE CART</span><i class="icon-refresh"></i></a>
 		            			</div><!-- End .cart-bottom -->
 	                		</div><!-- End .col-lg-9 -->
-	                		<aside class="col-lg-3">
-	                			<div class="summary summary-cart">
-	                				<h3 class="summary-title">Cart Total</h3><!-- End .summary-title -->
+						
 
-	                				<table class="table table-summary">
-	                					<tbody>
-	                						<tr class="summary-subtotal">
-	                							<td>Subtotal:</td>
-	                							<td>$160.00</td>
-	                						</tr><!-- End .summary-subtotal -->
-	                						<tr class="summary-shipping">
-	                							<td>Shipping:</td>
-	                							<td>&nbsp;</td>
-	                						</tr>
+<% if (cartItems.length > 0) { %>
+    <aside class="col-lg-3">
+        <div class="summary summary-cart">
+            <h3 class="summary-title">Cart Total</h3><!-- End .summary-title -->
 
-	                						<tr class="summary-shipping-row">
-	                							<td>
-													<div class="custom-control custom-radio">
-														<input type="radio" id="free-shipping" name="shipping" class="custom-control-input">
-														<label class="custom-control-label" for="free-shipping">Free Shipping</label>
-													</div><!-- End .custom-control -->
-	                							</td>
-	                							<td>$0.00</td>
-	                						</tr><!-- End .summary-shipping-row -->
+            <table class="table table-summary">
+                <tbody>
+                    <tr class="summary-subtotal">
+                        <td>Subtotal:</td>
+                        <td></td>
+                        <td id="totals<%= cartItems._id %>">&#8377;<%= cartTotal.totalAmount %></td>
+                    </tr><!-- End .summary-subtotal -->
+                    <tr class="summary-shipping">
+                        <td>Shipping:</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr class="summary-shipping-row">
+                        <td>
+                            <div class="custom-control custom-radio">
+                                <input type="radio" id="free-shipping" name="shipping" class="custom-control-input">
+                                <label class="custom-control-label" for="free-shipping">Free Shipping</label>
+                            </div><!-- End .custom-control -->
+                        </td>
+                        <td>$0.00</td>
+                    </tr><!-- End .summary-shipping-row -->
 
-	                						<tr class="summary-shipping-row">
-	                							<td>
-	                								<div class="custom-control custom-radio">
-														<input type="radio" id="standart-shipping" name="shipping" class="custom-control-input">
-														<label class="custom-control-label" for="standart-shipping">Standart:</label>
-													</div><!-- End .custom-control -->
-	                							</td>
-	                							<td>$10.00</td>
-	                						</tr><!-- End .summary-shipping-row -->
+                    <!-- Add the new line here -->
+                    <tr class="summary-new-line dark">
+                        <td colspan="2"></td>
+                    </tr>
 
-	                						<tr class="summary-shipping-row">
-	                							<td>
-	                								<div class="custom-control custom-radio">
-														<input type="radio" id="express-shipping" name="shipping" class="custom-control-input">
-														<label class="custom-control-label" for="express-shipping">Express:</label>
-													</div><!-- End .custom-control -->
-	                							</td>
-	                							<td>$20.00</td>
-	                						</tr><!-- End .summary-shipping-row -->
+                    <tr class="summary-total">
+                        <td>Total:</td>
+                        <td id="totals2<%= cartItems._id %>">&#8377;<%= cartTotal.totalAmount %></td>
+                    </tr><!-- End .summary-total -->
+                </tbody>
+            </table><!-- End .table table-summary -->
 
-	                						<tr class="summary-shipping-estimate">
-	                							<td>Estimate for Your Country<br> <a href="dashboard.html">Change address</a></td>
-	                							<td>&nbsp;</td>
-	                						</tr><!-- End .summary-shipping-estimate -->
+            <a href="/checkOut" class="btn btn-outline-primary-2 btn-order btn-block">PROCEED TO CHECKOUT</a>
+        </div><!-- End .summary -->
 
-	                						<tr class="summary-total">
-	                							<td>Total:</td>
-	                							<td>$160.00</td>
-	                						</tr><!-- End .summary-total -->
-	                					</tbody>
-	                				</table><!-- End .table table-summary -->
+        <a href="category.html" class="btn btn-outline-dark-2 btn-block mb-3"><span>CONTINUE SHOPPING</span><i class="icon-refresh"></i></a>
+    </aside><!-- End .col-lg-3 -->
 
-	                				<a href="checkout.html" class="btn btn-outline-primary-2 btn-order btn-block">PROCEED TO CHECKOUT</a>
-	                			</div><!-- End .summary -->
+<% } else { %>
+    <div class="alert alert-warning" role="alert">
+        Your cart is empty. Please add items to proceed to checkout.
+    </div>
+<% } %>
 
-		            			<a href="category.html" class="btn btn-outline-dark-2 btn-block mb-3"><span>CONTINUE SHOPPING</span><i class="icon-refresh"></i></a>
-	                		</aside><!-- End .col-lg-3 -->
 	                	</div><!-- End .row -->
 	                </div><!-- End .container -->
                 </div><!-- End .cart -->
             </div><!-- End .page-content -->
         </main><!-- End .main -->
+
+	<script>
+  function confirmDelete(cartItemId,productName) {
+    Swal.fire({
+      title: '<span style="color: red;">Are you sure?</span>',
+      html: '<span>You won\'t be able to revert this!</span>',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Make a DELETE request using fetch
+        fetch(`/remove-from-cart/${cartItemId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Handle success
+          console.log(productName);
+		       Swal.fire({
+          icon: 'success',
+  title: `<span style="color: black;">${productName}</span><span style="color: red;">, Removed</span>`,
+          showConfirmButton: false,
+          timer: 2500,
+        }).then((data)=>{
+
+       window.location.href = "/cart";
+		})
+         
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+      }
+    });
+  }
+</script>
+
+
+<script>
+
+async function updateQuantity(userId,itemId,newQuantity){
+	try{
+		const response = await fetch(`/update-quantity`,{
+			method:'PATCH',
+			headers:{
+				'Content-Type':'application/json'
+			},
+			body:JSON.stringify({userId,itemId,quantity:newQuantity})
+		});
+		const data = await response.json()
+if (data.success) {
+
+    data.itemTotals.forEach(itemTotal => {
+      const totalElement = document.getElementById(`total_${itemTotal.itemId}`);
+	  
+      if (totalElement) {
+        totalElement.innerText = `₹${itemTotal.itemTotal}`;
+		
+      }
+	 
+
+
+    });
+		const totalElements = document.getElementById(`totals`);
+		const totalElements2 = document.getElementById('totals2')
+	if(totalElements){
+	 totalElements.innerText=`₹${data.total}`
+	 totalElements2.innerText=`₹${data.total}`
+
+	}
+
+  } else {
+    console.error(data.message);
+  }
+	}catch(error){
+		console.log(error);
+	}
+}
+
+
+function handleQuantityChange(userId,itemId){
+	const inputElement = document.getElementById(`quantityInput_${itemId}`);
+	const newQuantity = parseInt(inputElement.value,10);
+	updateQuantity(userId,itemId,newQuantity)
+}
+
+
+// async function updateQuantity(itemId, newQuantity) {
+//   try {
+//     const response = await fetch(`/update-quantity/${itemId}`, {
+//       method: 'PATCH',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify({ quantity: newQuantity }),
+//     });
+
+//     const data = await response.json();
+
+//     if (data.success) {
+//       const totalElement = document.getElementById(`total_${itemId}`);
+//       totalElement.innerText = `$${data.total}`;
+
+//     } else {
+//       console.error(data.message);
+//     }
+//   } catch (error) {
+//     console.error(error);
+//   }
+// }
+
+// function handleQuantityChange(itemId) {
+//   const inputElement = document.getElementById(`quantityInput_${itemId}`);
+//   const newQuantity = parseInt(inputElement.value, 10);
+//   updateQuantity(itemId, newQuantity);
+// }
+
+</script>
+
 
 
         <%- include('../partialsUser/footer'); -%>

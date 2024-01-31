@@ -8,7 +8,6 @@ const path = require("path");
 const bcrypt = require("bcrypt");
 const fs = require("fs").promises;
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
 const uploads = multer({ storage: storage }).array("images", 5); 
 const User = require("../models/user")
 // exports.adminSave = async(req,res)=>{

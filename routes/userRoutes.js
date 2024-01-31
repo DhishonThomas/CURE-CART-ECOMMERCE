@@ -12,7 +12,7 @@ router.use("/signUp", checkUserBlocked);
 router.use("/shop", checkUserBlocked);
 router.use("/logout", checkUserBlocked);
 router.use("/product/:id",checkUserBlocked);
-
+ 
 
 
 router.get("/", userControllers.home);
@@ -43,6 +43,18 @@ router.get("/cart",userControllers.getCart)
 
 router.patch("/update-quantity", userControllers.updateQuantity);
 
-router.delete("/remove-from-cart", userControllers.removeFromCart);
+router.delete("/remove-from-cart/:cartItemId", userControllers.removeFromCart);
+
+router.get("/checkOut",userControllers.checkOut)
+
+router.get("/profile",userControllers.profile)
+
+router.post("/address",userControllers.address)
+
+router.get("/addressDelete/:id", userControllers.addressDelete);
+
+router.post("/addressEdit/:id",userControllers.addressEdit)
+
+
 
 module.exports = router

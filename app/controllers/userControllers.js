@@ -3,16 +3,28 @@
   const Userotp = require("../models/userOtp");
   const Product = require("../models/product");
   const mongoose = require("mongoose");
+  const UserCart = require("../models/cartItem");
+  const userAddress = require("../models/userAddress")
+
 const cartController = require("./cartController");
 
   const userControllers = {
     home: async (req, res) => {
       try {
-        const user = await User.find();
+        const userId = new mongoose.Types.ObjectId(res.locals.user);
+        const user = await User.findOne(userId);
         const products = await Product.find();
+        const cartItems = await UserCart.findOne(userId);
+        console.log(cartItems);
+        // console.log(cartItems.totalAmount);
         if (req.session.isUserAuth) {
           console.log("home reached");
-          res.render("user/home", { products, user: req.session.isUserAuth });
+          res.render("user/home", {
+            products,
+            user: req.session.isUserAuth,
+            cartItems,
+            user,
+          });
         } else {
           res.render("user/home", { products, user: null });
         }
@@ -172,6 +184,8 @@ const cartController = require("./cartController");
     },
     addToCart: async (req, res) => {
       const { quantity } = req.body;
+
+      console.log("Quantity==>", quantity);
       const productId = req.params.id;
       const userId = res.locals.user;
       console.log("1 quantity", req.body);
@@ -179,61 +193,236 @@ const cartController = require("./cartController");
       console.log("3 userId", userId);
 
       try {
-        console.log("worked");
-        const result = await cartController.addToCart(
-          userId,
-          productId,
-          quantity
-        );
-        if (result) {
-          res.status(200).json({ message: "Item added to cart successfully" });
+        if (req.session.isUserAuth) {
+          console.log("worked");
+          const result = await cartController.addToCart(
+            userId,
+            productId,
+            quantity
+          );
+          if (result) {
+            res
+              .status(200)
+              .json({ message: "Item added to cart successfully" });
+          } else {
+            res.status(500).json({ error: "Error adding item to cart" });
+          }
         } else {
-          res.status(500).json({ error: "Error adding item to cart" });
+          res.json({ success: false });
         }
       } catch (error) {
         res.status(500).json({ error: "Internal Server Error" });
       }
     },
 
-      getCart: async (req, res) => {
-        // const userId = req.query.userId;
-        const userId = res.locals.user
-        console.log(userId);
-        try {
-          const result = await cartController.getCart({ userId });
-          // res.json(result);
+    getCart: async (req, res) => {
+      // const userId = req.query.userId;
+      console.log("getCART wORKED");
+      const userId = res.locals.user;
+      console.log("userId", userId);
 
-          if(result){
-            res.render("user/cart")
-          }
-        } catch (error) {
-          console.log(error);
-        }
-      },
-    updateQuantity: async (req,res)=>{
-      const {userId,productId,quantity} = req.body
       try {
-        const result = await cartController.updateQuantity({
-          userId,
-          productId,
-          quantity,
-        });
+        const result = await cartController.getCart(userId);
+
+        console.log(result);
+
+        if (result && result.cartItems) {
+          const cartItems = result.cartItems;
+          const cartTotal = result.userCart;
+          console.log("cartTotal:", cartTotal);
+
+          const product = await Product.find();
+
+          res.render("user/cart", {
+            cartItems,
+            product,
+            productTitle: cartItems.productId,
+            cartTotal,
+          });
+        }
       } catch (error) {
-        console.log(error)
-
-      }
-
-    },
-    removeFromCart: async(req,res)=>{
-      const {userId,productId} = req.body
-
-      try{
-        const result = await cartController.removeFromCart({userId,productId})
-        res.json(result)
-      }catch(error){
         console.log(error);
       }
-    }
+    },
 
+    updateQuantity: async (req, res) => {
+      const { quantity, itemId, userId } = req.body;
+
+      const userCart = await UserCart.findById(userId).populate(
+        "cartItems.productId"
+      );
+      console.log("userCart", userCart);
+
+      try {
+        const result = await cartController.updateQuantity(
+          userId,
+          itemId,
+          quantity
+        );
+        console.log("Result After the updation", result);
+
+        console.log("itemTotals", result.itemTotals);
+        if (result.success) {
+          res.json({
+            success: true,
+            total: result.total,
+            itemTotals: result.itemTotals,
+          });
+        } else {
+          res.json({ success: false, total: result.total });
+        }
+      } catch (error) {
+        console.log(error);
+        res
+          .status(500)
+          .json({ success: false, message: "internal server error" });
+      }
+    },
+
+    removeFromCart: async (req, res) => {
+      console.log("Route is hit!");
+
+      const { cartItemId } = req.params;
+
+      console.log("cartItemId", cartItemId);
+
+      try {
+        const cartItemObjectId = new mongoose.Types.ObjectId(cartItemId);
+
+        console.log("removeFromCart function called");
+        const user = new mongoose.Types.ObjectId(res.locals.user);
+        console.log("User res", user);
+        const result = await cartController.removeFromCart(
+          user,
+          cartItemObjectId
+        );
+
+        if (result) {
+          return res.json({ success: true });
+        } else {
+          return res.json({
+            success: false,
+            message: "Error removing item from cart",
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        return res
+          .status(500)
+          .json({ success: false, message: "Internal Server Error" });
+      }
+    },
+
+    checkOut: async (req, res) => {
+      res.render("user/userAddress");
+    },
+
+    profile: async (req, res) => {
+      const userId = new mongoose.Types.ObjectId(res.locals.user);
+      const user = await User.findOne({ _id: userId });
+      const userAddresses = await userAddress.findOne({ userId: userId });
+
+      res.render("user/userProfile", {
+        user: user,
+        addresses: userAddresses.addresses,
+      });
+    },
+
+    address: async (req, res) => {
+      let { name, mobile, address, pinCode, street, city, state } = req.body;
+      console.log(req.body);
+      try {
+        name = name.trim();
+        mobile = mobile.trim();
+        //checking empty fields
+        if (!name || !mobile || !address || !pinCode || !city || !state) {
+          return res.redirect("/profile?err=emptyfields");
+        }
+        //validating phone number
+        //   if (!validatePhoneNumber(mobile)) {
+        //     return res.redirect('/profile?err=invalidphone')
+        // }
+        const newAddress = {
+          name,
+          mobile,
+          address,
+          pinCode,
+          street,
+          city,
+          state,
+        };
+
+        const userId = new mongoose.Types.ObjectId(res.locals.user);
+        const userData = await userAddress.findOne({ userId });
+        console.log("userData++>", userData);
+
+        if (!userData) {
+          const newUserAddress = new userAddress({
+            userId: userId,
+            addresses: [newAddress],
+          });
+          await newUserAddress.save();
+          res.redirect("/");
+        }
+
+        if (userData) {
+          userData.addresses.push(newAddress);
+        }
+
+        await userData.save();
+        res.redirect("/profile");
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    addressDelete: async (req, res) => {
+      try {
+        const userId = res.locals.user; // Assuming this gives the user ID
+        const deletedData = await userAddress.findOneAndUpdate(
+          { userId: userId },
+          { $pull: { addresses: { _id: req.params.id } } },
+          { new: true } // To return the updated document
+        );
+        console.log("dataDeleted===>>>", deletedData);
+        res.redirect("/");
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+
+    addressEdit: async (req,res)=>{
+      let addressId = req.params.id
+      try{
+        console.log(addressId)
+        const {name,mobile,address,pinCode,street,city,state} = req.body
+        console.log(req.body);
+        const userId = res.locals.user
+        const userAddresses = await userAddress.findOne({ userId: userId });
+        console.log(userAddresses);
+        if(!userAddresses){
+         return  res.status(401).json({message:"No User Address Found"})
+          } 
+console.log("worked");
+          const addressIndex = userAddresses.addresses.findIndex(address=>address._id.toString()==addressId)
+console.log(addressIndex);
+          if(addressIndex==-1){
+           return res.status(401).json({ message: "No User Address Found" });
+
+}
+          userAddresses.addresses[addressIndex].name= name
+          userAddresses.addresses[addressIndex].mobile = mobile
+          userAddresses.addresses[addressIndex].address = address
+          userAddresses.addresses[addressIndex].pinCode = pinCode
+          userAddresses.addresses[addressIndex].street = street
+          userAddresses.addresses[addressIndex].city = city
+          userAddresses.addresses[addressIndex].state = state
+          await userAddresses.save()
+          res.redirect("/profile")
+        }catch(error){
+        console.log("Errror Updating",error);
+      }
+    }
   };
   module.exports = userControllers;
