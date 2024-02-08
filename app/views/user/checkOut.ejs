@@ -1,0 +1,468 @@
+<%- include('../partialsUser/header') -%>
+<style>
+    @media (max-width: 991px) {
+        .order-lg-first {
+            order: -1;
+        }
+    }
+    .address-box {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-bottom: 10px;
+        cursor: pointer;
+    }
+    .address-box:hover {
+        background-color: #f0f0f0;
+    }
+  .tick-mark {
+    margin-right: 5px; /* Adjust margin to create space between tick mark and address details */
+    margin-top: -10px; /* Move tick mark above the address box */
+    color: green;
+    float: right; /* Align tick mark to the right */
+}
+
+
+      .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0; /* Set top to 0 to align with the top of the page */
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    overflow: auto;
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 0 auto; /* Center horizontally */
+    margin-top: 50px; /* Adjust this value to create space from the top */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    max-width: 600px;
+    width: 80%;
+}
+
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Form styles */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-row {
+            margin-top: 15px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+</style>
+<main class="main">
+    <div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
+        <div class="container">
+            <h1 class="page-title">Checkout<span>Shop</span></h1>
+        </div><!-- End .container -->
+    </div><!-- End .page-header -->
+
+    <nav aria-label="breadcrumb" class="breadcrumb-nav">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                <li class="breadcrumb-item"><a href="#">Shop</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+            </ol>
+        </div><!-- End .container -->
+    </nav><!-- End .breadcrumb-nav -->
+    
+        <div class="text-center mt-3">
+            <!-- <a href="/"> -->
+            <!-- <button type="button" id="openModalBtn" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#createAddressModal">
+                Add New Address
+            </button> -->
+             <!-- </a> -->
+             <button id="openModalBtn3" class="btn btn-primary">Add Address</button>
+
+        </div>
+
+        <!-- The modal -->
+<div id="addressModal2" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Add Address</h2>
+        <form id="addAdress">
+            <!-- Address fields -->
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="mobile">Mobile</label>
+                <input type="text" id="mobile" name="mobile" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="address">Address</label>
+                <input type="text" id="address" name="address" class="form-control" required>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="pinCode">Postal Code</label>
+                    <input type="text" id="pinCode" name="pinCode" class="form-control" required>
+                </div>
+                 <div class="form-group col-md-6">
+                    <label for="city">Street</label>
+                    <input type="text" id="street" name="street" class="form-control" required>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="city">City</label>
+                    <input type="text" id="city" name="city" class="form-control" required>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="state">State</label>
+                    <input type="text" id="state" name="state" class="form-control" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Address</button>
+        </form>
+    </div>
+</div>
+   
+
+<div class="page-content">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 order-lg-last">
+                <form id="checkout-form">
+                    <div class="summary">
+                        <h3 class="summary-title">Your Order</h3><!-- End .summary-title -->
+                        <table class="table table-summary">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% cartItems.forEach(cartItem => { %>
+                                <tr>
+                                    <td><a><%= cartItem.productId.productName %></a></td>
+                                    <%= console.log(cartItem.productId); %>
+                                    <td>₹<%= (cartItem.productId.price * cartItem.quantity) %></td>
+                                </tr>
+                                <% }) %>
+                                <tr class="summary-subtotal">
+                                    <td>Subtotal:</td>
+                                    <td>&#8377;<%= cartTotal.totalAmount %></td>
+                                </tr><!-- End .summary-subtotal -->
+                                <tr>
+                                    <td>Shipping:</td>
+                                    <td>Free shipping</td>
+                                </tr>
+                                <tr class="summary-total">
+                                    <td>Total:</td>
+                                    <td>&#8377;<%= cartTotal.totalAmount %></td>
+                                </tr><!-- End .summary-total -->
+                            </tbody>
+                        </table><!-- End .table table-summary -->
+                        <!-- Payment options -->
+                        <div class="accordion-summary" id="accordion-payment">
+                            <div class="card">
+                                <div class="card-header" id="heading-3">
+                                    <h2 class="card-title">
+                                        <input type="radio" id="cash-on-delivery" name="payment-option" value="cash">
+                                        <label for="cash-on-delivery">Cash on delivery</label>
+                                    </h2>
+                                </div><!-- End .card-header -->
+                            </div><!-- End .card -->
+                            <div class="card">
+                                <div class="card-header" id="heading-4">
+                                    <h2 class="card-title">
+                                        <input type="radio" id="paypal" name="payment-option" value="paypal">
+                                        <label for="paypal">PayPal</label>
+                                    </h2>
+                                </div><!-- End .card-header -->
+                            </div><!-- End .card -->
+                        </div><!-- End #accordion-payment -->
+                        <!-- Place Order button -->
+                        <button type="submit" class="btn btn-outline-primary-2 btn-order btn-block">
+                            <span class="btn-text">Place Order</span>
+                            <span class="btn-hover-text">Proceed to Checkout</span>
+                        </button>
+                    </div><!-- End .summary -->
+                </form>
+            </div><!-- End .col-lg-3 -->
+            <div class="col-lg-9">
+                <div id="address-container">
+                    <h2>Select Address</h2>
+                    <div class="row">
+                        <% userAddress.forEach(address => { %>
+                        <div class="col-md-6 mb-3">
+                            <div class="address-box" data-address-id="<%= address._id %>">
+                                <div class="address-details">
+                                    <p><strong>Name:</strong> <%= address.name %></p>
+                                    <p><strong>Mobile:</strong> <%= address.mobile %></p>
+                                    <p><strong>Address:</strong> <%= address.address %></p>
+                                    <p><strong>Street:</strong> <%= address.street %></p>
+                                    <p><strong>City:</strong> <%= address.city %></p>
+                                    <p><strong>State:</strong> <%= address.state %></p>
+                                </div>
+                            </div>
+                        </div>
+                        <% }) %>
+                    </div>
+                    <input type="hidden" id="selected-address-id" name="selected-address-id" value="">
+                </div><!-- End #address-container -->
+            </div><!-- End .col-lg-9 -->
+        </div><!-- End .row -->
+    </div><!-- End .container -->
+</div><!-- End .page-content -->
+
+
+</main><!-- End .main -->
+
+ <script>
+
+            // Get the modal
+const modal = document.getElementById('addressModal2');
+
+// Get the button that opens the modal
+const btn = document.getElementById('openModalBtn3');
+
+// Get the <span> element that closes the modal
+const span = document.getElementsByClassName('close')[0];
+
+// When the user clicks the button, open the modal
+btn.onclick = function() {
+  modal.style.display = 'block';
+}
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+  modal.style.display = 'none';
+}
+
+// window.onclick = function(event) {
+//   if (event.target == modal) {
+//     modal.style.display = 'none';
+//   }
+// }
+
+        </script>
+
+<script>
+    toastr.options = {
+        closeButton: true,
+        progressBar: true,
+        positionClass: 'toast-top-right',
+        timeOut: 3000
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const addAddressForm = document.getElementById("addAdress");
+
+        addAddressForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            // Retrieve form input values
+            const name = document.getElementById("name").value.trim();
+            const mobile = document.getElementById("mobile").value.trim();
+            const address = document.getElementById("address").value.trim();
+            const pinCode = document.getElementById("pinCode").value.trim();
+            const city = document.getElementById("city").value.trim();
+            const state = document.getElementById("state").value.trim();
+            const street = document.getElementById("street").value.trim();
+
+            // Regular expressions for validating mobile and pinCode
+            const mobileRegex = /^\d+$/;
+            const pinCodeRegex = /^\d+$/;
+
+            // Perform validation
+            if (!name || !mobile || !address || !pinCode || !city || !state || !street) {
+                console.error("All fields are required.");
+                toastr.error("All fields are required.");
+                return;
+            }
+
+            if (!mobileRegex.test(mobile)) {
+                console.error("Mobile number should contain only numbers.");
+                toastr.error("Mobile number should contain only numbers.");
+                return;
+            }
+
+            if (!pinCodeRegex.test(pinCode)) {
+                console.error("Pin code should contain only numbers.");
+                toastr.error("Pin code should contain only numbers.");
+                return;
+            }
+
+            fetch("/adderesAddChekOut", {
+                method: "POST",
+                body: JSON.stringify({
+                    name: name,
+                    mobile: mobile,
+                    address: address,
+                    pinCode: pinCode,
+                    city: city,
+                    state: state,
+                    street: street
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Address saved successfully');
+                    return response.json();
+                } else {
+                    throw new Error('Failed to save address');
+                }
+            })
+            .then(data => {
+                if (data && data.data) {
+                        Swal.fire({
+                        icon: 'success',
+                        title: 'Address saved',
+                        showConfirmButton: false,
+                        timer: 2500
+                    }).then((result) => {
+                        window.location = "/checkOut";
+                    });
+                } else {
+                    toastr.error('Failed to save address.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                toastr.error('An error occurred while saving the address.');
+            });
+        });
+    });
+</script>
+
+
+
+<script>
+    
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM content loaded");
+
+    var addressBoxes = document.querySelectorAll('.address-box');
+    var checkoutForm = document.getElementById('checkout-form');
+
+    addressBoxes.forEach(function(addressBox) {
+        addressBox.addEventListener('click', function() {
+            console.log("Address box clicked");
+            addressBoxes.forEach(function(box) {
+                box.classList.remove('active');
+            });
+
+            var tickMarks = document.querySelectorAll('.tick-mark');
+            tickMarks.forEach(function(tickMark) {
+                tickMark.remove();
+            });
+
+            addressBox.classList.add('active');
+            var tickMark = document.createElement('span');
+            tickMark.className = 'tick-mark';
+            tickMark.innerHTML = '&#10004; Selected';
+            addressBox.insertBefore(tickMark, addressBox.firstChild);
+
+            var addressId = addressBox.getAttribute('data-address-id');
+            document.getElementById('selected-address-id').value = addressId;
+        });
+    });
+
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var selectedAddressId = document.getElementById('selected-address-id').value;
+            var selectedPaymentOption = document.querySelector('input[name="payment-option"]:checked').value;
+
+            fetch('/orders', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    selectedAddressId: selectedAddressId,
+                    selectedPaymentOption: selectedPaymentOption
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Order Placed Successfully',
+                        showConfirmButton: false,
+                        timer: 2500
+                    }).then((result) => {
+                        window.location = "/orderPlaced";
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to place the order'
+                    });
+                }
+            })
+          .catch(error => {
+    console.error('Error placing order:', error);
+    Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to place the order. Please try again later.'
+  });
+});
+        });
+    } else {
+        console.log("Checkout form not found");
+    }
+});
+
+</script>
+
+ 
+
+<%- include('../partialsUser/footer') -%>
+
+

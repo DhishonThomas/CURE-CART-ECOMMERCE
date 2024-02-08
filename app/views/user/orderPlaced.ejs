@@ -1,0 +1,22 @@
+<%- include('../partialsUser/header'); -%>
+
+<main class="main">
+    <div class="container">
+        <div class="order-placed">
+            <div class="verification-message text-center">
+                <h1 class="mb-4">Order Placed Successfully!</h1>
+                <p class="lead">Thank you for your purchase. Your order has been successfully placed.</p>
+                <img src="/userCss/images/order-success.png" alt="Order Success Icon" class="img-fluid">
+                <div class="order-details">
+                    <!-- Display order details here -->
+                    <!-- Example: -->
+                    <!-- <p>Your order number is: <span class="order-number">123456</span></p>
+                    <p>Estimated delivery date: <span class="delivery-date">January 25, 2024</span></p> -->
+                </div>
+                <a href="/order-list" class="btn btn-primary mt-4">View Order List</a>
+            </div>
+        </div><!-- End .order-placed -->
+    </div><!-- End .container -->
+</main><!-- End .main -->
+
+<%- include('../partialsUser/footer'); -%>

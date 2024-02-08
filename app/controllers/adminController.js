@@ -8,8 +8,9 @@ const path = require("path");
 const bcrypt = require("bcrypt");
 const fs = require("fs").promises;
 const storage = multer.memoryStorage();
-const uploads = multer({ storage: storage }).array("images", 5); 
+const uploads = multer({ storage: storage }).array("images", 15); 
 const User = require("../models/user")
+const mongoose = require("mongoose")
 // exports.adminSave = async(req,res)=>{
 //   const { email, password } = req.body;
 //   const hashPassword=await bcrypt.hash(password,10);
@@ -17,109 +18,148 @@ const User = require("../models/user")
 //       email,
 //       password:hashPassword,
 //   });
-//   await newUsers.save();
+//   await newUsers.save(); 
 //   res.send("success fully saved")
 // }
 // <....................................................................................................................>
 
 const uploadDir = path.join(__dirname, "../../public/uploads");
-async function processAndSaveImages(files) {
-  const processedImages = [];
+// async function processAndSaveImages(files) {
+//   const processedImages = [];
 
-  for (const file of files) {
-    try {
-      const sharpImageFileName = `${Date.now()}_${file.originalname}_sharp`;
-      let sharpInstance = sharp(file.buffer);
+//   for (const file of files) {
+//     try {
+//       const sharpImageFileName = `${Date.now()}_${file.originalname}_sharp`;
+//       let sharpInstance = sharp(file.buffer);
 
-      sharpInstance = sharpInstance.resize(640, 320, {
-        fit: "inside",
-        withoutEnlargement: true,
-      });
+//       sharpInstance = sharpInstance.resize(640, 320, {
+//         fit: "inside",
+//         withoutEnlargement: true,
+//       });
 
-      const metadataBefore = await sharp(file.buffer).metadata();
-      console.log(
-        `Original Dimensions: ${metadataBefore.width} x ${metadataBefore.height}`
-      );
+//       const metadataBefore = await sharp(file.buffer).metadata();
+//       console.log(
+//         `Original Dimensions: ${metadataBefore.width} x ${metadataBefore.height}`
+//       );
 
-      let format;
-      if (file.mimetype === "image/jpeg") {
-        sharpInstance = sharpInstance.toFormat("jpeg", { quality: 80 });
-        format = "jpg";
-      } else if (file.mimetype === "image/png") {
-        sharpInstance = sharpInstance.toFormat("png", { compressionLevel: 9 });
-        format = "png";
-      } else if (file.mimetype === "image/webp") {
-        sharpInstance = sharpInstance.toFormat("webp", { quality: 80 });
-        format = "webp";
-      } else if (file.mimetype === "image/tiff") {
-        sharpInstance = sharpInstance.toFormat("tiff");
-        format = "tiff";
-      } else {
-        // Set a default format for unrecognized image types
-        sharpInstance = sharpInstance.toFormat("jpeg", { quality: 80 });
-        format = "jpg";
-      }
+//       let format;
+//       if (file.mimetype === "image/jpeg") {
+//         sharpInstance = sharpInstance.toFormat("jpeg", { quality: 80 });
+//         format = "jpg";
+//       } else if (file.mimetype === "image/png") {
+//         sharpInstance = sharpInstance.toFormat("png", { compressionLevel: 9 });
+//         format = "png";
+//       } else if (file.mimetype === "image/webp") {
+//         sharpInstance = sharpInstance.toFormat("webp", { quality: 80 });
+//         format = "webp";
+//       } else if (file.mimetype === "image/tiff") {
+//         sharpInstance = sharpInstance.toFormat("tiff");
+//         format = "tiff";
+//       } else {
+//         // Set a default format for unrecognized image types
+//         sharpInstance = sharpInstance.toFormat("jpeg", { quality: 80 });
+//         format = "jpg";
+//       }
 
-      const sharpImagePath = path.join(
-        uploadDir,
-        `${sharpImageFileName}.${format}`
-      );
-      await sharpInstance.toFile(sharpImagePath);
+//       const sharpImagePath = path.join(
+//         uploadDir,
+//         `${sharpImageFileName}.${format}`
+//       );
+//       await sharpInstance.toFile(sharpImagePath);
 
-      // Verify the dimensions of the resized image
-      const resizedMetadata = await sharp(sharpImagePath).metadata();
-      console.log(
-        `Resized Dimensions: ${resizedMetadata.width} x ${resizedMetadata.height}`
-      );
+//       // Verify the dimensions of the resized image
+//       const resizedMetadata = await sharp(sharpImagePath).metadata();
+//       console.log(
+//         `Resized Dimensions: ${resizedMetadata.width} x ${resizedMetadata.height}`
+//       );
 
 
-      // Use a relative path for serving images (e.g., in your HTML or API responses)
-      const relativePath = path.join(
-        "/uploads",
-        `${sharpImageFileName}.${format}`
-      );
-      processedImages.push(relativePath);
-    } catch (sharpError) {
-      console.error("Sharp error:", sharpError);
-    }
-  }
+//       // Use a relative path for serving images (e.g., in your HTML or API responses)
+//       const relativePath = path.join(
+//         "/uploads",
+//         `${sharpImageFileName}.${format}`
+//       );
+//       processedImages.push(relativePath);
+//     } catch (sharpError) {
+//       console.error("Sharp error:", sharpError);
+//     }
+//   }
 
-  return processedImages;
-}
+//   return processedImages;
+// }
+
+// <....................................................................................................................>
+
+
 exports.admin = (req, res) => {
   
-
-
     res.render("admin/adminDashboard");
    
 };
  
+// <....................................................................................................................>
 
+exports.usersList = async (req, res) => {
+  const page = parseInt(req.query.page) || 1; // Current page number
+  const perPage = 10; // Items per page
 
-exports.usersList =async (req,res)=>{
+  try {
+    const totalUsers = await User.countDocuments();
+    const totalPages = Math.ceil(totalUsers / perPage);
+
+    const users = await User.find()
+      .skip((page - 1) * perPage)
+      .limit(perPage);
+
+    res.render("admin/userList", { users, totalPages, currentPage: page });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+};
  
-const users = await User.find()
-  res.render("admin/userList", { users });
-}
 
-exports.userUlist = async (req,res) =>{
+// <....................................................................................................................>
+exports.userUlist = async (req, res) => {
   const userId = req.params.id;
-   try{
-    const user = await User.findById(userId)
-    if(user){
-      user.isBlocked = !user.isBlocked
-      const updatedUser = await user.save()
-      if(updatedUser){
-        res.redirect("/admin/usersList")
-      }else{
-        res.status(404).send("User not found");
+  const { isBlocked } = req.body;
+  console.log(userId);
+console.log(req.body);
+  try { 
+    const user = await User.findById(userId);
+    if (user) {
+      user.isBlocked = !user.isBlocked;
+      const updatedUser = await user.save();
+      if (updatedUser) {
+        if(user.isBlocked){
+  res.json({
+    success: true,
+    message:
+      '<span style="color: white;">User has been blocked successfully.</span>',
+  });
+        }else{
+            res.json({
+              success: true,
+              message:
+                '<span style="color: white;">User has been unblocked successfully.</span>',
+            });
+        }
+          
+
+      } else {
+            res.json({
+              success: false,
+              message: "OOps",
+            });
+;
       }
     }
-   }catch(error){
- console.error(error);
+  } catch (error) {
+    console.error(error);
     res.status(500).send("Internal Server Error");
-   }
-}
+  }
+};
+
 
 
 // <....................................................................................................................>
@@ -201,19 +241,19 @@ exports.createProduct = async (req, res) => {
 
     try {
       const { productName, description, brand, price, quantity } = req.body;
-
+console.log(req.body.mycategory);
       // Use Sharp to process and save the images
       const sharpPromises = req.files.map(async (file, index) => {
         const filename = `image_${index + 1}.${file.originalname},${Date.now()}.jpg`;
         const imagePath = `public/uploads/${filename}`;
 
         await sharp(file.buffer)
-          .resize(300, 300, {
+          .resize(800,800, {
             fit: "contain",
             withoutEnlargement: true,
             background: "white",
           })
-          .toFile(imagePath,{ quality: 90 });
+          .toFile(imagePath,{ quality: 80 });
 
         filenames.push(filename);
       });
@@ -221,13 +261,13 @@ exports.createProduct = async (req, res) => {
       // Wait for all sharpPromises to resolve before creating the Product
       await Promise.all(sharpPromises);
 
-      const categorys = req.body.mycategory;
+      const categoryId = new mongoose.Types.ObjectId(req.body.mycategory);
       const product = new Product({
         productName,
         description,
         brand,
         price,
-        categorys,
+        category:categoryId,
         quantity,
         images: filenames.map((filename) => `/uploads/${filename}`),
       });
@@ -236,7 +276,7 @@ exports.createProduct = async (req, res) => {
 
      const products = await Product.find();
 
-     res.render("admin/productList", { products });
+     res.redirect("/admin/productList")
     } catch (error) {
       console.error("Error:", error);
       res.status(500).send("Internal Server Error");
@@ -379,12 +419,20 @@ exports.categoryUlist = async (req, res) => {
 };
 // <.........................................................................................................>
 exports.productList = async (req, res) => {
-  const products = await Product.find();
+const page = parseInt(req.query.page)
+const perPage = 10;
+
+const totalUsers = await Product.countDocuments()
+const totalPages = Math.ceil(totalUsers / perPage);
+
+  const products = await Product.find()
+  .skip((page-1)*perPage)
+  .limit(perPage)
   // try{
   //   const
   // }catch(error){
   // }
-  res.render("admin/productList", { products });
+  res.render("admin/productList", { products,totalPages, currentPage:page });
 };
 // <.........................................................................................................>
 exports.productCategory = async (req, res) => {
@@ -400,7 +448,7 @@ try{
  const category = await Category.find();
    // Logging to check the structure of the retrieved product document
 
-   const products = await Product.findById({ _id: productEditId });
+   const products = await Product.findById({ _id: productEditId }).populate("category").exec();
    console.log(products);
    res.render("admin/productListEdit", { products, category });
 }catch(error){
@@ -444,7 +492,7 @@ exports.productListEditUpdate = async (req, res) => {
       // Wait for all sharpPromises to resolve before updating the Product
       await Promise.all(sharpPromises);
 
-      const categorys = req.body.mycategory;
+      const categoryId = new mongoose.Types.ObjectId(req.body.mycategory);
 
       // Find the product by ID and update it
       await Product.findByIdAndUpdate(productId, {
@@ -452,7 +500,7 @@ exports.productListEditUpdate = async (req, res) => {
         description,
         brand,
         price,
-        categorys,
+        category: categoryId,
         quantity,
         $push: {
           images: {
@@ -463,7 +511,7 @@ exports.productListEditUpdate = async (req, res) => {
 
       const products = await Product.find();
 
-      res.render("admin/productList", { products });
+      res.redirect("/admin/productList")
     } catch (error) {
       console.error("Error:", error);
       res.status(500).send("Internal Server Error");

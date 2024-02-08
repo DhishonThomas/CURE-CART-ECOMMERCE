@@ -126,29 +126,18 @@
                 <h6>3. Category</h6>
               </div>
 
-              <div class="col-md-9">
-                <div class="mb-4">
-                  <% category.forEach(category => { %>
-                  <label
-                    class="mb-2 form-check form-check-inline"
-                    style="width: 45%"
-                  >
-                    <input
-                      class="form-check-input"
-                      name="mycategory"
-                      type="radio"
-                      id="category"
-                      value="<%=category.category_name%>"
-                      required
-                     
-                    />
-                    <span class="form-check-label">
-                      <%= category.category_name %>
-                    </span>
-                  </label>
-                  <% }); %>
-                </div>
-              </div>
+            <div class="col-md-9">
+    <div class="mb-4">
+        <!-- Dropdown select for category -->
+        <select class="form-select" name="mycategory" id="category" required>
+            <option value="">Select Category</option>
+            <% category.forEach(category => { %>
+                <option value="<%= category._id%>"><%= category.category_name %></option>
+            <% }); %>
+        </select>
+    </div>
+</div>
+
               <!-- col.// -->
             </div>
             <!-- row.// -->
@@ -333,6 +322,7 @@ function handleImage() {
         const brand = document.getElementById("brand").value;
         const price = document.getElementById("price").value;
         const quantity = document.getElementById("quantity").value;
+        console.log(productName,description,brand,price,quantity,selectedImages.length);
 
         if (!productName || !description || !brand || !price || !quantity || selectedImages.length === 0) {
             alert("Please fill all the required fields and select at least one image");

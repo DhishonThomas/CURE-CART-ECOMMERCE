@@ -1,5 +1,29 @@
 <%- include('../partialsUser/header'); -%>
 
+<div class="container">
+    <hr class="mb-4">
+
+    <h2 class="title text-center mb-3">Large Banner</h2><!-- End .title mb-2 -->
+
+    <div class="row">
+        <div class="col-12">
+            <div class="banner banner-big">
+                <a href="#">
+                    <img src="userCss/images/banners/banner-fullwidth.jpg" alt="Banner">
+                </a>
+
+                <div class="banner-content">
+                    <h4 class="banner-subtitle text-primary">Quisque a lectus</h4><!-- End .banner-subtitle -->
+                    <h3 class="banner-title text-white">Morbi interdum <br>mollis sapien.</h3><!-- End .banner-title -->
+                    <p class="d-none d-lg-block">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna nibh, viverra non, posuere a, pede.</p>
+
+                    <a href="#" class="btn btn-primary btn-rounded"><span>Click Here</span><i class="icon-long-arrow-right"></i></a>
+                </div><!-- End .banner-content -->
+            </div><!-- End .banner -->
+        </div><!-- End .col-12 -->
+    </div><!-- End .row -->
+</div>
+
 <div class="container new-arrivals">
   <div class="heading heading-flex mb-3">
     <div class="heading-left">
@@ -18,6 +42,301 @@
     </div>
     <!-- End .heading-right -->
   </div>
+  
+
+  <div class="tab-content tab-content-carousel just-action-icons-sm">
+    <div
+      class="tab-pane p-0 fade show active"
+      id="new-all-tab"
+      role="tabpanel"
+      aria-labelledby="new-all-link"
+    >
+      <div
+        class="owl-carousel owl-full carousel-equal-height carousel-with-shadow"
+        data-toggle="owl"
+        data-owl-options='{
+                                "nav": true, 
+                                "dots": true,
+                                "margin": 20,
+                                "loop": false,
+                                "responsive": {
+                                    "0": {
+                                        "items":2
+                                    },
+                                    "480": {
+                                        "items":2
+                                    },
+                                    "768": {
+                                        "items":3
+                                    },
+                                    "992": {
+                                        "items":4
+                                    },
+                                    "1200": {
+                                        "items":5
+                                    }
+                                }
+                            }'
+      >
+      <% products.forEach(product => { %>
+       
+      
+        <div class="product product-2">
+          <figure class="product-media">
+            <!-- <span class="product-label label-circle label-top">Top</span> -->
+            <a href="/product/<%= product._id %>">
+              <img
+                src="<%= product.images[0] %>"
+                alt="Product image"
+                class="product-image"
+              />
+            </a>
+
+            <div class="product-action-vertical">
+              <a
+                href="#"
+                class="btn-product-icon btn-wishlist"
+                title="Add to wishlist"
+              ></a>
+            </div>
+            <!-- End .product-action -->
+
+            <div class="product-action">
+              <a href="#" class="btn-product btn-cart" title="Add to cart"
+                ><span>add to cart</span></a
+              >
+              <a
+                href="popup/quickView.html"
+                class="btn-product btn-quickview"
+                title="Quick view"
+                ><span>quick view</span></a
+              >
+            </div>
+            <!-- End .product-action -->
+          </figure>
+          <!-- End .product-media -->
+
+          <div class="product-body">
+            <div class="product-cat">
+              <a href="#"></a>
+            </div>
+            <!-- End .product-cat -->
+            <h3 class="product-title">
+              <a href="product.html"><%= product.productName %></a>
+            </h3>
+            <!-- End .product-title -->
+            <div class="product-price"><%= product.price %></div>
+            <!-- End .product-price -->
+            <div class="ratings-container">
+              <div class="ratings">
+                <div class="ratings-val" style="width: 100%"></div>
+                <!-- End .ratings-val -->
+              </div>
+              <!-- End .ratings -->
+              <span class="ratings-text">( 4 Reviews )</span>
+            </div>
+            <!-- End .rating-container -->
+          </div>
+          <!-- End .product-body -->
+        </div>
+        <!-- End .product -->
+<% }) %>
+
+    <!-- .End .tab-pane -->
+
+</div>
+<!-- End .container -->
+</div>
+</div></div>
+
+
+<div class="container new-arrivals">
+  <div class="heading heading-flex mb-3">
+    <div class="heading-left">
+      <h2 class="title">New Arrivals</h2>
+      <!-- End .title -->
+    </div>
+    <!-- End .heading-left -->
+
+    <div class="heading-right">
+      <ul
+        class="nav nav-pills nav-border-anim justify-content-center"
+        role="tablist"
+      >
+    
+      </ul>
+    </div>
+    <!-- End .heading-right -->
+  </div>
+  
+
+  <div class="tab-content tab-content-carousel just-action-icons-sm">
+    <div
+      class="tab-pane p-0 fade show active"
+      id="new-all-tab"
+      role="tabpanel"
+      aria-labelledby="new-all-link"
+    >
+      <div
+        class="owl-carousel owl-full carousel-equal-height carousel-with-shadow"
+        data-toggle="owl"
+        data-owl-options='{
+                                "nav": true, 
+                                "dots": true,
+                                "margin": 20,
+                                "loop": false,
+                                "responsive": {
+                                    "0": {
+                                        "items":2
+                                    },
+                                    "480": {
+                                        "items":2
+                                    },
+                                    "768": {
+                                        "items":3
+                                    },
+                                    "992": {
+                                        "items":4
+                                    },
+                                    "1200": {
+                                        "items":5
+                                    }
+                                }
+                            }'
+      >
+      <% products.forEach(product => { %>
+       
+      
+        <div class="product product-2">
+          <figure class="product-media">
+            <!-- <span class="product-label label-circle label-top">Top</span> -->
+            <a href="/product/<%= product._id %>">
+              <img
+                src="<%= product.images[0] %>"
+                alt="Product image"
+                class="product-image"
+              />
+            </a>
+
+            <div class="product-action-vertical">
+              <a
+                href="#"
+                class="btn-product-icon btn-wishlist"
+                title="Add to wishlist"
+              ></a>
+            </div>
+            <!-- End .product-action -->
+
+            <div class="product-action">
+              <a href="#" class="btn-product btn-cart" title="Add to cart"
+                ><span>add to cart</span></a
+              >
+              <a
+                href="popup/quickView.html"
+                class="btn-product btn-quickview"
+                title="Quick view"
+                ><span>quick view</span></a
+              >
+            </div>
+            <!-- End .product-action -->
+          </figure>
+          <!-- End .product-media -->
+
+          <div class="product-body">
+            <div class="product-cat">
+              <a href="#"></a>
+            </div>
+            <!-- End .product-cat -->
+            <h3 class="product-title">
+              <a href="product.html"><%= product.productName %></a>
+            </h3>
+            <!-- End .product-title -->
+            <div class="product-price"><%= product.price %></div>
+            <!-- End .product-price -->
+            <div class="ratings-container">
+              <div class="ratings">
+                <div class="ratings-val" style="width: 100%"></div>
+                <!-- End .ratings-val -->
+              </div>
+              <!-- End .ratings -->
+              <span class="ratings-text">( 4 Reviews )</span>
+            </div>
+            <!-- End .rating-container -->
+          </div>
+          <!-- End .product-body -->
+        </div>
+        <!-- End .product -->
+<% }) %>
+
+    <!-- .End .tab-pane -->
+
+</div>
+<!-- End .container -->
+</div>
+</div></div>
+
+<div class="container new-arrivals">
+  <div class="heading heading-flex mb-3">
+    <div class="heading-left">
+      <h2 class="title">New Arrivals</h2>
+      <!-- End .title -->
+    </div>
+    <!-- End .heading-left -->
+
+    <div class="heading-right">
+      <ul
+        class="nav nav-pills nav-border-anim justify-content-center"
+        role="tablist"
+      >
+    
+      </ul>
+    </div>
+    <!-- End .heading-right -->
+  </div>
+  	<div class="row justify-content-center">
+                		<div class="col-md-6 col-lg-4">
+                			<div class="banner">
+	                			<a href="#">
+	                				<img src="userCss/images/banners/3cols/banner-1.jpg" alt="Banner">
+	                			</a>
+
+	                			<div class="banner-content">
+	                				<h4 class="banner-subtitle">Quisque a lectus</h4><!-- End .banner-subtitle -->
+	                				<h3 class="banner-title">Praesent elementum <br>hendrerit tortor.</h3><!-- End .banner-title -->
+	                				<a href="#" class="banner-link">Click here</a>
+	                			</div><!-- End .banner-content -->
+                			</div><!-- End .banner -->
+                	   </div><!-- End .col-md-6 -->
+
+                		<div class="col-md-6 col-lg-4">
+                			<div class="banner">
+	                			<a href="#">
+	                				<img src="userCss/images/banners/3cols/banner-2.jpg" alt="Banner">
+	                			</a>
+
+	                			<div class="banner-content">
+	                				<h4 class="banner-subtitle">Quisque a lectus</h4><!-- End .banner-subtitle -->
+	                				<h3 class="banner-title">Donec consectetuer <br>ligula vulputate.</h3><!-- End .banner-title -->
+	                				<a href="#" class="banner-link">Click here</a>
+	                			</div><!-- End .banner-content -->
+                			</div><!-- End .banner -->
+                		</div><!-- End .col-md-6 -->
+
+                		<div class="col-md-6 col-lg-4">
+                			<div class="banner">
+	                			<a href="#">
+	                				<img src="userCss/images/banners/3cols/banner-3.jpg" alt="Banner">
+	                			</a>
+
+	                			<div class="banner-content">
+	                				<h4 class="banner-subtitle">Quisque a lectus</h4><!-- End .banner-subtitle -->
+	                				<h3 class="banner-title text-white">Phasellus ultrices <br>nulla quisnibh.</h3><!-- End .banner-title -->
+	                				<a href="#" class="banner-link">Click here</a>
+	                			</div><!-- End .banner-content -->
+                			</div><!-- End .banner -->
+                		</div><!-- End .col-md-6 -->
+                	</div><!-- End .row -->
+
   
 
   <div class="tab-content tab-content-carousel just-action-icons-sm">

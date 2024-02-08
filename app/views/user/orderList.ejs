@@ -1,0 +1,41 @@
+<%- include('../partialsUser/header'); -%>
+
+<main class="main">
+    <div class="container">
+        <h1 class="page-title">Order List</h1>
+
+        <% if (orders.length === 0) { %>
+            <p>No orders found.</p>
+        <% } else { %>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Order Number</th>
+                            <th>Total Amount</th>
+                            <th>Payment Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% orders.forEach(order => { %>
+                            <tr>
+                                <td><%= order._id %></td>
+                                <td><%= order.totalAmount %></td>
+                                <td><%= order.paymentStatus %></td>
+                                <td>
+                                    <form method="POST" action="/cancel-order">
+                                        <input type="hidden" name="orderId" value="<%= order._id %>">
+                                        <button type="submit" class="btn btn-danger">Cancel Order</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div><!-- End .table-responsive -->
+        <% } %>
+    </div><!-- End .container -->
+</main><!-- End .main -->
+
+<%- include('../partialsUser/footer'); -%>

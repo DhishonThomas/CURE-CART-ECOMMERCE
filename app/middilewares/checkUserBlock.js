@@ -8,20 +8,18 @@ const checkUserBlocked = async (req, res, next) => {
       const user = await User.findById(userId);
 
       if (user && !user.isBlocked) {
-        // If the user is blocked, destroy the session and log them out
         req.session.destroy()
         //   if (err) {
         //     console.error("Error destroying session:", err);
         //   }
-
           console.log("this sign in work");
-          res.redirect("/signIn"); // Redirect to the login page after logout
+          res.redirect("/signIn"); 
        
       } else {
-        next(); // User is not blocked, proceed with the request
+        next(); 
       }
     } else {
-      next(); // User is not authenticated, proceed with the request
+      next(); 
     }
   } catch (error) {
     console.error("Error checking user status:", error);

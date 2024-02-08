@@ -1,5 +1,7 @@
 const mongoose = require("mongoose")
 
+const User = require("../models/user")
+
 const addressSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -31,7 +33,7 @@ const addressSchema = new mongoose.Schema({
     required: true,
   },
 });
-
+   
 
 const UserAddressSchema = new mongoose.Schema({
     userId:{

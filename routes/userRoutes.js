@@ -5,6 +5,7 @@ const userControllers = require('../app/controllers/userControllers')
 const otpController  = require('../app/controllers/otpControllers')
 const checkUserBlocked = require("../app/middilewares/checkUserBlock");
 const cartController = require('../app/controllers/cartController');
+const resetPasswordController = require('../app/controllers/resetPasswordController')
 router.use(userAuthMiddleware);
 router.use("/", checkUserBlocked); 
 router.use("/signIn", checkUserBlocked);
@@ -54,6 +55,29 @@ router.post("/address",userControllers.address)
 router.get("/addressDelete/:id", userControllers.addressDelete);
 
 router.post("/addressEdit/:id",userControllers.addressEdit)
+
+router.get("/forget-password", resetPasswordController.forgetEmail);
+
+router.post("/forget-password",resetPasswordController.forgetPassword)
+
+router.get("/reset/:token",resetPasswordController.reset)
+
+router.post("/reset-password/:token",resetPasswordController.resetPassword);
+
+router.post("/update-userProfile", userControllers.updateuserProfile);
+
+router.post("/changepassword", userControllers.changepassword);
+
+router.post("/adderesAddChekOut", userControllers.adderesAddChekOut);
+
+router.post("/orders",userControllers.order)
+
+router.get("/orderPlaced", userControllers.orderPlaced);
+
+router.get("/order-list",userControllers.orderList);
+
+
+
 
 
 

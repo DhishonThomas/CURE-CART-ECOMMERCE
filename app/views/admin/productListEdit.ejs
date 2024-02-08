@@ -178,28 +178,21 @@
                 <h6>3. Category</h6>
               </div>
 
-              <div class="col-md-9">
-                <div class="mb-4">
-                  <input type="text"value="<%= products && products.categorys ? products.categorys : '' %>" class="form-control" readonly>
-                  <% category.forEach(category => { %>
-                  <label
-                    class="mb-2 form-check form-check-inline"
-                    style="width: 45%"
-                  >
-                    <input
-                      class="form-check-input"
-                      name="mycategory"
-                      type="radio"
-                      id="category"
-                      value="<%= category._category_name%>"
-                    />
-                    <span class="form-check-label">
-                      <%= category.category_name %>
-                    </span>
-                  </label>
-                  <% }); %>
-                </div>
-              </div>
+<div class="col-md-9">
+    <div class="mb-4">
+        <select class="form-select" name="mycategory" id="category">
+            <% category.forEach(cat => { %>
+                <% if (products.category.category_name === cat.category_name) { %>
+                    <option value="<%= cat._id %>" selected><%= cat.category_name %></option>
+                <% } else { %>
+                    <option value="<%= cat._id %>"><%= cat.category_name %></option>
+                <% } %>
+            <% }); %>
+        </select>
+    </div>
+</div>
+
+
               <!-- col.// -->
             </div>
             <!-- row.// -->

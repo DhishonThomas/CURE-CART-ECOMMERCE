@@ -97,21 +97,19 @@
 	                	<div class="row">
 	                		<aside class="col-md-4 col-lg-3">
 	                			<ul class="nav nav-dashboard flex-column mb-3 mb-md-0" role="tablist">
-								    <li class="nav-item">
-								        <a class="nav-link active" id="tab-dashboard-link" data-toggle="tab" href="#tab-dashboard" role="tab" aria-controls="tab-dashboard" aria-selected="true">Dashboard</a>
+							  <li class="nav-item">
+								        <a class="nav-link" id="tab-account-link" data-toggle="tab" href="#tab-account" role="tab" aria-controls="tab-account" aria-selected="false">User Profile</a>
 								    </li>
 								    <li class="nav-item">
 								        <a class="nav-link" id="tab-orders-link" data-toggle="tab" href="#tab-orders" role="tab" aria-controls="tab-orders" aria-selected="false">Orders</a>
 								    </li>
-								    <li class="nav-item">
+								    <!-- <li class="nav-item">
 								        <a class="nav-link" id="tab-downloads-link" data-toggle="tab" href="#tab-downloads" role="tab" aria-controls="tab-downloads" aria-selected="false">Downloads</a>
-								    </li>
+								    </li> -->
 								    <li class="nav-item">
 								        <a class="nav-link" id="tab-address-link" data-toggle="tab" href="#tab-address" role="tab" aria-controls="tab-address" aria-selected="false">Adresses</a>
 								    </li>
-								    <li class="nav-item">
-								        <a class="nav-link" id="tab-account-link" data-toggle="tab" href="#tab-account" role="tab" aria-controls="tab-account" aria-selected="false">Account Details</a>
-								    </li>
+								  
 								    <li class="nav-item">
 								        <a class="nav-link" href="#">Sign Out</a>
 								    </li>
@@ -120,11 +118,12 @@
 
 	                		<div class="col-md-8 col-lg-9">
 	                			<div class="tab-content">
-								    <div class="tab-pane fade show active" id="tab-dashboard" role="tabpanel" aria-labelledby="tab-dashboard-link">
+                                      <div class="tab-pane fade show active" id="tab-dashboard" role="tabpanel" aria-labelledby="tab-dashboard-link">
 								    	<p>Hello <span class="font-weight-normal text-dark"><%= user.username %></span> (not <span class="font-weight-normal text-dark">User</span>? <a href="#">Log out</a>) 
 								    	<br>
 								    	From your account dashboard you can view your <a href="#tab-orders" class="tab-trigger-link link-underline">recent orders</a>, manage your <a href="#tab-address" class="tab-trigger-link">shipping and billing addresses</a>, and <a href="#tab-account" class="tab-trigger-link">edit your password and account details</a>.</p>
 								    </div><!-- .End .tab-pane -->
+								 
 
 								    <div class="tab-pane fade" id="tab-orders" role="tabpanel" aria-labelledby="tab-orders-link">
 								    	<p>No order has been made yet.</p>
@@ -150,7 +149,7 @@
     <div class="modal-content">
         <span class="close">&times;</span>
         <h2>Add Address</h2>
-        <form action="/address" method="post" >
+        <form action="/address" method="post" id="addressForm" >
             <!-- Address fields -->
             <div class="form-group">
                 <label for="name">Name</label>
@@ -195,32 +194,32 @@
                 <!-- Address fields -->
                 <div class="form-group">
                     <label for="name">Name</label>
-                    <input type="text" id="name" name="name" class="form-control" required value="<%= address.name %>">
+                    <input type="text"  name="name" class="form-control" required value="<%= address.name %>">
                 </div>
                 <div class="form-group">
                     <label for="mobile">Mobile</label>
-                    <input type="text" id="mobile" name="mobile" class="form-control" value="<%= address.mobile %>">
+                    <input type="text"  name="mobile" class="form-control" value="<%= address.mobile %>">
                 </div>
                 <div class="form-group">
                     <label for="address">Address</label>
-                    <input type="text" id="address" name="address" class="form-control" required value="<%= address.address %>">
+                    <input type="text"  name="address" class="form-control" required value="<%= address.address %>">
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="pinCode">Postal Code</label>
-                        <input type="text" id="pinCode" name="pinCode" class="form-control" required value="<%= address.pinCode %>">
+                        <input type="text"  name="pinCode" class="form-control" required value="<%= address.pinCode %>">
                     </div>
                     <div class="form-group col-md-6">
                         <label for="street">Street</label>
-                        <input type="text" id="street" name="street" class="form-control" required value="<%= address.street %>">
+                        <input type="text"  name="street" class="form-control" required value="<%= address.street %>">
                     </div>
                     <div class="form-group col-md-6">
                         <label for="city">City</label>
-                        <input type="text" id="city" name="city" class="form-control" required value="<%= address.city %>">
+                        <input type="text"  name="city" class="form-control" required value="<%= address.city %>">
                     </div>
                     <div class="form-group col-md-6">
                         <label for="state">State</label>
-                        <input type="text" id="state" name="state" class="form-control" required value="<%= address.state %>">
+                        <input type="text"  name="state" class="form-control" required value="<%= address.state %>">
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Update Address</button>
@@ -229,9 +228,11 @@
     </div>
 
 <% }) %>
+
+
                                             <% addresses.forEach(address => { %>
 
-								    		<div class="col-lg-6">
+								    		<div class="col-lg-6" id="tab-address" aria-labelledby="tab-address-link">
                                                 <br>
 								    			<div class="card card-dashboard">
 								    				<div class="card-body">
@@ -258,42 +259,57 @@
 								    	</div><!-- End .row -->
 								    </div><!-- .End .tab-pane -->
 
-								    <div class="tab-pane fade" id="tab-account" role="tabpanel" aria-labelledby="tab-account-link">
-								    	<form action="#">
-			                				<div class="row">
-			                					<div class="col-sm-6">
-			                						<label>First Name *</label>
-                                                    <input type="text" class="form-control" required>
-			                					</div><!-- End .col-sm-6 -->
+								<div class="tab-pane fade" id="tab-account" role="tabpanel" aria-labelledby="tab-account-link">
+  <form id="update-user-form" >
+    <div class="form-group">
+        <label for="username">Username *</label>
+        <input type="text" id="username" name="username" class="form-control" required value="<%= user.username %>">
+    </div>
 
-			                					<div class="col-sm-6">
-			                						<label>Last Name *</label>
-			                						<input type="text" class="form-control" required>
-			                					</div><!-- End .col-sm-6 -->
-			                				</div><!-- End .row -->
+    <div class="form-group">
+        <label for="email">Email address *</label>
+        <input type="email" id="email" name="email" class="form-control" required value="<%= user.email %>" readonly>
+    </div>
 
-		            						<label>Display Name *</label>
-		            						<input type="text" class="form-control" required>
-		            						<small class="form-text">This will be how your name will be displayed in the account section and in reviews</small>
+    <div class="form-group">
+        <label for="phoneNumber">Phone Number *</label>
+        <input type="text" id="phonenumber" name="phonenumber" class="form-control" required value="<%= user.phonenumber %>">
+    </div>
 
-		                					<label>Email address *</label>
-		        							<input type="email" class="form-control" required>
+    <button type="submit" class="btn btn-outline-primary-2">
+        <span>UPDATE CHANGES</span>
+        <i class="icon-long-arrow-right"></i>
+    </button>
+</form>
+<br>
+             <button id="openModalBtn2" class="btn btn-primary">Change Password</button>
 
-		            						<label>Current password (leave blank to leave unchanged)</label>
-		            						<input type="password" class="form-control">
+<div id="ChangeModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Change Password</h2>
+        <form  id="change-password">
+            <!-- Password fields -->
+            <div class="form-group">
+                <label for="currentPassword">Current Password</label>
+                <input type="password" id="currentPassword" name="currentPassword" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="newPassword">New Password</label>
+                <input type="password" id="newPassword" name="newPassword" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Confirm New Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required>
+                        <span id="password-strength"></span>
 
-		            						<label>New password (leave blank to leave unchanged)</label>
-		            						<input type="password" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">Change Password</button>
+        </form>
+    </div>
+</div>
+</div><!-- .End .tab-pane -->
 
-		            						<label>Confirm new password</label>
-		            						<input type="password" class="form-control mb-2">
-
-		                					<button type="submit" class="btn btn-outline-primary-2">
-			                					<span>SAVE CHANGES</span>
-			            						<i class="icon-long-arrow-right"></i>
-			                				</button>
-			                			</form>
-								    </div><!-- .End .tab-pane -->
 								</div>
 	                		</div><!-- End .col-lg-9 -->
 	                	</div><!-- End .row -->
@@ -301,7 +317,231 @@
                 </div><!-- End .dashboard -->
             </div><!-- End .page-content -->
         </main><!-- End .main -->
-        <script>
+
+      
+               <script> 
+
+            // Get the modal
+const modals = document.getElementById('ChangeModal');
+
+// Get the button that opens the modal
+const btns = document.getElementById('openModalBtn2');
+
+// Get the <span> element that closes the modal
+const spans = document.getElementsByClassName('close')[0];
+
+// When the user clicks the button, open the modal
+btns.onclick = function() {
+  modals.style.display = 'block';
+}
+
+// When the user clicks on <span> (x), close the modal
+spans.onclick = function() {
+  modals.style.display = 'none';
+}
+
+        </script>
+
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const changePasswordForm = document.getElementById("change-password");
+
+        changePasswordForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const currentPassword = document.getElementById("currentPassword").value;
+            const newPassword = document.getElementById("newPassword").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+            var strengthIndicator = document.getElementById('password-strength');
+
+            // Check if new password matches the confirmation
+            if (newPassword !== confirmPassword) {
+    Swal.fire({
+                    icon: 'error',
+                    title: 'Password Confirmation Error',
+                    text: 'Password confirmation does not match.'
+                });
+                return;        
+            }
+        const passwordIsValid = checkPasswordStrength(confirmPassword);
+        if (!passwordIsValid) {
+               Swal.fire({
+                    icon: 'error',
+                    title: 'Password not strong',
+                    text: 'Password must be true.'
+                });
+                return;   
+        }
+
+
+             function checkPasswordStrength(password) {
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        const isStrong = regex.test(password);
+
+        const strengthIndicator = document.getElementById('password-strength');
+        if (isStrong) {
+            strengthIndicator.style.color = 'green';
+            strengthIndicator.innerHTML = 'Strong password';
+        } else {
+            strengthIndicator.style.color = 'red';
+            strengthIndicator.innerHTML = 'Password should be at least 8 characters long and include at least one lowercase letter, one uppercase letter, one digit, and one special character.';
+        }
+
+        return isStrong;
+    }
+
+        
+            // Send the request to change the password
+       fetch("/changepassword", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                currentPassword: currentPassword,
+                newPassword: newPassword,
+                confirmPassword: confirmPassword
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.data) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Password changed successfully',
+                    showConfirmButton: false,
+                    timer: 2500
+                }).then((result) => {
+                    window.location = "/profile";
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Password change failed',
+                    text: data.message
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("An error occurred while changing password.");
+        });
+    });
+    });
+</script>
+
+</script>
+
+
+
+
+<script>
+
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const updateForm = document.getElementById("update-user-form");
+
+        updateForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+           
+            const email = document.getElementById("email").value.trim();
+            const username = document.getElementById("username").value.trim();
+            const phonenumber = document.getElementById("phonenumber").value.trim();
+
+            if (!isValidEmail(email)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Email',
+                    text: 'Please enter a valid email address'
+                });
+                return;
+            }
+
+            if (username.length < 3) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Username',
+                    text: 'Username must be at least 3 characters long'
+                });
+                return;
+            }
+
+            if (!isValidPhoneNumber(phonenumber)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Phone Number',
+                    text: 'Phone number must be 10 digits long'
+                });
+                return;
+            }
+
+            // Make the fetch request
+            fetch("/update-userProfile", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username,
+                    phonenumber: phonenumber,
+                    email: email
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Profile Edited',
+                        showConfirmButton: false,
+                        timer: 2500
+                    }).then((result) => {
+                        window.location = "/profile";
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to edit profile'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to edit profile'
+                });
+            });
+        });
+    });
+
+    // Function to validate email format
+    function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    // Function to validate phone number format
+    function isValidPhoneNumber(phonenumber) {
+        const phoneNumberRegex = /^\d{10}$/;
+        return phoneNumberRegex.test(phonenumber);
+    }
+
+
+
+</script>
+
+        <script> 
 
             // Get the modal
 const modal = document.getElementById('addressModal');
@@ -331,33 +571,7 @@ span.onclick = function() {
 
 
 
-document.addEventListener("DOMContentLoaded",function(){
-    const addressForm = document.getElementById("addressForm")
 
-    addressForm.addEventListener("submit",function(event){
-        event.preventDefault()
-
-        const formData = new FormData(addressForm)
-
-        fetch("/address",{
-            method:"POST",
-            body:formData
-        })
-        .then(response=>{
-            if(response.ok){
-         console.log('Address saved successfully');
-
-            }else{
-          console.log('Failed to save address');
-
-            }
-        })
-        .catch(error=>{
-       console.error('Error:', error);
-
-        })
-    })
-})
         </script>
 <%- include('../partialsUser/footer') -%>
 <script>

@@ -27,12 +27,12 @@
                 <div class="content-header">
                     <div>
                         <h2 class="content-title card-title">Products List</h2>
-                        <p>Lorem ipsum dolor sit amet.</p>
+                        <!-- <p>Lorem ipsum dolor sit amet.</p> -->
                     </div>
                     <div>
-                        <a href="#" class="btn btn-light rounded font-md">Export</a>
-                        <a href="#" class="btn btn-light rounded font-md">Import</a>
-                        <a href="#" class="btn btn-primary btn-sm rounded">Create new</a>
+                        <!-- <a href="#" class="btn btn-light rounded font-md">Export</a>
+                        <a href="#" class="btn btn-light rounded font-md">Import</a> -->
+                        <a href="/admin/createProduct" class="btn btn-primary btn-sm rounded">Add Product</a>
                     </div>
                 </div>
                 <div class="card mb-4">
@@ -146,21 +146,20 @@
                         <!-- itemlist  .// -->
                                  <!-- card-body end// -->
                 
-                <!-- card end// -->
-                <!-- <div class="pagination-area mt-30 mb-50">
-                    <nav aria-label="Page navigation example">
-                        <ul class="pagination justify-content-start">
-                            <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                            <li class="page-item"><a class="page-link" href="#">02</a></li>
-                            <li class="page-item"><a class="page-link" href="#">03</a></li>
-                            <li class="page-item"><a class="page-link dot" href="#">...</a></li>
-                            <li class="page-item"><a class="page-link" href="#">16</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div> -->
+                  <div class="pagination-area mt-15 mb-50 ">
+    <nav aria-label="Page navigation example">
+<!-- Pagination HTML -->
+
+<ul class="pagination justify-content-start ">
+    <% for (let i = 1; i <= totalPages; i++) { %>
+        <li class="page-item <%= currentPage === i ? 'active' : 'active' %>">
+            <a class="page-link" href="/admin/productList?page=<%= i %>"><%= i %></a>
+        </li>
+    <% } %>
+</ul>
+
+    </nav>
+  </div>
             </section>
             <!-- content-main end// -->
 

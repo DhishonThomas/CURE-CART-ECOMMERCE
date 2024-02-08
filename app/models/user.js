@@ -27,7 +27,13 @@ const userShcema = new mongoose.Schema({
   isBlocked:{
     type:Boolean,
     default:true
-  }
+  },
+    resetPasswordToken: {
+    type: String,
+  },
+  resetPasswordExpires: {
+    type: Date,
+  },
 });
 const User = mongoose.model('User',userShcema)
 module.exports = User

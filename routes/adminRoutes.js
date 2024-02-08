@@ -9,7 +9,7 @@ router.get("/admin", adminAuthMiddileware,adminController.admin);
 
 router.get("/usersList", adminAuthMiddileware, adminController.usersList);
 
-router.get("/userUlist/:id", adminAuthMiddileware, adminController.userUlist);
+router.put("/userUlist/:id", adminAuthMiddileware, adminController.userUlist);
 
 // Admin sign-in route
 router.post("/signin", adminController.signIn);

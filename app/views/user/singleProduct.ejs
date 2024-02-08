@@ -5,6 +5,55 @@
 
 
 }
+/* Add CSS for the orange button */
+.btn-orange {
+    background-color: orange;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: not-allowed; /* Show disabled cursor */
+}
+.btn-orange:hover {
+    background-color: orange; /* Keep background color on hover */
+}
+.btn-orange:disabled {
+    opacity: 0.7; /* Reduce opacity for disabled state */
+    cursor: not-allowed; /* Show disabled cursor */
+}
+/* Style for the Go to Cart button */
+.btn-goto-cart {
+    background-color: blue; /* Change the background color to blue */
+    color: orange; /* Change the text color to orange */
+    border: none; /* Remove border */
+    padding: 10px 20px; /* Adjust padding as needed */
+    cursor: pointer; /* Add pointer cursor */
+    text-decoration: none; /* Remove underline */
+    display: inline-block; /* Make it inline block */
+}
+
+/* Style for the Go to Cart button on hover */
+.btn-goto-cart:hover {
+    background-color: darkblue; /* Change background color on hover */
+    color: white; /* Change text color on hover */
+}
+.btn-add-cart {
+    background-color: blue; /* Change the background color to blue */
+    color: orange; /* Change the text color to orange */
+    border: none; /* Remove border */
+    padding: 10px 20px; /* Adjust padding as needed */
+    cursor: pointer; /* Add pointer cursor */
+    text-decoration: none; /* Remove underline */
+    display: inline-block; /* Make it inline block */
+}
+
+/* Style for the Go to Cart button on hover */
+.btn-add-cart:hover {
+    background-color: darkblue; /* Change background color on hover */
+    color: white; /* Change text color on hover */
+}
+
+
 </style>
  <main class="main">
             <nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
@@ -53,46 +102,7 @@
         </div><!-- End .product-gallery -->
     <% } %>
 </div><!-- End .col-md-6 -->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const mainImageContainer = document.getElementById('product-zoom-container');
-        const mainImage = document.getElementById('product-zoom');
-        let isZoomed = false;
 
-        mainImageContainer.addEventListener('mouseover', function () {
-            // Check if the image has sufficient dimensions for zooming
-            if (!isZoomed) {
-                mainImage.style.transform = 'scale(1.5)'; // Adjust the scale factor as needed
-                mainImage.style.transition = 'transform 1.3s ease'; // Optional: Add a transition for a smooth effect
-
-                // Set z-index to a high value
-                mainImageContainer.style.zIndex = '1000';
-
-                isZoomed = true;
-            }
-        });
-
-        mainImageContainer.addEventListener('mousemove', function (e) {
-            if (isZoomed) {
-                const boundingBox = mainImageContainer.getBoundingClientRect();
-                const offsetX = (e.clientX - boundingBox.left) / boundingBox.width;
-                const offsetY = (e.clientY - boundingBox.top) / boundingBox.height;
-
-                // Move the image container according to mouse movement
-                mainImage.style.transformOrigin = `${offsetX * 50}% ${offsetY * 50}%`;
-            }
-        });
-
-        mainImageContainer.addEventListener('mouseleave', function () {
-            // Reset to normal size on mouseleave
-            mainImage.style.transform = 'scale(1)';
-            isZoomed = false;
-
-            // Reset z-index to its original value
-            mainImageContainer.style.zIndex = 'auto';
-        });
-    });
-</script>
 
 
 
@@ -147,23 +157,37 @@
 
                                         <a href="#" class="size-guide"><i class="icon-th-list"></i>size guide</a>
                                     </div><!-- End .details-filter-row -->
-
+<!-- 
                                     <div class="details-filter-row details-row-size">
                                         <label for="qty">Qty:</label>
                                         <div class="product-details-quantity">
                                             <input type="number" id="qty" class="form-control" value="1" min="1" max="<%= product.quantity %>" step="1" data-decimals="0" required>
                                         </div><!-- End .product-details-quantity -->
-                                    </div><!-- End .details-filter-row -->
+                                    <!-- </div>End .details-filter-row --> 
+<div class="product-details-action">
+    <% if (product.quantity == 0) { %>
+        <button class="btn btn-orange" disabled>No Stock</button>
+    <% } else { %>
+        <% console.log("Product id______=>>", foundProduct.productId, product._id); %>
+        <% if (foundProduct.productId+"" === product._id+"") { %>
+            <button class="btn btn-goto-cart" data-gotoCart><span>Go to Cart</span></button>
+        <% } else { %>
+                        <button class="btn-add-cart" data-product-id="<%= product._id %>"><span>Add to Cart</span></button>
 
-                                    <div class="product-details-action">
-                                        <!-- Inside your HTML template -->
-                                      <a href="#" class="btn-cart" data-product-id="<%= product._id %>"><span>Add to Cart</span></a>
+        <% } %>
+    <% } %>
 
-                                        <div class="details-action-wrapper">
-                                            <a href="#" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a>
-                                            <a href="#" class="btn-product btn-compare" title="Compare"><span>Add to Compare</span></a>
-                                        </div><!-- End .details-action-wrapper -->
-                                    </div><!-- End .product-details-action -->
+
+
+
+
+    <!-- Rest of the buttons -->
+    <div class="details-action-wrapper">
+        <a href="#" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a>
+        <a href="#" class="btn-product btn-compare" title="Compare"><span>Add to Compare</span></a>
+    </div><!-- End .details-action-wrapper -->
+</div><!-- End .product-details-action -->
+
 `
                                     <div class="product-details-footer">
                                         <div class="product-cat">
@@ -578,8 +602,22 @@
 
  <script>
 
+
 document.addEventListener("DOMContentLoaded", function (){
-    const addToCartButtons = document.querySelectorAll(".btn-cart")
+    const addToCartButtons = document.querySelectorAll(".btn-add-cart")
+        const gotoCartButtons = document.querySelectorAll(".btn-goto-cart")
+
+        gotoCartButtons.forEach(button => {
+
+            button.addEventListener("click",function(event){
+                event.preventDefault()
+                window.location="/cart"
+
+            })
+            
+           
+        });
+
 
 
     addToCartButtons.forEach(button => {
@@ -606,7 +644,9 @@ document.addEventListener("DOMContentLoaded", function (){
           title: 'Item added to cart!',
           showConfirmButton: false,
           timer: 2500,
-        });
+        }).then((data)=>{
+            window.location="/cart"
+        })
       } else {
         // Handle other cases as needed
         Swal.fire({
