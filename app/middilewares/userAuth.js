@@ -1,4 +1,7 @@
 const UserCart = require("../models/cartItem");
+const Category = require("../models/category");
+const WishList = require("../models/wishlist")
+
 const userAuthMiddleware =async (req, res, next) => {
   if (req.session.isUserAuth) {
   console.log("req.session.isUserAuth====>", req.session.isUserAuth);
@@ -8,7 +11,8 @@ const userAuthMiddleware =async (req, res, next) => {
     res.locals.userCartNumber = await UserCart.findOne({
        userId: userId,
     }).populate("cartItems.productId");
-    console.log("fgdsfgdfsgfdgdsfgdfgs",res.locals.userCartNumber);
+
+    res.locals.userWishlistNumber = await WishList.findOne({ user:userId })
 //  const userCartN = await UserCart.findOne({
 //       userId: userId,
 //     }).populate("cartItems.productId");
@@ -17,8 +21,11 @@ const userAuthMiddleware =async (req, res, next) => {
 //     }else{
 //       res.locals.userCartNumber = 0
 //     }
-    next();
+res.locals.categorys = await Category.find();
+    next(); 
   } else {
+    res.locals.categorys = await Category.find();
+
     res.locals.user = null;
     next();
   }

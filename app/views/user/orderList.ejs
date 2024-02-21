@@ -1,41 +1,172 @@
+
 <%- include('../partialsUser/header'); -%>
 
-<main class="main">
-    <div class="container">
-        <h1 class="page-title">Order List</h1>
+<style>
+  .main {
+    padding: 20px;
+  }
 
-        <% if (orders.length === 0) { %>
-            <p>No orders found.</p>
-        <% } else { %>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Order Number</th>
-                            <th>Total Amount</th>
-                            <th>Payment Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% orders.forEach(order => { %>
-                            <tr>
-                                <td><%= order._id %></td>
-                                <td><%= order.totalAmount %></td>
-                                <td><%= order.paymentStatus %></td>
-                                <td>
-                                    <form method="POST" action="/cancel-order">
-                                        <input type="hidden" name="orderId" value="<%= order._id %>">
-                                        <button type="submit" class="btn btn-danger">Cancel Order</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        <% }); %>
-                    </tbody>
-                </table>
-            </div><!-- End .table-responsive -->
-        <% } %>
-    </div><!-- End .container -->
-</main><!-- End .main -->
+  .order-list {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  .order-list th,
+  .order-list td {
+    padding: 10px;
+    text-align: left;
+  }
+
+  .order-list th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+  }
+
+  .product-image-cell {
+    width: 10%;
+    text-align: center;
+  }
+
+  .product-image {
+    max-width: 100%;
+    max-height: 50px;
+    object-fit: cover;
+  }
+
+  .no-image-placeholder {
+    color: #999;
+    font-style: italic;
+  }
+
+  .product-name {
+    width: 30%;
+  }
+
+  .quantity,
+  .price,
+  .total-amount {
+    width: 10%;
+  }
+
+  .payment-status,
+  .action {
+    width: 10%;
+  }
+
+  .btn {
+    border-radius: 4px;
+  }
+
+  .btn-danger {
+    background-color: #dc3545;
+  }
+
+  .btn-secondary {
+    background-color: #ccc;
+  }
+
+  .disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .no-orders {
+    text-align: center;
+    font-size: 1.2em;
+  }
+
+  /* New for hover effect */
+  .order-list tr:hover {
+    background-color: #f5f5f5;
+  }
+</style>
+<main class="main">
+  <div class="container">
+    <h1>Here's your order list, buddy!</h1>
+
+    <% if (orders.length === 0) { %>
+      <p class="no-orders">Looks like you haven't ordered anything yet. Hop to it!</p>
+    <% } else { %>
+      <div class="table-responsive">
+        <table class="table table-bordered order-list">
+          <thead>
+            <tr>
+              <th>Product Pic</th>
+              <th class="product-name-bold">Product Name</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Total</th>
+              <th>Order Status</th>
+              <th>Ordered Date</th>
+            </tr>
+          </thead>
+         <!-- Constructing product detail links in your frontend template -->
+<tbody id="orderList">
+    <% orders.forEach(order => { %>
+        <% order.items.forEach(item => { %>
+            <tr class="order-row" data-order-id="<%= order._id %>" data-product-id="<%= item.product._id %>">
+                <%= console.log("dgfdfsgwuyeguyqwegfuyqewgf",item.product._id); %>
+                <td class="product-image-cell">
+                    <% if (item.product && item.product.images && item.product.images.length > 0) { %>
+                        <img src="<%= item.product.images[0] %>" alt="<%= item.product.productName %>" class="product-image">
+                    <% } else { %>
+                        <div class="no-image-placeholder">No pic yet</div>
+                    <% } %>
+                </td>
+              <td class="product-name" style="font-weight: bold; color: blue;">
+    <b><%= item.product ? item.product.productName : 'Product Not Found' %></b>
+</td>
+<td class="quantity" style="font-weight: bold; color: green;"><%= item.quantity %></td>
+<td class="price" style="font-weight: bold; color: red;">&#8377; <%=item.price %></td>
+<td class="total-amount" style="font-weight: bold; color: purple;">&#8377; <%= item.quantity * item.price %></td>
+<td class="payment-status-bold" style="font-weight: bold; color: #dc3545;"><%= item.orderStatus %></td>
+<td class="demo-date" style="font-weight: bold; color: orange;">
+    <%= order.createdAt %>
+</td>
+            </tr>
+        <% }); %>
+    <% }); %>
+</tbody>
+
+
+
+
+
+
+        </table>
+      </div>
+    <% } %>
+  </div>
+</main>
+
 
 <%- include('../partialsUser/footer'); -%>
+
+<script>
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+    const orderRows = document.querySelectorAll('.order-row');
+
+    orderRows.forEach(row => {
+        row.addEventListener('click', function() {
+            const orderId = row.dataset.orderId;
+            const productId = row.dataset.productId;
+            
+            window.location.href = `/order-details/${orderId}/${productId}`;
+        });
+    });
+});
+
+</script>
+
+<script>
+  $(document).ready(function() {
+  $('.order-list').on('click', 'tr[data-order-id]', function() {
+    const orderId = $(this).data('order-id');
+    const productId = $(this).data('product-id')
+    window.location.href = `/order-details/${orderId}/${productId}`;
+  });
+});
+
+</script>

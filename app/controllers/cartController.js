@@ -6,59 +6,36 @@ const { ObjectId } = require("mongoose").Types;
 
 class CartController {
   async addToCart(userId, productId, quantity) {
-    console.log("1", userId);
-    console.log("2", userId, productId, quantity);
     try {
       const producrIds = new ObjectId(productId);
-      //  console.log(producrIds);
 
       const user = await User.findById(userId);
       const product = await Product.findOne({ _id: producrIds });
-      console.log("3", userId, productId, quantity);
-      console.log(productId);
+
       if (!user || !product) {
         throw new Error("User or product not found");
       }
 
-      console.log("reached to user cart");
-
       let userCart = await UserCart.findOne({ userId });
       if (userCart == null) {
         userCart = new UserCart({ userId, cartItems: [] });
-        console.log("user cart null worked");
       }
+
       const productPrices = await Product.findOne({ _id: producrIds });
-
       const productPrice = productPrices.price;
-      const total = userCart.totalAmount;
-
-      console.log("Total==>", total);
       const productTotal = productPrice;
 
       userCart.totalAmount += productTotal;
-
       await userCart.save();
-
-      console.log("productPrice:", productPrice, productId);
-
-      console.log("4userCart==>", userCart);
-
-      // if (!userCart) {
-
-      //   userCart = new UserCart({ userId, cartItems: [] });
-      // }
 
       let cartItem = userCart.cartItems.find((item) =>
         item.productId.equals(productId)
       );
-      //*******************************pushing to array in the usercart cartitemsv -******************
+
       if (cartItem) {
         cartItem.quantity += quantity;
-        console.log("5cartItemIf==>", cartItem);
       } else {
         userCart.cartItems.push({ productId, quantity });
-
-        console.log("6cartItemElse==>", userCart.cartItems);
       }
 
       await userCart.save();

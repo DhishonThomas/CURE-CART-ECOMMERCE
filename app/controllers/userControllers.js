@@ -5,7 +5,6 @@ const Product = require("../models/product");
 const mongoose = require("mongoose");
 const UserCart = require("../models/cartItem");
 const userAddress = require("../models/userAddress");
-const Order = require("../models/order");
 
 const cartController = require("./cartController");
 
@@ -18,6 +17,7 @@ const userControllers = {
       const cartItems = await UserCart.findOne(userId).populate(
         "cartItems.productId"
       );
+      
 
       console.log(cartItems);
       // console.log(cartItems.totalAmount);
@@ -28,6 +28,7 @@ const userControllers = {
           user: req.session.isUserAuth,
           cartItems,
           user,
+          
         });
       } else {
         res.render("user/home", { products, user: null });
@@ -68,10 +69,8 @@ const userControllers = {
       const user = await User.findOne({ email });
 
       if (user) {
-        // Check if the user is blocked
         if (!user.isBlocked) {
           console.log(user.isBlocked);
-          // If blocked, send a message to the user
           return res.json({ data: false, error: "User is blocked" });
         }
 
@@ -81,14 +80,12 @@ const userControllers = {
           // res.locals.user = user;
           res.json({ data: true });
         } else {
-          // Incorrect password
           res.json({
             data: false,
             error: "Invalid email or password",
           });
         }
       } else {
-        // No user found
         return res.json({ data: false, error: "Invalid email or password" });
       }
     } catch (error) {
@@ -148,18 +145,49 @@ const userControllers = {
 
   // <..........................................................................................................>
 
-  shop: async (req, res) => {
-    const page = parseInt(req.query.page);
-    const perPage = 10;
+shop: async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const perPage = 10;
 
-    const totalUsers = await Product.countDocuments();
-    const totalPages = Math.ceil(totalUsers / perPage);
+        let query = { isListed: true }; // Default query
 
-    const products = await Product.find({ isListed: true })
-      .skip((page - 1) * perPage)
-      .limit(perPage);
-    res.render("user/shop", { products, totalPages, currentPage: page });
-  },
+        // Check if category filter is applied
+        if (req.query.category) {
+            query.category = req.query.category;
+            console.log(query);
+
+              const totalProducts = await Product.countDocuments({
+                category: query.category,
+              });
+              const totalPages = Math.ceil(totalProducts / perPage);
+
+              const products = await Product.find({category:query.category})
+                .skip((page - 1) * perPage)
+                .limit(perPage);
+
+              res.render("user/shop", {
+                products,
+                totalPages,
+                currentPage: page,
+              });
+        } else{
+        const totalProducts = await Product.countDocuments(query);
+        const totalPages = Math.ceil(totalProducts / perPage);
+
+        const products = await Product.find(query)
+          .skip((page - 1) * perPage)
+          .limit(perPage);
+
+        res.render("user/shop", { products, totalPages, currentPage: page });
+        }
+
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        res.status(500).send("Internal Server Error");
+    }
+},
+
   // <..........................................................................................................>
 
   singleProduct: async (req, res) => {
@@ -205,12 +233,9 @@ const userControllers = {
   addToCart: async (req, res) => {
     const { quantity } = req.body;
 
-    console.log("Quantity==>", quantity);
     const productId = req.params.id;
     const userId = res.locals.user;
-    console.log("1 quantity", req.body);
-    console.log("2 productid", req.params.id);
-    console.log("3 userId", userId);
+    
 
     try {
       if (req.session.isUserAuth) {
@@ -335,6 +360,8 @@ const userControllers = {
     try {
       const userId = res.locals.user;
 
+      const RazUser = await User.findById(userId);
+
       const userAddresses = await userAddress.findOne({ userId: userId });
       console.log("userAddress::", userAddresses);
 
@@ -352,6 +379,7 @@ const userControllers = {
           userAddress: userAddresses.addresses,
           cartItems,
           cartTotal,
+          RazUser,
         });
         // res.render("user/cart", {
         //   cartItems,
@@ -569,131 +597,15 @@ const userControllers = {
     }
   },
 
-  order: async (req, res) => {
-    const { selectedAddressId, selectedPaymentOption } = req.body;
 
-    try {
-      const user = res.locals.user;
-      console.log(req.body);
 
-      const UserAddress = await userAddress
-        .findOne({
-          userId: user,
-        })
-        .exec();
-      if (!UserAddress) {
-        return res.status(404).json({ message: "User address not found" });
-      }
+ 
 
-      const address = UserAddress.addresses.find(
-        (addr) => addr._id == selectedAddressId
-      );
 
-      console.log("Address", address);
-      if (!address) {
-        return res.status(404).json({ message: "Address not found" });
-      }
-      console.log("usercart start");
 
-      const userCart = await UserCart.findOne({ userId: user });
-      if (!userCart) {
-        return res.status(404).json({ message: "User cart not found" });
-      }
-      const { totalAmount } = userCart;
-      const cartItems = userCart.cartItems;
 
-      const orderItems = await Promise.all(
-        cartItems.map(async (cartItem) => {
-          const product = await Product.findById(cartItem.productId).exec();
-          if (!product) {
-            throw new Error("Product not found");
-          }
-          const price = product.price;
-          return {
-            product: cartItem.productId,
-            quantity: cartItem.quantity,
-            price: price,
-          };
-        })
-      );
+  
+ 
 
-      const order = new Order({
-        user: user,
-        items: orderItems,
-        totalAmount: totalAmount,
-        shippingAddress: address,
-        paymentMethod: selectedPaymentOption,
-      });
-
-      if (selectedPaymentOption === "online") {
-        // Integrate with Razorpay or other payment gateway service here
-        const razorpayOrderOptions = {
-          amount: totalAmount * 100, // Amount in paise
-          currency: "INR",
-          receipt: "order_rcptid_" + Math.floor(Math.random() * 1000), // Generate a unique receipt ID
-        };
-
-        const razorpayOrder = await razorpay.orders.create(
-          razorpayOrderOptions
-        );
-
-        // Redirect the user to the Razorpay checkout page
-        return res.status(200).json({
-          message: "Redirecting to Razorpay for payment",
-          orderId: razorpayOrder.id,
-          amount: razorpayOrder.amount,
-        });
-      } else {
-        // For other payment options like cash on delivery
-        await order.save();
-        console.log(order);
-
-        await Promise.all(
-          cartItems.map(async (cartItem) => {
-            const product = await Product.findById(cartItem.productId).exec();
-            if (product) {
-              product.quantity -= cartItem.quantity;
-              await product.save();
-            }
-          })
-        );
-        const carts = userCart.cartItems;
-        console.log(
-          "userCart.cartItems===========================>>>>>>>",
-          carts
-        );
-        userCart.cartItems = [];
-        userCart.totalAmount = 0;
-        await userCart.save();
-
-        return res
-          .status(201)
-          .json({ message: "Order created successfully", order: order });
-      }
-    } catch (error) {
-      console.error("Error creating order:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  },
-
-  orderPlaced: async (req, res) => {
-    try {
-      res.render("user/orderPlaced");
-    } catch (error) {
-      console.log(error);
-    }
-  },
-  orderList: async (req, res) => {
-    try {
-      // Fetch orders from the database
-      const orders = await Order.find({ user: res.locals.user }).exec();
-
-      // Render the orderList view with the orders data
-      res.render("user/orderList", { orders: orders });
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  },
 };
 module.exports = userControllers;

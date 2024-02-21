@@ -196,6 +196,8 @@
                                 </tr>
                                 <tr class="summary-total">
                                     <td>Total:</td>
+                                        <input type="hidden" id="amount" name="amount" value="<%= cartTotal.totalAmount %>">
+
                                     <td>&#8377;<%= cartTotal.totalAmount %></td>
                                 </tr><!-- End .summary-total -->
                             </tbody>
@@ -213,13 +215,15 @@
                             <div class="card">
                                 <div class="card-header" id="heading-4">
                                     <h2 class="card-title">
-                                        <input type="radio" id="paypal" name="payment-option" value="paypal">
-                                        <label for="paypal">PayPal</label>
+                                        <input type="radio" id="paypal" name="payment-option" value="Razorpay">
+                                        <label for="paypal">Razorpay</label>
                                     </h2>
                                 </div><!-- End .card-header -->
                             </div><!-- End .card -->
                         </div><!-- End #accordion-payment -->
                         <!-- Place Order button -->
+            <span id="SelectionError" style="color: red;"></span>
+
                         <button type="submit" class="btn btn-outline-primary-2 btn-order btn-block">
                             <span class="btn-text">Place Order</span>
                             <span class="btn-hover-text">Proceed to Checkout</span>
@@ -255,7 +259,8 @@
 
 
 </main><!-- End .main -->
-
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
  <script>
 
             // Get the modal
@@ -377,9 +382,7 @@ span.onclick = function() {
 </script>
 
 
-
 <script>
-    
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM content loaded");
 
@@ -415,6 +418,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
             var selectedAddressId = document.getElementById('selected-address-id').value;
             var selectedPaymentOption = document.querySelector('input[name="payment-option"]:checked').value;
+console.log("selectedAddressId",selectedAddressId);
+if(selectedAddressId){
+
 
             fetch('/orders', {
                 method: 'POST',
@@ -428,38 +434,134 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => response.json())
             .then(data => {
-                if (data) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Order Placed Successfully',
-                        showConfirmButton: false,
-                        timer: 2500
-                    }).then((result) => {
-                        window.location = "/orderPlaced";
+                if(selectedPaymentOption==="Razorpay"){
+
+               
+                if (data.success) {
+                    console.log("Data resposed", data.success);
+                    console.log("Payment form worked");
+
+                    var amount = $('#amount').val();
+                    console.log(amount);
+
+                    console.log("success worked");
+
+                    var orderId = data.orderId;
+                    var amount = data.amount;
+
+                    // Call Razorpay checkout method
+                    var options = {
+                        key: 'rzp_test_SsymjD3eNkPA50', // Replace with your Razorpay key
+                        amount: amount,
+                        currency: 'INR',
+                        name: 'Your Company Name',
+                        description: 'Test Payment',
+                        image: 'https://your-company-logo.png', // Replace with your company logo
+                        order_id: orderId,
+                        handler: function(response) {
+                            // Send response along with razorpay_signature to server for verification
+                            var requestData = {
+                                response: response,
+                                razorpay_signature: response.razorpay_signature,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_order_id: response.razorpay_order_id,
+                                selectedAddressId:selectedAddressId,
+                                selectedPaymentOption:selectedPaymentOption
+                            };
+
+                            $.ajax({
+                                url: '/payment-callback',
+                                type: 'POST',
+                                contentType: 'application/json',
+                                data: JSON.stringify(requestData),
+                                success: function(data) {
+                                    if (data) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Order Placed Successfully',
+                                            showConfirmButton: false,
+                                            timer: 2500
+                                        }).then((result) => {
+                                            window.location = "/orderPlaced";
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: 'Failed to place the order'
+                                        });
+                                    }
+                                },
+                                error: function(xhr, status, error) {
+                                    console.error(error);
+                                    alert('Payment failed! ' + error);
+                                }
+                            });
+                        },
+                        prefill: {
+                            name: '<%=RazUser.username%>' ,
+                            email: '<%=RazUser.email%>',
+                            contact: '<%=RazUser.phonenumber%>'
+                        },
+                        notes: {
+                            address: 'Razorpay Corporate Office'
+                        },
+                        theme: {
+                            color: 'green'
+                        }
+                    };
+
+                    var rzp1 = new Razorpay(options);
+                    rzp1.on('payment.failed', function(response) {
+                        console.error(response.error.description);
+                        alert('Payment failed! ' + response.error.description);
                     });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Failed to place the order'
-                    });
+
+                    rzp1.open();
                 }
+            }else{
+                  if (data) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Order Placed Successfully',
+                                            showConfirmButton: false,
+                                            timer: 2500
+                                        }).then((result) => {
+                                            window.location = "/orderPlaced";
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: 'Failed to place the order'
+                                        });
+                                    }
+            }
             })
-          .catch(error => {
-    console.error('Error placing order:', error);
-    Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Failed to place the order. Please try again later.'
-  });
-});
+             
+            .catch(error => {
+                console.error('Error placing order:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to place the order. Please try again later.'
+                });
+            });
+        }else{
+            SelectionError.innerText = 'Please select the address';
+        }
         });
+    
     } else {
-        console.log("Checkout form not found");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Please Choose any payment option'
+                });
     }
 });
-
 </script>
+
 
  
 

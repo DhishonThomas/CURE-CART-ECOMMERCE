@@ -1,0 +1,501 @@
+<%- include('../partialsUser/header'); -%>
+
+<style>
+   * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+}
+
+/* Styles for the order details table and its components */
+.container {
+  width: 100%; /* Adjust the width to occupy the full screen */
+  margin: 0px auto;
+  max-width: 80%;
+  
+}
+  .invoice-download {
+    text-align: right;
+    margin-bottom: 20px;
+  }
+
+  #downloadInvoiceButton {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 16px;
+  }
+
+  #downloadInvoiceButton:hover {
+    background-color: #0056b3;
+  }
+
+.order-details-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.order-details-table th,
+.order-details-table td {
+  width: 27%;
+  padding: 8px;
+  border: 3px solid #ddd;
+  text-align: left;
+}
+
+.order-details-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+  
+  
+}
+
+.order-details-table .customer-info th {
+  background-color: #dff0d8;
+  width: 20%;
+}
+
+
+
+.order-details-table .cancel-order-button button {
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.order-details-table .cancel-order-button button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.order-details-table .cancel-order-button button:hover {
+  background-color: #c9302c;
+}
+
+/* Media query for responsive layout */
+@media (max-width: 100%) {
+  .order-details-table th,
+  .order-details-table td {
+    font-size: 12px;
+    padding: 6px; /* Adjust padding for smaller screens */
+  }
+}
+
+
+</style>
+<br>
+<main class="main">
+  <div class="container">
+<div class="invoice-download">
+  <button id="downloadInvoiceButton" data-order-id="<%= orders._id %>" >Download Invoice</button>
+</div>
+<table class="order-details-table">
+  <thead>
+    <tr>
+      <th colspan="5" style="font-family: sans-serif; font-weight: bold; color: black;">Order Details</th>
+    </tr>
+    <tr>
+      <th style="font-weight: bold">Order ID</th>
+      <th>Payment Method</th>
+      <th style="font-weight: bold; color: black;">Payment Status</th>
+      <th style="font-weight: bold; color: black;">Order Status</th>
+    </tr>
+    <tr>
+      <td>#<%= orders ? orders.orderId : 'N/A' %></td>
+      <td style="font-weight: bold; color: green;"><%= orders ? orders.paymentMethod : 'N/A' %></td>
+      <td style="color: orange;"><%= orders ? orders.paymentStatus : 'N/A' %></td>
+      <% if (orders) { %>
+      <% if (oneProduct.orderStatus === "Pending") { %>
+      <td style="color: orange" id="orderShipped">Shipped</td>
+      <% } else if (oneProduct.orderStatus === "OrderCanceled") { %>
+      <td style="color: orange">Order Canceled</td>
+      <% } else if (oneProduct.orderStatus === "Delivered") { %>
+      <td style="color: orange">Delivered</td>
+      <% } else if (oneProduct.orderStatus === "Return") { %>
+      <td style="color: orange">Return</td>
+      <% } else { %>
+      <td style="color: orange">N/A</td>
+      <% } %>
+      <% } else { %>
+      <td style="color: orange">N/A</td>
+      <% } %>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="customer-info" style="font-family: sans-serif; font-weight: bold; color: green;">
+      <th colspan="4">Customer Information</th>
+    </tr>
+    <% if (orders && orders.shippingAddress) { %>
+    <tr>
+      <td style="font-weight: bold">Name:</td>
+      <td colspan="3">
+        <% try { %>
+        <%= orders.shippingAddress.name %>
+        <% } catch (error) { %>
+        Error parsing shipping address: <%= error.message %>
+        <% } %>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold">Mobile Number:</td>
+      <td colspan="3">
+        <% try { %>
+        <%= orders.shippingAddress.mobile %>
+        <% } catch (error) { %>
+        Error parsing shipping address: <%= error.message %>
+        <% } %>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold">Address:</td>
+      <td colspan="3">
+        <% try { %>
+        <%= orders.shippingAddress.address %> - <%= orders.shippingAddress.street %>,
+        <%= orders.shippingAddress.city %>, <%= orders.shippingAddress.state %> -
+        <%= orders.shippingAddress.pinCode %>
+        <% } catch (error) { %>
+        Error parsing shipping address: <%= error.message %>
+        <% } %>
+      </td>
+    </tr>
+    <% } else { %>
+    <tr>
+      <td colspan="4">Shipping address details missing.</td>
+    </tr>
+    <% } %>
+    <!-- Total Row -->
+        <tr class="customer-info" style="font-family: sans-serif; font-weight: bold; color: green;">
+      <th colspan="4">Total Amount</th>
+    </tr>
+    <tr>
+      <td colspan="3" style="font-weight: bold; text-align: left;">Total Amount: </td>
+     
+     
+    <td style="font-weight: bold; color: green;">&#8377; <%= orders ? oneProduct.quantity*oneProduct.price : 'N/A' %></td>
+       
+
+     
+    <tr>
+     
+    </tr>
+   
+    <!-- Cancel Order Button -->
+    <tr>
+      <td colspan="5" class="cancel-order-button">
+        <% if (oneProduct.orderStatus === "Pending") { %>
+        <button id="cancelButton" data-product-id="<%= oneProduct.product %>" data-order-id="<%= orders._id %>">Cancel Order</button>
+        <% } else if (oneProduct.orderStatus === "OrderCanceled") { %>
+        <button disabled>Order Canceled</button>
+        <% } else if (oneProduct.orderStatus === "Return") { %>
+        <button id="returnButton" data-order-id="<%= oneProduct.product %>">Return Order</button>
+        <% } else if (oneProduct.orderStatus === "Delivered") { %>
+        <button disabled>Delivered</button>
+        <% } %>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+    <style>
+      /* CSS Styles */
+.order-items {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.order-items th,
+.order-items td {
+  width: 1px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.order-items th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.order-items .product-image-cell {
+  width: 100px;
+}
+
+.order-items .product-image-small {
+  max-width: 50px;
+  max-height: 50px;
+}
+
+.order-items .product-name-cell {
+  width: 200px;
+}
+
+.order-items .product-name-cell a {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+    </style>
+                
+
+<table class="order-items">
+  <tr class="order-items">
+    <th colspan="14">Another Order Items</th>
+  </tr>
+  <tr>
+    <th>Product</th>
+    <th>Product Name</th>
+    <th>Quantity</th>
+    <th>Price</th>
+    <th>Total</th>
+  </tr>
+  <% if (orderProduct && orderProduct.items) { %>
+    <% orderProduct.items.forEach(item => { %>
+      <tr>
+        <td class="product-image-small">
+          <img src="<%= item.product.images[0] %>" alt="<%= item.product.productName %>" class="product-image">
+        </td>
+        <td class="product-name">
+          <a href="/order-details/<%= orders._id %>/<%= item.product._id%>">
+            <b><%= item.product ? item.product.productName : 'Product Not Found' %></b>
+          </a>
+        </td>
+        <td><%= item.quantity %></td>
+        <td>&#8377; <%= item.price %></td>
+        <td>&#8377; <%= item.quantity * item.price %></td>
+      </tr>`
+    <% }); %>
+  <% } else { %>
+    <tr>
+      <td colspan="4">Order items not available.</td>
+    </tr>
+  <% } %>
+  <tr>
+    <th colspan="4" style="font-weight: bold">Total Amount:</th>
+    <td style="font-weight: bold">&#8377; <%= orders ? orders.totalAmount : 'N/A' %></td>
+  </tr>
+</table>
+
+
+
+  </div>
+</main>
+<br>
+
+<script>
+
+  // Add event listener to the button
+document.getElementById('downloadInvoiceButton').addEventListener('click', () => {
+
+const orderId = document.getElementById("downloadInvoiceButton").dataset.orderId
+
+  fetch(`/download-pdf?orderId=${orderId}`)
+    .then(response => {
+      if (response.ok) {
+        // If the response is successful, trigger the download
+        return response.blob();
+      }
+      throw new Error('Network response was not ok.');
+    })
+    .then(blob => {
+      // Create a URL for the PDF blob
+      const url = window.URL.createObjectURL(blob);
+      // Create a temporary link element
+      const a = document.createElement('a');
+      // Set the href attribute to the PDF URL
+      a.href = url;
+      // Set the download attribute to specify the filename
+      a.download = 'orderDetails.pdf';
+      // Append the link to the document body
+      document.body.appendChild(a);
+      // Click the link to trigger the download
+      a.click();
+      // Remove the temporary link from the document body
+      document.body.removeChild(a);
+      // Revoke the URL object to free up resources
+      window.URL.revokeObjectURL(url);
+    })
+    .catch(error => {
+      console.error('Error downloading PDF:', error);
+    });
+});
+
+</script>
+
+
+<script>
+
+
+document.addEventListener('DOMContentLoaded', async () => {
+const handleCancelOrder = async (orderId, productId) => {
+    try {
+        const { value: reason } = await Swal.fire({
+            title: 'Cancel Order',
+            text: 'Are you sure you want to cancel this order?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            input: 'text',
+            inputLabel: 'Please provide a reason for cancellation',
+            inputPlaceholder: 'Reason...'
+        });
+
+        if (reason) {
+            const response = await fetch('/cancel-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ orderId, productId, reason })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                    orderShipped.textContent = 'Order Canceled';
+                    cancelButton.textContent = 'Order Canceled';
+                    cancelButton.disabled = true;
+                    Swal.fire({
+                        title: 'Order Canceled',
+                        text: 'Your order has been successfully canceled.',
+                        icon: 'success',
+                    });
+                } else {
+                    throw new Error(data.message);
+                }
+            } else {
+                throw new Error('Failed to cancel order');
+            }
+        }
+    } catch (error) {
+        console.error('Error canceling order:', error);
+        // Display error message using SweetAlert
+        Swal.fire({
+            title: 'Error',
+            text: 'Failed to cancel order. Please try again later.',
+            icon: 'error',
+        });
+    }
+};
+
+
+
+    const handleReturnOrder = async (orderId,productId) => {
+        try {
+            const reason = await Swal.fire({
+                title: 'Return Order',
+                text: 'Please provide a reason for return:',
+                content: {
+                    element: 'input',
+                    attributes: {
+                        placeholder: 'Enter reason',
+                        type: 'text',
+                    },
+                },
+                buttons: {
+                    cancel: 'Cancel',
+                    confirm: 'Return',
+                },
+            });
+
+            if (reason) {
+                const response = await fetch('/return-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ orderId, reason ,productId})
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        orderShipped.textContent = 'Return Requested'
+                        returnButton.textContent = 'Return Requested';
+                        returnButton.disabled = true;
+                        Swal.fire({
+                            title: 'Return Accepted',
+                            text: 'Your return request has been accepted.',
+                            icon: 'success',
+                        });
+                    } else {
+                        throw new Error(data.message);
+                    }
+                } else {
+                    throw new Error('Failed to process return request');
+                }
+            }
+        } catch (error) {
+            console.error('Error processing return request:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Failed to process return request. Please try again later.',
+                icon: 'error',
+            });
+        }
+    };
+
+    // Get cancel and return buttons
+    const orderShipped = document.getElementById('orderShipped')
+    const cancelButton = document.getElementById('cancelButton');
+    const returnButton = document.getElementById('returnButton');
+
+    // Add event listener for cancel order button
+    cancelButton.addEventListener('click', async () => {
+        const orderId = cancelButton.dataset.orderId;
+        const productId =  cancelButton.dataset.productId;
+
+        console.log(orderId, productId);
+        if (orderId && productId) {
+            const confirmCancel = await Swal.fire({
+                 title: 'Cancel Order',
+    text: 'Are you sure you want to cancel this order?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes',
+    cancelButtonText: 'No'
+            });
+
+            if (confirmCancel.isConfirmed) {
+                handleCancelOrder(orderId,productId);
+
+            }
+        } else {
+            console.error('Order ID not found');
+        }
+    });
+
+    returnButton.addEventListener('click', async () => {
+        const orderId = returnButton.dataset.orderId;
+        if (orderId) {
+            handleReturnOrder(orderId,productId);
+        } else {
+            console.error('Order ID not found');
+        }
+    });
+});
+  
+</script>
+
+
+<%- include('../partialsUser/footer'); -%>
+
+

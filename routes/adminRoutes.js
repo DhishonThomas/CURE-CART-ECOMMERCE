@@ -5,6 +5,8 @@ const adminController = require("../app/controllers/adminController");
 const adminAuthMiddileware = require("../app/middilewares/adminAuth");
 const path = require('path')
 
+const adminOrderController = require("../app/controllers/adminOrderController");
+
 router.get("/admin", adminAuthMiddileware,adminController.admin);
 
 router.get("/usersList", adminAuthMiddileware, adminController.usersList);
@@ -65,5 +67,15 @@ router.delete(
 router.get("/productListDelete/:id",adminAuthMiddileware, adminController.productListDelete);
 
 router.get("/productListUlist/:id",adminAuthMiddileware, adminController.productListUlist);
+
+router.get("/order-List", adminAuthMiddileware, adminOrderController.orderList);
+
+router.get(
+  "/order-details/:orderId",
+  adminAuthMiddileware,
+  adminOrderController.orderDetails
+);
+
+router.post("/cancel-order", adminAuthMiddileware, adminOrderController.orderCancel);
 
 module.exports = router; 

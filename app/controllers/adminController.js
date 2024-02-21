@@ -11,6 +11,8 @@ const storage = multer.memoryStorage();
 const uploads = multer({ storage: storage }).array("images", 15); 
 const User = require("../models/user")
 const mongoose = require("mongoose")
+const  Order = require("../models/order");
+const { error } = require("console");
 // exports.adminSave = async(req,res)=>{
 //   const { email, password } = req.body;
 //   const hashPassword=await bcrypt.hash(password,10);
@@ -638,4 +640,8 @@ exports.productListUlist = async (req, res) => {
     console.log(error);
     res.status(500).send("Internal Server Error");
   }
+
+  
 };
+
+

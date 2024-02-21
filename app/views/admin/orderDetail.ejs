@@ -1,6 +1,22 @@
   <%- include('../partials/header'); -%>
 
-  
+  <style>
+    button {
+  /* padding: 0px 10px; */
+  width: 130px;
+  height: 30px  ;
+  border-radius: 5%;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: #e26c0b;
+  cursor: not-allowed;
+}
+  </style>
   <section class="content-main">
                 <div class="content-header">
                     <div>
@@ -39,31 +55,16 @@
                                     <div class="text">
                                         <h6 class="mb-1">Customer</h6>
                                         <p class="mb-1">
-                                            John Alexander <br />
-                                            alex@example.com <br />
-                                            +998 99 22123456
+                                            <%= orders.user.username %><br />
+                                            <%= orders.user.email %> <br />
+                                            <%= orders.user.phonenumber%>
                                         </p>
-                                        <a href="#">View profile</a>
+                                        <!-- <a href="#">View profile</a> -->
                                     </div>
                                 </article>
                             </div>
                             <!-- col// -->
-                            <div class="col-md-4">
-                                <article class="icontext align-items-start">
-                                    <span class="icon icon-sm rounded-circle bg-primary-light">
-                                        <i class="text-primary material-icons md-local_shipping"></i>
-                                    </span>
-                                    <div class="text">
-                                        <h6 class="mb-1">Order info</h6>
-                                        <p class="mb-1">
-                                            Shipping: Fargo express <br />
-                                            Pay method: card <br />
-                                            Status: new
-                                        </p>
-                                        <a href="#">Download info</a>
-                                    </div>
-                                </article>
-                            </div>
+                            
                             <!-- col// -->
                             <div class="col-md-4">
                                 <article class="icontext align-items-start">
@@ -73,10 +74,14 @@
                                     <div class="text">
                                         <h6 class="mb-1">Deliver to</h6>
                                         <p class="mb-1">
-                                            City: Tashkent, Uzbekistan <br />Block A, House 123, Floor 2 <br />
-                                            Po Box 10000
-                                        </p>
-                                        <a href="#">View profile</a>
+                                            Name: <%= orders.shippingAddress.name %> <br />
+                                            Mobile: <%=orders.shippingAddress.mobile%><br/>
+                                            Address: <%= orders.shippingAddress.address%><br/>
+                                            PinCode:<%= orders.shippingAddress.pinCode %><br/>
+                                            Street: <%= orders.shippingAddress.street %><br/>
+                                            City: <%= orders.shippingAddress.city %><br/>
+                                            State: <%= orders.shippingAddress.state %>
+                                        <!-- <a href="#">View profile</a> -->
                                     </div>
                                 </article>
                             </div>
@@ -84,7 +89,7 @@
                         </div>
                         <!-- row // -->
                         <div class="row">
-                            <div class="col-lg-7">
+                            <div class="col-lg-15">
                                 <div class="table-responsive">
                                     <table class="table">
                                         <thead>
@@ -92,81 +97,80 @@
                                                 <th width="40%">Product</th>
                                                 <th width="20%">Unit Price</th>
                                                 <th width="20%">Quantity</th>
+                                                <th width="20%">Current Status</th>
+                                                 <th width="20%">Order Status</th>
                                                 <th width="20%" class="text-end">Total</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
+                                      
+                                            <% orders.items.forEach(item => { %>
+                                             
+                                              <tr>
                                                 <td>
                                                     <a class="itemside" href="#">
                                                         <div class="left">
-                                                            <img src="assets/imgs/items/1.jpg" width="40" height="40" class="img-xs" alt="Item" />
+                                                            <img src="<%=item.product.images[0]%>" width="40" height="40" class="img-xs" alt="Item" />
                                                         </div>
-                                                        <div class="info">Haagen-Dazs Caramel Cone Ice</div>
+                                                        <div class="info"><%= item.product.productName %></div>
                                                     </a>
                                                 </td>
-                                                <td>$44.25</td>
-                                                <td>2</td>
-                                                <td class="text-end">$99.50</td>
+                                                <td><%= item.product.price %></td>
+
+                                                <td><%= item.quantity %></td>
+                                                <% if (item.orderStatus==="Pending") { %>
+       <td> <button id="cancelButton" data-product-id="<%= item.product._id %>"  data-order-id="<%= orders._id %>">Cancel Order</button></td>   
+<% } else if (item.orderStatus==="OrderCanceled") { %>
+               <td> <button  disabled >Order Canceled</button></td>
+<% } else if (item.orderStatus==="Delivered") { %>
+                <td> <button  disabled >Delivered</button></td>
+<% } else if (item.orderStatus==="Return") { %>
+                 <td> <button  disabled >Return Requested</button></td>
+
+                                                <% } %>
+
+                                                <% if (item.orderStatus==="Pending") { %>
+                                                                  <td> <button id="placedButton" >Place order</button></td>
+<% } else if (item.orderStatus==="OrderCanceled") { %>
+                                                                   <td> <button  disabled >Canceled</button></td>
+<% } else if (item.orderStatus==="Return") { %>
+                                        <td> <button id="ddyrd"  >Accept Return</button></td>
+<% } else if (item.orderStatus==="ReturnOk") { %>
+                                         <td> <button  disabled >Return Accepted</button></td>
+
+                                                <% } %>
+
+
+
+                                                <td class="text-end"><%= (item.product.price*item.quantity) %></td>
                                             </tr>
-                                            <tr>
-                                                <td>
-                                                    <a class="itemside" href="#">
-                                                        <div class="left">
-                                                            <img src="assets/imgs/items/2.jpg" width="40" height="40" class="img-xs" alt="Item" />
-                                                        </div>
-                                                        <div class="info">Seeds of Change Organic</div>
-                                                    </a>
-                                                </td>
-                                                <td>$7.50</td>
-                                                <td>2</td>
-                                                <td class="text-end">$15.00</td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <a class="itemside" href="#">
-                                                        <div class="left">
-                                                            <img src="assets/imgs/items/3.jpg" width="40" height="40" class="img-xs" alt="Item" />
-                                                        </div>
-                                                        <div class="info">All Natural Italian-Style</div>
-                                                    </a>
-                                                </td>
-                                                <td>$43.50</td>
-                                                <td>2</td>
-                                                <td class="text-end">$102.04</td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <a class="itemside" href="#">
-                                                        <div class="left">
-                                                            <img src="assets/imgs/items/4.jpg" width="40" height="40" class="img-xs" alt="Item" />
-                                                        </div>
-                                                        <div class="info">Sweet & Salty Kettle Corn</div>
-                                                    </a>
-                                                </td>
-                                                <td>$99.00</td>
-                                                <td>3</td>
-                                                <td class="text-end">$297.00</td>
-                                            </tr>
+                                             <% }) %>
+                                           
+                                            
                                             <tr>
                                                 <td colspan="4">
                                                     <article class="float-end">
                                                         <dl class="dlist">
                                                             <dt>Subtotal:</dt>
-                                                            <dd>$973.35</dd>
+                                                            <dd><%= orders.totalAmount %></dd>
                                                         </dl>
                                                         <dl class="dlist">
                                                             <dt>Shipping cost:</dt>
-                                                            <dd>$10.00</dd>
+                                                            <dd>0</dd>
                                                         </dl>
                                                         <dl class="dlist">
                                                             <dt>Grand total:</dt>
-                                                            <dd><b class="h5">$983.00</b></dd>
+                                                            <dd><b class="h5"><%= orders.totalAmount %></b></dd>
                                                         </dl>
                                                         <dl class="dlist">
                                                             <dt class="text-muted">Status:</dt>
                                                             <dd>
-                                                                <span class="badge rounded-pill alert-success text-success">Payment done</span>
+                                                                <% if (orders.paymentStatus==="Pending") { %>
+                                                                    <span class="badge rounded-pill alert-success text-success">Not Paid</span>
+                                                                    <% } else if (orders.paymentStatus==="Completed") { %>
+                                                                    <span class="badge rounded-pill alert-success text-success">Paid</span>
+
+                                                                <% } %>
                                                             </dd>
                                                         </dl>
                                                     </article>
@@ -178,23 +182,23 @@
                                 <!-- table-responsive// -->
                             </div>
                             <!-- col// -->
-                            <div class="col-lg-1"></div>
-                            <div class="col-lg-4">
-                                <div class="box shadow-sm bg-light">
+                            <!-- <div class="col-lg-1"></div>
+                            <div class="col-lg-4"> -->
+                                <!-- <div class="box shadow-sm bg-light">
                                     <h6 class="mb-15">Payment info</h6>
                                     <p>
-                                        <img src="assets/imgs/card-brands/2.png" class="border" height="20" /> Master Card **** **** 4768 <br />
+                                        <img src="/adminCss/imgs/card-brands/2.png" class="border" height="20" /> Master Card **** **** 4768 <br />
                                         Business name: Grand Market LLC <br />
                                         Phone: +1 (800) 555-154-52
                                     </p>
-                                </div>
-                                <div class="h-25 pt-4">
+                                </div> -->
+                                <!-- <div class="h-25 pt-4">
                                     <div class="mb-3">
                                         <label>Notes</label>
                                         <textarea class="form-control" name="notes" id="notes" placeholder="Type some note"></textarea>
                                     </div>
                                     <button class="btn btn-primary">Save note</button>
-                                </div>
+                                </div> -->
                             </div>
                             <!-- col// -->
                         </div>
@@ -205,3 +209,143 @@
             </section>
 
             <%- include('../partials/footer'); -%>
+
+            <script>
+
+
+document.addEventListener('DOMContentLoaded', async () => {
+       const placedButton = document.getElementById('placedButton');
+
+   
+    const handleCancelOrder = async (orderId,productId) => {
+        try {
+            const response = await fetch('/admin/cancel-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ orderId,productId })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                    placedButton.textContent = 'Canceled'
+                    placedButton.disabled = true
+                    cancelButton.textContent = 'Order Canceled';
+                    cancelButton.disabled = true;
+                    Swal.fire({
+                        title: 'Order Canceled',
+                        text: 'Your order has been successfully canceled.',
+                        icon: 'success',
+                    });
+                } else {
+                    throw new Error(data.message);
+                }
+            } else {
+                throw new Error('Failed to cancel order');
+            }
+        } catch (error) {
+            console.error('Error canceling order:', error);
+            swal({
+                title: 'Error',
+                text: 'Failed to cancel order. Please try again later.',
+                icon: 'error',
+            });
+        }
+    };
+
+    const handleReturnOrder = async (orderId) => {
+        try {
+            const reason = await swal({
+                title: 'Return Order',
+                text: 'Please provide a reason for return:',
+                content: {
+                    element: 'input',
+                    attributes: {
+                        placeholder: 'Enter reason',
+                        type: 'text',
+                    },
+                },
+                buttons: {
+                    cancel: 'Cancel',
+                    confirm: 'Return',
+                },
+            });
+
+            if (reason) {
+                const response = await fetch('/return-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ orderId, reason })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        returnButton.textContent = 'Return Accepted';
+                        returnButton.disabled = true;
+                        swal({
+                            title: 'Return Accepted',
+                            text: 'Your return request has been accepted.',
+                            icon: 'success',
+                        });
+                    } else {
+                        throw new Error(data.message);
+                    }
+                } else {
+                    throw new Error('Failed to process return request');
+                }
+            }
+        } catch (error) {
+            console.error('Error processing return request:', error);
+            swal({
+                title: 'Error',
+                text: 'Failed to process return request. Please try again later.',
+                icon: 'error',
+            });
+        }
+    };
+
+    const cancelButton = document.getElementById('cancelButton');
+    const returnButton = document.getElementById('returnButton');
+
+    cancelButton.addEventListener('click', async () => {
+        const orderId = cancelButton.dataset.orderId;
+        const productId =  cancelButton.dataset.productId;
+
+        console.log("OrderId", productId);
+        if (orderId && productId) {
+            const confirmCancel = await Swal.fire({
+                 title: 'Cancel Order',
+    text: 'Are you sure you want to cancel this order?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes',
+    cancelButtonText: 'No'
+            });
+
+            if (confirmCancel.isConfirmed) {
+                handleCancelOrder(orderId,productId);
+
+            }
+        } else {
+            console.error('Order ID not found');
+        }
+    });
+
+    returnButton.addEventListener('click', async () => {
+        const orderId = returnButton.dataset.orderId;
+        if (orderId) {
+            handleReturnOrder(orderId);
+        } else {
+            console.error('Order ID not found');
+        }
+    });
+});
+  
+</script>

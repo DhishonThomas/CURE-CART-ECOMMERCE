@@ -59,15 +59,24 @@
 <style>
     /* Add your custom styles for the Login and Logout buttons */
     .btn-outline-primary {
+        border-radius: 10px;
         background-color: #007bff;
         color: #fff;
     }
 
     /* Add more styles as needed */
 </style>
-
+<style>
+    
+.logo img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    padding-right: 50px;
+}
+</style>
 <body>
-    <div class="page-wrapper">
+    <div class="page-wrapper " >
         <header class="header header-intro-clearance header-4">
             <div class="header-top">
                 <div class="container">
@@ -84,8 +93,8 @@
                             <i class="icon-bars"></i>
                         </button>
                         
-                        <a href="index.html" class="logo">
-                            <img src="/userCss/images/demos/demo-4/logocurehealth.png" alt="Molla Logo" width="105" height="25">
+                        <a href="/" class="logo ">
+                            <img src="/userCss/images/demos/demo-4/logocurehealth.png" alt="Molla Logo" width="250" height="35">
                         </a>
                     </div><!-- End .header-left -->
 
@@ -118,10 +127,10 @@
       <% if (user) { %>
        
     <div class="wishlist">
-        <a href="wishlist.html" title="Wishlist">
+        <a href="/wishList" title="Wishlist">
             <div class="icon">
                 <i class="icon-heart-o"></i>
-                <span class="wishlist-count badge">3</span>
+                <span class="wishlist-count badge"><%= userWishlistNumber.products.length %></span>
             </div>
             <p>Wishlist</p>
         </a>
@@ -206,9 +215,11 @@
                             <div class="dropdown-menu">
                                 <nav class="side-nav">
                                     <ul class="menu-vertical sf-arrows">
-                                        <li class="item-lead"><a href="#">Daily offers</a></li>
-                                        <li class="item-lead"><a href="#">Gift Ideas</a></li>
-                                        <li><a href="#">Beds</a></li>
+                                          <% categorys.forEach(category => { %>
+                                        <li class="item-lead"><a href="#"><%=category.category_name  %></a></li>
+
+                                        <% }) %>
+                                       
                                  
                                     </ul><!-- End .menu-vertical -->
                                 </nav><!-- End .side-nav -->
@@ -219,15 +230,15 @@
                     <div class="header-center">
                         <nav class="main-nav">
                             <ul class="menu sf-arrow">
-                                <li class="megamenu-container active">
-                                    <a href="/" class="sf-with-ul">Home</a>
+                                <li class="megamenu-container ">
+                                    <a href="/" >Home</a>
 
                                     
 
                                                
                                 </li>
                                 <li>
-                                    <a href="/shop" class="sf-with-ul">Shop</a>
+                                    <a href="/shop" >Shop</a>
 
                                     <!-- <div class="megamenu megamenu-md">
                                         <div class="row no-gutters">
@@ -285,13 +296,17 @@
                                     </div>End .megamenu megamenu-md -->
                                 </li>
                                 <li>
+                                                                        <a href="product.html">Contact</a>
+
+                                </li>
+                                <!-- <li>
                                     <a href="product.html" class="sf-with-ul">Product</a>
 
                                     <div class="megamenu megamenu-sm">
                                         <div class="row no-gutters">
                                             <div class="col-md-6">
                                                 <div class="menu-col">
-                                                    <div class="menu-title">Product Details</div><!-- End .menu-title -->
+                                                    <div class="menu-title">Product Details</div>End .menu-title
                                                     <ul>
                                                         <li><a href="product.html">Default</a></li>
                                                         <li><a href="product-centered.html">Centered</a></li>
@@ -302,8 +317,8 @@
                                                         <li><a href="product-fullwidth.html">Full Width</a></li>
                                                         <li><a href="product-masonry.html">Masonry Sticky Info</a></li>
                                                     </ul>
-                                                </div><!-- End .menu-col -->
-                                            </div><!-- End .col-md-6 -->
+                                                </div>End .menu-col
+                                            </div>End .col-md-6
 
                                             <div class="col-md-6">
                                                 <div class="banner banner-overlay">
@@ -311,15 +326,15 @@
                                                         <img src="/userCss/images/menu/banner-2.jpg" alt="Banner">
 
                                                         <div class="banner-content banner-content-bottom">
-                                                            <div class="banner-title text-white">New Trends<br><span><strong>spring 2019</strong></span></div><!-- End .banner-title -->
-                                                        </div><!-- End .banner-content -->
+                                                            <div class="banner-title text-white">New Trends<br><span><strong>spring 2019</strong></span></div>End .banner-title
+                                                        </div>End .banner-content
                                                     </a>
-                                                </div><!-- End .banner -->
-                                            </div><!-- End .col-md-6 -->
-                                        </div><!-- End .row -->
-                                    </div><!-- End .megamenu megamenu-sm -->
-                                </li>
-                                <li>
+                                                </div>End .banner
+                                            </div>End .col-md-6
+                                        </div>End .row
+                                    </div>End .megamenu megamenu-sm
+                                </li> -->
+                                <!-- <li>
                                     <a href="#" class="sf-with-ul">Pages</a>
 
                                     <ul>
@@ -344,8 +359,8 @@
                                         <li><a href="404.html">Error 404</a></li>
                                         <li><a href="coming-soon.html">Coming Soon</a></li>
                                     </ul>
-                                </li>
-                                <li>
+                                </li> -->
+                                <!-- <li>
                                     <a href="blog.html" class="sf-with-ul">Blog</a>
 
                                     <ul>
@@ -385,8 +400,8 @@
                                             </ul>
                                         </li>
                                     </ul>
-                                </li>
-                                <li>
+                                </li> -->
+                                <!-- <li>
                                     <a href="elements-list.html" class="sf-with-ul">Elements</a>
 
                                     <ul>
@@ -405,14 +420,14 @@
                                         <li><a href="elements-cta.html">Call to Action</a></li>
                                         <li><a href="elements-icon-boxes.html">Icon Boxes</a></li>
                                     </ul>
-                                </li>
+                                </li> -->
                             </ul><!-- End .menu -->
                         </nav><!-- End .main-nav -->
                     </div><!-- End .header-center -->
 
-                    <div class="header-right">
+                    <!-- <div class="header-right">
                         <i class="la la-lightbulb-o"></i><p>Clearance<span class="highlight">&nbsp;Up to 30% Off</span></p>
-                    </div>
+                    </div> -->
                 </div><!-- End .container -->
             </div><!-- End .header-bottom -->
         </header><!-- End .header -->
