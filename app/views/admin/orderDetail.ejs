@@ -115,7 +115,7 @@ button:disabled {
                                                         <div class="info"><%= item.product.productName %></div>
                                                     </a>
                                                 </td>
-                                                <td><%= item.product.price %></td>
+                                                <td>&#8377; <%= item.product.price %></td>
 
                                                 <td><%= item.quantity %></td>
                                                 <% if (item.orderStatus==="Pending") { %>
@@ -126,15 +126,20 @@ button:disabled {
                 <td> <button  disabled >Delivered</button></td>
 <% } else if (item.orderStatus==="Return") { %>
                  <td> <button  disabled >Return Requested</button></td>
+ <% } else if (item.orderStatus==="ReturnOk") { %>
+      <td> <button  disabled >Return Accepted</button></td>
 
-                                                <% } %>
+               <% } %>
 
                                                 <% if (item.orderStatus==="Pending") { %>
-                                                                  <td> <button id="placedButton" >Place order</button></td>
+                                                                  <td> <button id="placedButton"  data-product-id="<%= item.product._id %>"  data-order-id="<%= orders._id %>" >Place order</button></td>
 <% } else if (item.orderStatus==="OrderCanceled") { %>
                                                                    <td> <button  disabled >Canceled</button></td>
+
+<% } else if (item.orderStatus==="Delivered") { %>
+                                                     <td> <button  disabled >Delivered</button></td>                               
 <% } else if (item.orderStatus==="Return") { %>
-                                        <td> <button id="ddyrd"  >Accept Return</button></td>
+                                        <td> <button id="acceptReturn" data-product-id="<%= item.product._id %>"  data-order-id="<%= orders._id %>"   >Accept Return</button></td>
 <% } else if (item.orderStatus==="ReturnOk") { %>
                                          <td> <button  disabled >Return Accepted</button></td>
 
@@ -142,7 +147,7 @@ button:disabled {
 
 
 
-                                                <td class="text-end"><%= (item.product.price*item.quantity) %></td>
+                                                <td class="text-end">&#8377; <%= (item.product.price*item.quantity) %></td>
                                             </tr>
                                              <% }) %>
                                            
@@ -152,7 +157,7 @@ button:disabled {
                                                     <article class="float-end">
                                                         <dl class="dlist">
                                                             <dt>Subtotal:</dt>
-                                                            <dd><%= orders.totalAmount %></dd>
+                                                            <dd>&#8377; <%= orders.totalAmount %></dd>
                                                         </dl>
                                                         <dl class="dlist">
                                                             <dt>Shipping cost:</dt>
@@ -160,11 +165,12 @@ button:disabled {
                                                         </dl>
                                                         <dl class="dlist">
                                                             <dt>Grand total:</dt>
-                                                            <dd><b class="h5"><%= orders.totalAmount %></b></dd>
+                                                            <dd><b class="h5">&#8377; <%= orders.totalAmount %></b></dd>
                                                         </dl>
                                                         <dl class="dlist">
                                                             <dt class="text-muted">Status:</dt>
                                                             <dd>
+ 
                                                                 <% if (orders.paymentStatus==="Pending") { %>
                                                                     <span class="badge rounded-pill alert-success text-success">Not Paid</span>
                                                                     <% } else if (orders.paymentStatus==="Completed") { %>
@@ -214,11 +220,11 @@ button:disabled {
 
 
 document.addEventListener('DOMContentLoaded', async () => {
-       const placedButton = document.getElementById('placedButton');
 
    
     const handleCancelOrder = async (orderId,productId) => {
-        try {
+      
+      try {
             const response = await fetch('/admin/cancel-order', {
                 method: 'POST',
                 headers: {
@@ -251,9 +257,91 @@ document.addEventListener('DOMContentLoaded', async () => {
                 title: 'Error',
                 text: 'Failed to cancel order. Please try again later.',
                 icon: 'error',
-            });
+            })
         }
     };
+
+
+        const handlePlaceOrder = async (orderId,productId) => {
+      
+      try {
+            const response = await fetch('/admin/place-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ orderId,productId })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                    placedButton.textContent = 'Delivered'
+                    placedButton.disabled = true
+                    cancelButton.textContent = 'Delivered';
+                    cancelButton.disabled = true;
+                    Swal.fire({
+                        title: '<span style="color: red;">Order Delivered</span>',
+                              background: 'RGB(46, 46, 46)',
+                        text: 'Order has been successfully Delivered.',
+                        icon: 'success',
+                    });
+                } else {
+                    throw new Error(data.message);
+                }
+            } else {
+                throw new Error('Failed to cancel order');
+            }
+        } catch (error) {
+            console.error('Error canceling order:', error);
+            swal({
+                title: 'Error',
+                text: 'Failed to cancel order. Please try again later.',
+                icon: 'error',
+            })
+        }
+    };
+
+    const handleAccpetReturn = async (orderId,productId) => {
+      
+      try {
+            const response = await fetch('/admin/accpetReturn-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ orderId,productId })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                    acceptReturn.textContent = 'Return Accepted'
+                    acceptReturn.disabled = true
+                    cancelButton.textContent = 'Return Accepted';
+                    cancelButton.disabled = true;
+                    Swal.fire({
+                        title: 'Return Accepted',
+                        text: 'Return Accepted successfully .',
+                        icon: 'success',
+                    });
+                } else {
+                    throw new Error(data.message);
+                }
+            } else {
+                throw new Error('Failed to cancel order');
+            }
+        } catch (error) {
+            console.error('Error canceling order:', error);
+            swal({
+                title: 'Error',
+                text: 'Failed to cancel order. Please try again later.',
+                icon: 'error',
+            })
+        }
+    };
+
+
 
     const handleReturnOrder = async (orderId) => {
         try {
@@ -307,10 +395,76 @@ document.addEventListener('DOMContentLoaded', async () => {
                 icon: 'error',
             });
         }
-    };
+    }; 
 
     const cancelButton = document.getElementById('cancelButton');
     const returnButton = document.getElementById('returnButton');
+    const acceptReturn = document.getElementById('acceptReturn');
+       const placedButton = document.getElementById('placedButton');
+if (acceptReturn) {
+    
+
+acceptReturn.addEventListener('click',async ()=>{
+      const orderId = acceptReturn.dataset.orderId;
+        const productId =  acceptReturn.dataset.productId;
+       console.log("Order Id",productId);
+  if (orderId && productId) {
+            const confirmPlaced = await Swal.fire({
+                 title: 'Accept Return',
+    text: 'Are you sure you want Accept Return?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes',
+    cancelButtonText: 'No'
+            });
+
+            if (confirmPlaced.isConfirmed) {
+                handleAccpetReturn(orderId,productId);
+
+            }
+        } else {
+            console.error('Order ID not found');
+        }
+
+})
+}
+
+if (placedButton) {
+placedButton.addEventListener('click',async ()=>{
+        const orderId = placedButton.dataset.orderId;
+        const productId =  placedButton.dataset.productId;
+
+        console.log("Order Id",productId);
+  if (orderId && productId) {
+            const confirmPlaced = await Swal.fire({
+                 title: '<span style="color: red;">Order Place</span>',
+    text: 'Are you sure you want to Place this order?',
+         html: '<span style="color: white;">You won\'t be able to revert this!</span>',
+
+    icon: 'warning',
+    showCancelButton: true,
+     background: 'RGB(46, 46, 46)',
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes',
+    cancelButtonText: 'No'
+            });
+
+            if (confirmPlaced.isConfirmed) {
+                handlePlaceOrder(orderId,productId);
+
+            }
+        } else {
+            console.error('Order ID not found');
+        } 
+})
+
+}
+
+if (cancelButton) {
+    
 
     cancelButton.addEventListener('click', async () => {
         const orderId = cancelButton.dataset.orderId;
@@ -337,7 +491,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Order ID not found');
         }
     });
-
+}
+if (returnButton) {
     returnButton.addEventListener('click', async () => {
         const orderId = returnButton.dataset.orderId;
         if (orderId) {
@@ -346,6 +501,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Order ID not found');
         }
     });
+    }
 });
   
 </script>

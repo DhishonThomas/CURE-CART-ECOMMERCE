@@ -1,22 +1,88 @@
 <%- include('../partialsUser/header'); -%>
+<style>
+  
+.order-placed {
+  padding: 20px; /* Add padding for better spacing */
+}
 
+/* Styling for verification-message element */
+.verification-message {
+  text-align: center;
+  color: #333; /* Set text color */
+}
+
+.verification-message h1 {
+  font-size: 2em; /* Increase heading size */
+  color: #3b5998; /* Set heading color */
+  margin-bottom: 15px; /* Add space after heading */
+}
+
+.verification-message p {
+  font-size: 16px; /* Set paragraph size */
+  line-height: 1.5; /* Adjust line spacing for better readability */
+  color: #495057; /* Set paragraph color */
+  margin-bottom: 10px; /* Add space after paragraph */
+}
+
+/* Styling for img element */
+.verification-message img {
+  width: 100px; /* Adjust image size as needed */
+  display: block; /* Display image as a block-level element */
+  margin: 0 auto; /* Center image horizontally */
+  margin-bottom: 20px; /* Add space after image */
+}
+
+/* Styling for order-details element */
+.order-details {
+  margin-bottom: 20px; /* Add space below order details */
+}
+
+.order-details p {
+  font-size: 14px; /* Set order details text size */
+  color: #6c757d; /* Set order details text color */
+  margin-bottom: 5px; /* Add space between details */
+}
+
+.order-details .order-number,
+.order-details .delivery-date {
+  font-weight: bold; /* Emphasize order number and delivery date */
+}
+
+/* Styling for button element */
+.btn-primary {
+  background-color: #3b5998; /* Set button color */
+  border-color: #3b5998; /* Set button border color */
+  color: #fff; /* Set button text color */
+  padding: 10px 20px; /* Adjust button padding */
+  border-radius: 5px; /* Add rounded corners */
+  transition: all 0.2s ease-in-out; /* Add smooth hover effect */
+}
+
+.btn-primary:hover {
+  background-color: #284177; /* Change button color on hover */
+  border-color: #284177; /* Change button border color on hover */
+}
+.order-placed {
+  background-color: #f5f5f5; /* Light background color */
+  border: 1px solid #ddd; /* Solid border */
+  border-radius: 5px; /* Rounded corners */
+  padding: 20px; /* Padding for content within the box */
+}
+
+
+</style>
 <main class="main">
-    <div class="container">
-        <div class="order-placed">
-            <div class="verification-message text-center">
-                <h1 class="mb-4">Order Placed Successfully!</h1>
-                <p class="lead">Thank you for your purchase. Your order has been successfully placed.</p>
-                <img src="/userCss/images/order-success.png" alt="Order Success Icon" class="img-fluid">
-                <div class="order-details">
-                    <!-- Display order details here -->
-                    <!-- Example: -->
-                    <!-- <p>Your order number is: <span class="order-number">123456</span></p>
-                    <p>Estimated delivery date: <span class="delivery-date">January 25, 2024</span></p> -->
-                </div>
-                <a href="/order-list" class="btn btn-primary mt-4">View Order List</a>
-            </div>
-        </div><!-- End .order-placed -->
-    </div><!-- End .container -->
-</main><!-- End .main -->
+  <div class="container">
+    <div class="order-placed">
+      <div class="verification-message text-center">
+        <h1>Order Placed Successfully!</h1>
+       <p>OrderId</p> <p style="color: #333;font-size: large  ; font-weight: bold ;"><%= order[0].orderId %></p>
+        <p class="lead">Thank you for your purchase. Your order has been successfully placed.</p>
+        <img src="/userCss/images/order-success.png" alt="Order Success Icon" class="img-fluid">
+        <div class="order-details">
+          </div>
+        <a href="/order-list" class="btn btn-primary mt-4">View Order List</a>
+      </div>
+    </div></div></main>`
 
 <%- include('../partialsUser/footer'); -%>

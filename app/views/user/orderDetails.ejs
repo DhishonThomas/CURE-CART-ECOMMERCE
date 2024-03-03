@@ -120,9 +120,11 @@ body {
       <% } else if (oneProduct.orderStatus === "OrderCanceled") { %>
       <td style="color: orange">Order Canceled</td>
       <% } else if (oneProduct.orderStatus === "Delivered") { %>
-      <td style="color: orange">Delivered</td>
+      <td style="color: orange" id="orderDelivered">Delivered</td>
       <% } else if (oneProduct.orderStatus === "Return") { %>
-      <td style="color: orange">Return</td>
+      <td style="color: orange">Return Requested</td>
+       <% } else if (oneProduct.orderStatus === "ReturnOk") { %>
+      <td style="color: orange">Return Accepted</td>
       <% } else { %>
       <td style="color: orange">N/A</td>
       <% } %>
@@ -196,10 +198,12 @@ body {
         <button id="cancelButton" data-product-id="<%= oneProduct.product %>" data-order-id="<%= orders._id %>">Cancel Order</button>
         <% } else if (oneProduct.orderStatus === "OrderCanceled") { %>
         <button disabled>Order Canceled</button>
-        <% } else if (oneProduct.orderStatus === "Return") { %>
-        <button id="returnButton" data-order-id="<%= oneProduct.product %>">Return Order</button>
         <% } else if (oneProduct.orderStatus === "Delivered") { %>
-        <button disabled>Delivered</button>
+        <button id="returnButton" data-product-id="<%= oneProduct.product %>" data-order-id="<%= orders._id %>">Return Order</button>
+        <% } else if (oneProduct.orderStatus === "Return") { %>
+        <button disabled>Return Requested</button>
+        <% } else if (oneProduct.orderStatus === "ReturnOk") { %>
+        <button disabled>Return Accepted</button>
         <% } %>
       </td>
     </tr>
@@ -340,6 +344,10 @@ const orderId = document.getElementById("downloadInvoiceButton").dataset.orderId
 
 
 document.addEventListener('DOMContentLoaded', async () => {
+    const orderShipped = document.getElementById('orderShipped')
+    const cancelButton = document.getElementById('cancelButton');
+    const returnButton = document.getElementById('returnButton');
+const orderDelivered = document.getElementById('orderDelivered')
 const handleCancelOrder = async (orderId, productId) => {
     try {
         const { value: reason } = await Swal.fire({
@@ -385,7 +393,6 @@ const handleCancelOrder = async (orderId, productId) => {
         }
     } catch (error) {
         console.error('Error canceling order:', error);
-        // Display error message using SweetAlert
         Swal.fire({
             title: 'Error',
             text: 'Failed to cancel order. Please try again later.',
@@ -397,66 +404,67 @@ const handleCancelOrder = async (orderId, productId) => {
 
 
     const handleReturnOrder = async (orderId,productId) => {
-        try {
-            const reason = await Swal.fire({
-                title: 'Return Order',
-                text: 'Please provide a reason for return:',
-                content: {
-                    element: 'input',
-                    attributes: {
-                        placeholder: 'Enter reason',
-                        type: 'text',
-                    },
+    try {
+        const { value: reason } = await Swal.fire({
+            title: 'Return Order',
+            text: 'Are you sure you want to Return this order?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            input: 'text',
+            inputLabel: 'Please provide a reason for cancellation',
+            inputPlaceholder: 'Reason...'
+        });
+
+        if (reason) {
+            const response = await fetch('/return-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
                 },
-                buttons: {
-                    cancel: 'Cancel',
-                    confirm: 'Return',
-                },
+                body: JSON.stringify({ orderId, productId, reason })
             });
 
-            if (reason) {
-                const response = await fetch('/return-order', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ orderId, reason ,productId})
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.success) {
-                        orderShipped.textContent = 'Return Requested'
-                        returnButton.textContent = 'Return Requested';
-                        returnButton.disabled = true;
-                        Swal.fire({
-                            title: 'Return Accepted',
-                            text: 'Your return request has been accepted.',
-                            icon: 'success',
-                        });
-                    } else {
-                        throw new Error(data.message);
-                    }
+            if (response.ok) {
+                const data = await response.json();
+                console.log("fghjfdghjk",data);
+                console.log("data.success",data.success);
+                if (data.success) {
+                  console.log(data.success);
+orderDelivered.textContent = 'Return Requested';
+                    console.log("orderShipped");
+                    returnButton.textContent = 'Return Requested';
+                    console.log("returnButton");
+                    returnButton.disabled = true;
+                    console.log("disable button");
+                    Swal.fire({
+                        title: 'Return Requested',
+                        text: 'Return Requested Successfully.',
+                        icon: 'success',
+                    });
                 } else {
-                    throw new Error('Failed to process return request');
+                    throw new Error(data.message);
                 }
+            } else {
+                throw new Error('Failed to cancel order');
             }
-        } catch (error) {
-            console.error('Error processing return request:', error);
-            Swal.fire({
-                title: 'Error',
-                text: 'Failed to process return request. Please try again later.',
-                icon: 'error',
-            });
         }
+    } catch (error) {
+        console.error('Error canceling order:', error);
+        Swal.fire({
+            title: 'Error',
+            text: 'Failed to cancel order. Please try again later.',
+            icon: 'error',
+        });
+    }
     };
 
     // Get cancel and return buttons
-    const orderShipped = document.getElementById('orderShipped')
-    const cancelButton = document.getElementById('cancelButton');
-    const returnButton = document.getElementById('returnButton');
 
-    // Add event listener for cancel order button
+    if (cancelButton) {
     cancelButton.addEventListener('click', async () => {
         const orderId = cancelButton.dataset.orderId;
         const productId =  cancelButton.dataset.productId;
@@ -482,14 +490,31 @@ const handleCancelOrder = async (orderId, productId) => {
             console.error('Order ID not found');
         }
     });
-
+  }
     returnButton.addEventListener('click', async () => {
         const orderId = returnButton.dataset.orderId;
-        if (orderId) {
-            handleReturnOrder(orderId,productId);
+    const productId = returnButton.dataset.productId;
+
+    if (orderId && productId) {
+        const confirmReturn = await Swal.fire({
+            title: 'Return Order',
+            text: 'Are you sure you want to return this order?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No'
+        });
+
+        if (confirmReturn.isConfirmed) {
+            handleReturnOrder(orderId, productId);
         } else {
-            console.error('Order ID not found');
+            console.error('Return Order not confirmed');
         }
+    } else {
+        console.error('Order ID or Product ID not found');
+    }
     });
 });
   

@@ -15,7 +15,6 @@ const categorySchema = new mongoose.Schema({
   isListed: { type: Boolean, default: true },
 });
 
-
   const Category = mongoose.model("Category", categorySchema);
 
   module.exports = Category;

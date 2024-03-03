@@ -94,6 +94,8 @@
         }
 
 </style>
+
+
 <main class="main">
     <div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
         <div class="container">
@@ -126,42 +128,50 @@
     <div class="modal-content">
         <span class="close">&times;</span>
         <h2>Add Address</h2>
-        <form id="addAdress">
+        <form id="addAddress" >
             <!-- Address fields -->
             <div class="form-group">
                 <label for="name">Name</label>
                 <input type="text" id="name" name="name" class="form-control" required>
+                <div class="error-message" id="name-error"></div>
             </div>
             <div class="form-group">
                 <label for="mobile">Mobile</label>
-                <input type="text" id="mobile" name="mobile" class="form-control">
+                <input type="text" id="mobile" name="mobile" class="form-control" required>
+                <div class="error-message" id="mobile-error"></div>
             </div>
             <div class="form-group">
                 <label for="address">Address</label>
                 <input type="text" id="address" name="address" class="form-control" required>
+                <div class="error-message" id="address-error"></div>
             </div>
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label for="pinCode">Postal Code</label>
                     <input type="text" id="pinCode" name="pinCode" class="form-control" required>
+                    <div class="error-message" id="pinCode-error"></div>
                 </div>
                  <div class="form-group col-md-6">
-                    <label for="city">Street</label>
+                    <label for="street">Street</label>
                     <input type="text" id="street" name="street" class="form-control" required>
+                    <div class="error-message" id="street-error"></div>
                 </div>
                 <div class="form-group col-md-6">
                     <label for="city">City</label>
                     <input type="text" id="city" name="city" class="form-control" required>
+                    <div class="error-message" id="city-error"></div>
                 </div>
                 <div class="form-group col-md-6">
                     <label for="state">State</label>
                     <input type="text" id="state" name="state" class="form-control" required>
+                    <div class="error-message" id="state-error"></div>
                 </div>
             </div>
             <button type="submit" class="btn btn-primary">Save Address</button>
         </form>
     </div>
 </div>
+
    
 
 <div class="page-content">
@@ -289,22 +299,121 @@ span.onclick = function() {
 // }
 
         </script>
+            <script>
+   document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('addAddress');
+    const fields = ['name', 'mobile', 'address', 'pinCode', 'street', 'city', 'state'];
+
+async function validateField(field, value) {
+    try {
+        const response = await fetch('/validate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ [field]: value })
+        });
+        
+        const data = await response.json();
+        if (data) {
+            console.log("DSta", data);
+            const { field, message,success } = data;
+            console.log(message);
+            console.log(field);
+            console.log(success);
+            return { field, message ,success};
+        } else {
+            console.error('Server error:', response.status);
+            return { error: 'Server error' };
+        }
+    } catch (error) {
+        console.error('Error:', error.message);
+        return { error: 'An error occurred' };
+    }
+}
+    fields.forEach(field => {
+        const inputField = document.getElementById(field);
+
+        inputField.addEventListener('input', async function(event) {
+            const value = event.target.value;
+            const errorDiv = document.getElementById(`${field}-error`);
+
+            const validationResult = await validateField(field, value);
+console.log(validationResult);
+            if (validationResult.success) {
+             errorDiv.textContent = validationResult.message;
+errorDiv.style.color = 'red';
+
+                form.querySelector('button[type="submit"]').disabled = true; // Disable submit button
+            } else {
+                 errorDiv.textContent = ''; 
+
+// errorDiv.textContent = '\u2714'; 
+// errorDiv.style.color = 'green';
+     form.querySelector('button[type="submit"]').disabled = false; // Disable submit button
+
+            }
+        })
+    });
+});
+
+        
+        </script>
+
+        <style>
+           
+.toast {
+    width: 400px; 
+    height: auto; 
+}
+
+.toast-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.toast-message {
+    font-size: 16px; 
+}
+.toast {
+    color: #fff !important; 
+    opacity: 1 !important; 
+}
+
+/* .toast:hover {
+    background-color: #008800 !important; 
+} */
+        </style>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
 
 <script>
-    toastr.options = {
-        closeButton: true,
-        progressBar: true,
-        positionClass: 'toast-top-right',
-        timeOut: 3000
-    };
+toastr.options = {
+    "closeButton": true,
+    "debug": false,
+    "newestOnTop": false,
+    "progressBar": true,
+    "positionClass": "toast-top-left",
+    "preventDuplicates": false,
+    "onclick": null,
+    "showDuration": "300",
+    "hideDuration": "1000",
+    "timeOut": "3000",
+    "extendedTimeOut": "1000",
+    "showEasing": "swing",
+    "hideEasing": "linear",
+    "showMethod": "fadeIn",
+    "hideMethod": "slideUp"
+};
+
+
+
+
 
     document.addEventListener("DOMContentLoaded", function() {
-        const addAddressForm = document.getElementById("addAdress");
+        const addAddressForm = document.getElementById("addAddress");
 
         addAddressForm.addEventListener("submit", function(event) {
             event.preventDefault();
-
-            // Retrieve form input values
             const name = document.getElementById("name").value.trim();
             const mobile = document.getElementById("mobile").value.trim();
             const address = document.getElementById("address").value.trim();
@@ -313,14 +422,12 @@ span.onclick = function() {
             const state = document.getElementById("state").value.trim();
             const street = document.getElementById("street").value.trim();
 
-            // Regular expressions for validating mobile and pinCode
-            const mobileRegex = /^\d+$/;
-            const pinCodeRegex = /^\d+$/;
+            const mobileRegex = /^[0-9]{10}$/;
+            const pinCodeRegex = /^[0-9]{6}$/;
 
-            // Perform validation
             if (!name || !mobile || !address || !pinCode || !city || !state || !street) {
                 console.error("All fields are required.");
-                toastr.error("All fields are required.");
+toastr.error('All fields are required.');
                 return;
             }
 
@@ -482,7 +589,8 @@ if(selectedAddressId){
                                             showConfirmButton: false,
                                             timer: 2500
                                         }).then((result) => {
-                                            window.location = "/orderPlaced";
+                                            const order_id = data.order_id
+                                            window.location = `/orderPlaced?order_id=${order_id}`;
                                         });
                                     } else {
                                         Swal.fire({
@@ -527,7 +635,8 @@ if(selectedAddressId){
                                             showConfirmButton: false,
                                             timer: 2500
                                         }).then((result) => {
-                                            window.location = "/orderPlaced";
+                                            const order_id = data.order_id
+                                            window.location = `/orderPlaced?order_id=${order_id}`;
                                         });
                                     } else {
                                         Swal.fire({
@@ -566,5 +675,3 @@ if(selectedAddressId){
  
 
 <%- include('../partialsUser/footer') -%>
-
-

@@ -18,21 +18,14 @@
                             <div class="col-lg-4 col-md-6 me-auto">
                                 <input type="text" placeholder="Search..." class="form-control" />
                             </div>
-                            <div class="col-lg-2 col-6 col-md-3">
-                                <select class="form-select">
-                                    <option>Status</option>
-                                    <option>Active</option>
-                                    <option>Disabled</option>
-                                    <option>Show all</option>
-                                </select>
-                            </div>
-                            <div class="col-lg-2 col-6 col-md-3">
-                                <select class="form-select">
-                                    <option>Show 20</option>
-                                    <option>Show 30</option>
-                                    <option>Show 40</option>
-                                </select>
-                            </div>
+                              <div class="col-lg-2 col-6 ">
+                        <a href="/admin/status/?status=Pending" class="btn btn-primary"><i class="text-muted material-icons md-post_add "></i>Pendings </a>
+                    </div>
+                       <div class="col-lg-4 col-6 ">
+                        <a href="/admin/status/?status=Return" class="btn btn-primary"><i class="text-muted material-icons md-post_add"></i>Returns</a>
+                    </div>
+
+                            
                         </div>
                     </header>
                     <!-- card-header end// -->
@@ -41,7 +34,7 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th>#ID</th>
+                                        <th>OrderId</th>
                                         <th scope="col">Name</th>
                                         <th scope="col">Email</th>
                                         <th scope="col">Total</th>
@@ -59,9 +52,11 @@
             order.items.forEach(item => {
                 if (item.orderStatus === 'Return') {
                     orderStatus = 'Return Requested'; 
-                } else if (item.orderStatus === 'Pending' && orderStatus !== 'Return Requested') {
+                }else if (item.orderStatus === 'ReturnOk') {
+                    orderStatus = 'Return Accepted';  
+                }else if (item.orderStatus === 'Pending' && orderStatus !== 'Return Requested') {
                     orderStatus = 'Pending'; 
-                } else if (item.orderStatus === 'Order Success' && orderStatus !== 'Return Requested' && orderStatus !== 'Pending') {
+                } else if (item.orderStatus === 'Delivered' && orderStatus !== 'Return Requested' && orderStatus !== 'Pending') {
                     orderStatus = 'Order Success'; 
                 }
             });
@@ -71,11 +66,16 @@
             }
         %>
         <tr>
-            <td>2328</td>
+            <td><%= order.orderId %></td>
             <td><b><%= order.user.username %></b></td>
             <td><%= order.user.email %></td>
-            <td><%= order.totalAmount %></td>
-            <td><%= order.createdAt %></td>
+            <td>&#8377; <%= order.totalAmount %></td>
+            <td><%
+                                let dateString = order.createdAt.toString()
+                                     dateString = dateString.split("G")[0].trim();
+                                                                        %>
+              <%=dateString %>
+              </td>
             <td>
                 <% if (orderStatus === 'Order Canceled') { %>
                     <span class="badge rounded-pill alert-danger"><%= orderStatus %></span>
@@ -83,7 +83,11 @@
                     <span class="badge rounded-pill alert-info"><%= orderStatus %></span>
                 <% } else if (orderStatus === 'Pending') { %>
                     <span class="badge rounded-pill alert-warning"><%= orderStatus %></span>
-                <% } else { %>
+                 <% } else if (orderStatus === 'Order Success') { %>
+                    <span class="badge rounded-pill alert-success"><%= orderStatus %></span>
+                      <% } else if (orderStatus === 'Return Accepted') { %>
+                    <span class="badge rounded-pill alert-success"><%= orderStatus %></span>
+                    <% } else { %>
                     <span class="badge rounded-pill alert-success"><%= orderStatus %></span>
                 <% } %>
             </td>
@@ -104,16 +108,13 @@
                 <!-- card end// -->
                 <div class="pagination-area mt-15 mb-50">
                     <nav aria-label="Page navigation example">
-                        <ul class="pagination justify-content-start">
-                            <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                            <li class="page-item"><a class="page-link" href="#">02</a></li>
-                            <li class="page-item"><a class="page-link" href="#">03</a></li>
-                            <li class="page-item"><a class="page-link dot" href="#">...</a></li>
-                            <li class="page-item"><a class="page-link" href="#">16</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a>
-                            </li>
-                        </ul>
+                         <ul class="pagination justify-content-start ">
+    <% for (let i = 1; i <= totalPages; i++) { %>
+        <li class="page-item <%= currentPage === i ? 'active' : 'active' %>">
+            <a class="page-link" href="/admin/order-List?page=<%= i %>"><%= i %></a>
+        </li>
+    <% } %>
+</ul>
                     </nav>
                 </div>
             </section>

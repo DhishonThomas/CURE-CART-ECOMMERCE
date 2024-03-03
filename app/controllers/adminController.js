@@ -244,7 +244,6 @@ exports.createProduct = async (req, res) => {
     try {
       const { productName, description, brand, price, quantity } = req.body;
 console.log(req.body.mycategory);
-      // Use Sharp to process and save the images
       const sharpPromises = req.files.map(async (file, index) => {
         const filename = `image_${index + 1}.${file.originalname},${Date.now()}.jpg`;
         const imagePath = `public/uploads/${filename}`;
@@ -260,7 +259,6 @@ console.log(req.body.mycategory);
         filenames.push(filename);
       });
 
-      // Wait for all sharpPromises to resolve before creating the Product
       await Promise.all(sharpPromises);
 
       const categoryId = new mongoose.Types.ObjectId(req.body.mycategory);
@@ -422,7 +420,7 @@ exports.categoryUlist = async (req, res) => {
 // <.........................................................................................................>
 exports.productList = async (req, res) => {
 const page = parseInt(req.query.page)
-const perPage = 10;
+const perPage = 6;
 
 const totalUsers = await Product.countDocuments()
 const totalPages = Math.ceil(totalUsers / perPage);
@@ -448,7 +446,6 @@ exports.productListEdit = async (req, res) => {
 try{
    const productEditId = req.params.id;
  const category = await Category.find();
-   // Logging to check the structure of the retrieved product document
 
    const products = await Product.findById({ _id: productEditId }).populate("category").exec();
    console.log(products);
@@ -475,7 +472,6 @@ exports.productListEditUpdate = async (req, res) => {
         console.log("Existing Product:", existingProduct);
 
 
-      // Use Sharp to process and save the images
       const sharpPromises = req.files.map(async (file, index) => {
         const filename = `image_${index + 1}.${file.originalname}.jpg`;
         const imagePath = `public/uploads/${filename}`;
@@ -491,12 +487,10 @@ exports.productListEditUpdate = async (req, res) => {
         filenames.push(filename);
       });
 
-      // Wait for all sharpPromises to resolve before updating the Product
       await Promise.all(sharpPromises);
 
       const categoryId = new mongoose.Types.ObjectId(req.body.mycategory);
 
-      // Find the product by ID and update it
       await Product.findByIdAndUpdate(productId, {
         productName,
         description,

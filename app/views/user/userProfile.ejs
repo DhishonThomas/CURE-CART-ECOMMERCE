@@ -72,6 +72,39 @@
         .btn-primary:hover {
             background-color: #0056b3;
         }
+          .wallet-box {
+    width: 300px;
+    height: 200px;
+    border-radius: 10px;
+    background-color: #f5f5f5;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+  }
+
+  .wallet-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .wallet-balance {
+    font-size: 30px;
+    color: #22b86a; /* Green color for positive balance */ 
+  }
+
+  .add-money-button {
+    background-color: #22b86a;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
     </style>
 
 
@@ -81,16 +114,8 @@
         			<h1 class="page-title">My Account<span>Shop</span></h1>
         		</div><!-- End .container -->
         	</div><!-- End .page-header -->
-            <nav aria-label="breadcrumb" class="breadcrumb-nav mb-3">
-                <div class="container">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Shop</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">My Account</li>
-                    </ol>
-                </div><!-- End .container -->
-            </nav><!-- End .breadcrumb-nav -->
 
+<br><br>
             <div class="page-content">
             	<div class="dashboard">
 	                <div class="container">
@@ -101,7 +126,9 @@
 								        <a class="nav-link" id="tab-account-link" data-toggle="tab" href="#tab-account" role="tab" aria-controls="tab-account" aria-selected="false">User Profile</a>
 								    </li>
 								    <li class="nav-item">
-								        <a class="nav-link" id="tab-orders-link" data-toggle="tab" href="#tab-orders" role="tab" aria-controls="tab-orders" aria-selected="false">Orders</a>
+								        <a class="nav-link" href="/order-list">Orders</a>
+
+                                        <!-- <a class="nav-link" id="tab-orders-link" data-toggle="tab" href="#tab-orders" role="tab" aria-controls="tab-orders" aria-selected="false">Orders</a> -->
 								    </li>
 								    <!-- <li class="nav-item">
 								        <a class="nav-link" id="tab-downloads-link" data-toggle="tab" href="#tab-downloads" role="tab" aria-controls="tab-downloads" aria-selected="false">Downloads</a>
@@ -109,9 +136,12 @@
 								    <li class="nav-item">
 								        <a class="nav-link" id="tab-address-link" data-toggle="tab" href="#tab-address" role="tab" aria-controls="tab-address" aria-selected="false">Adresses</a>
 								    </li>
+                                      <li class="nav-item">
+								        <a class="nav-link" id="tab-wallet-link" data-toggle="tab" href="#tab-wallet" role="tab" aria-controls="tab-address" aria-selected="false">Wallet</a>
+								    </li>
 								  
 								    <li class="nav-item">
-								        <a class="nav-link" href="#">Sign Out</a>
+								        <a class="nav-link" href="/logout">Sign Out</a>
 								    </li>
 								</ul>
 	                		</aside><!-- End .col-lg-3 -->
@@ -135,6 +165,20 @@
 								    	<a href="category.html" class="btn btn-outline-primary-2"><span>GO SHOP</span><i class="icon-long-arrow-right"></i></a>
 								    </div><!-- .End .tab-pane -->
 
+		<div class="tab-pane fade" id="tab-wallet" role="tabpanel" aria-labelledby="tab-wallet-link">
+  <div class="wallet-box">
+    <h1 class="wallet-title">My Wallet</h1>
+    <h2 class="wallet-balance">&#8377; <span id="walletBalance"> <%= Wallets = Wallets?Wallets.balance:0.0%></span></h2>
+
+    <div class="add-money-section">
+      <input type="number" id="addMoneyInput" placeholder="Enter amount to add">
+      <button class="add-money-button" id="addMoney">Add Money</button>
+    </div>
+  </div>
+</div>
+
+
+
 								    <div class="tab-pane fade" id="tab-address" role="tabpanel" aria-labelledby="tab-address-link">
 								    	<p>The following addresses will be used on the checkout page by default.</p>
 <button id="openModalBtn" class="btn btn-primary">Add Address</button>
@@ -149,36 +193,43 @@
     <div class="modal-content">
         <span class="close">&times;</span>
         <h2>Add Address</h2>
-        <form action="/address" method="post" id="addressForm" >
+        <form id="addAddress" >
             <!-- Address fields -->
             <div class="form-group">
                 <label for="name">Name</label>
                 <input type="text" id="name" name="name" class="form-control" required>
+                <div class="error-message" id="name-error"></div>
             </div>
             <div class="form-group">
                 <label for="mobile">Mobile</label>
-                <input type="text" id="mobile" name="mobile" class="form-control">
+                <input type="text" id="mobile" name="mobile" class="form-control" required>
+                <div class="error-message" id="mobile-error"></div>
             </div>
-              <div class="form-group ">
-                    <label for="address">Address</label>
-                    <input type="text" id="address" name="address" class="form-control" required>
-                </div>
+            <div class="form-group">
+                <label for="address">Address</label>
+                <input type="text" id="address" name="address" class="form-control" required>
+                <div class="error-message" id="address-error"></div>
+            </div>
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label for="pinCode">Postal Code</label>
                     <input type="text" id="pinCode" name="pinCode" class="form-control" required>
+                    <div class="error-message" id="pinCode-error"></div>
                 </div>
-                <div class="form-group col-md-6">
+                 <div class="form-group col-md-6">
                     <label for="street">Street</label>
                     <input type="text" id="street" name="street" class="form-control" required>
+                    <div class="error-message" id="street-error"></div>
                 </div>
                 <div class="form-group col-md-6">
                     <label for="city">City</label>
                     <input type="text" id="city" name="city" class="form-control" required>
+                    <div class="error-message" id="city-error"></div>
                 </div>
                 <div class="form-group col-md-6">
                     <label for="state">State</label>
                     <input type="text" id="state" name="state" class="form-control" required>
+                    <div class="error-message" id="state-error"></div>
                 </div>
             </div>
             <button type="submit" class="btn btn-primary">Save Address</button>
@@ -320,8 +371,319 @@
             </div><!-- End .page-content -->
         </main><!-- End .main -->
 
-      
-               <script> 
+    
+          <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+document.getElementById('addMoney').addEventListener('click', async () => {
+    const addMoney = document.getElementById('addMoneyInput').value;
+const walletBalance  = document.getElementById('walletBalance')
+    // Validate if amount to add is a positive number
+    if (isNaN(addMoney) || addMoney <= 0) {
+        alert('Please enter a valid amount to add');
+        return;
+    }
+
+    fetch('/wallet', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            addMoney: addMoney,
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log("Data response", data.success);
+            console.log("Payment form worked");
+
+       
+
+            console.log("success worked");
+
+            var orderId = data.orderId;
+            var amount = data.amount;
+
+            // Call Razorpay checkout method
+            var options = {
+                key: 'rzp_test_SsymjD3eNkPA50', // Replace with your Razorpay key
+                amount: amount,
+                currency: 'INR',
+                name: 'Your Company Name',
+                description: 'Test Payment',
+                image: 'https://your-company-logo.png', // Replace with your company logo
+                order_id: orderId,
+                handler: function(response) {
+                    // Send response along with razorpay_signature to server for verification
+                    var requestData = {
+                        response: response,
+                        razorpay_signature: response.razorpay_signature,
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_order_id: response.razorpay_order_id,
+                        addMoney: addMoney,
+                    };
+
+                    $.ajax({
+                        url: '/wallet-callback',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(requestData),
+                        success: function(data) {
+                            if (data) {
+                            console.log("y7ewyu7erhuerhu8",data);
+                                walletBalance.textContent = data.walletBalance
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Amount Added Successfully',
+                                    showConfirmButton: false,
+                                    timer: 2500
+                                })
+                                // .then((result) => {
+                                //     window.location = "/orderPlaced";
+                                // });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Failed to place the order'
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error(error);
+                            alert('Payment failed! ' + error);
+                        }
+                    });
+                },
+                prefill: {
+                    name: '<%=RazUser.username%>' ,
+                    email: '<%=RazUser.email%>',
+                    contact: '<%=RazUser.phonenumber%>'
+                },
+                notes: {
+                    address: 'Razorpay Corporate Office'
+                },
+                theme: {
+                    color: 'green'
+                }
+            };
+
+            var rzp1 = new Razorpay(options);
+            rzp1.on('payment.failed', function(response) {
+                console.error(response.error.description);
+                alert('Payment failed! ' + response.error.description);
+            });
+
+            rzp1.open();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to add money to wallet. Please try again later.');
+    });
+});
+
+
+</script>
+
+
+ <script>
+   document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('addAddress');
+    const fields = ['name', 'mobile', 'address', 'pinCode', 'street', 'city', 'state'];
+
+async function validateField(field, value) {
+    try {
+        const response = await fetch('/validate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ [field]: value })
+        });
+        
+        const data = await response.json();
+        if (data) {
+            console.log("DSta", data);
+            const { field, message,success } = data;
+            console.log(message);
+            console.log(field);
+            console.log(success);
+            return { field, message ,success};
+        } else {
+            console.error('Server error:', response.status);
+            return { error: 'Server error' };
+        }
+    } catch (error) {
+        console.error('Error:', error.message);
+        return { error: 'An error occurred' };
+    }
+}
+    fields.forEach(field => {
+        const inputField = document.getElementById(field);
+
+        inputField.addEventListener('input', async function(event) {
+            const value = event.target.value;
+            const errorDiv = document.getElementById(`${field}-error`);
+
+            const validationResult = await validateField(field, value);
+console.log(validationResult);
+            if (validationResult.success) {
+             errorDiv.textContent = validationResult.message;
+errorDiv.style.color = 'red';
+
+                form.querySelector('button[type="submit"]').disabled = true; // Disable submit button
+
+            } else {
+ errorDiv.textContent = ''; 
+
+                // errorDiv.textContent = '\u2714'; 
+// errorDiv.style.color = 'green';
+     form.querySelector('button[type="submit"]').disabled = false; // Disable submit button
+
+            }
+        })
+    });
+});
+
+        
+        </script>
+
+        <style>
+           
+.toast {
+    width: 400px; 
+    height: auto; 
+}
+
+.toast-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.toast-message {
+    font-size: 16px; 
+}
+.toast {
+    color: #fff !important; 
+    opacity: 1 !important; 
+}
+
+/* .toast:hover {
+    background-color: #008800 !important; 
+} */
+        </style>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+
+<script>
+toastr.options = {
+    "closeButton": true,
+    "debug": false,
+    "newestOnTop": false,
+    "progressBar": true,
+    "positionClass": "toast-top-left",
+    "preventDuplicates": false,
+    "onclick": null,
+    "showDuration": "300",
+    "hideDuration": "1000",
+    "timeOut": "3000",
+    "extendedTimeOut": "1000",
+    "showEasing": "swing",
+    "hideEasing": "linear",
+    "showMethod": "fadeIn",
+    "hideMethod": "slideUp"
+};
+
+
+
+
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const addAddressForm = document.getElementById("addAddress");
+
+        addAddressForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+            const name = document.getElementById("name").value.trim();
+            const mobile = document.getElementById("mobile").value.trim();
+            const address = document.getElementById("address").value.trim();
+            const pinCode = document.getElementById("pinCode").value.trim();
+            const city = document.getElementById("city").value.trim();
+            const state = document.getElementById("state").value.trim();
+            const street = document.getElementById("street").value.trim();
+
+            const mobileRegex = /^[0-9]{10}$/;
+            const pinCodeRegex = /^[0-9]{6}$/;
+
+            if (!name || !mobile || !address || !pinCode || !city || !state || !street) {
+            console.error("All fields are required.");
+            toastr.error('All fields are required.');
+                return;
+            }
+
+            if (!mobileRegex.test(mobile)) {
+                console.error("Mobile number should contain only numbers.");
+                toastr.error("Mobile number should contain only numbers.");
+                return;
+            }
+
+            if (!pinCodeRegex.test(pinCode)) {
+                console.error("Pin code should contain only numbers.");
+                toastr.error("Pin code should contain only numbers.");
+                return;
+            }
+
+            fetch("/adderesAddChekOut", {
+                method: "POST",
+                body: JSON.stringify({
+                    name: name,
+                    mobile: mobile,
+                    address: address,
+                    pinCode: pinCode,
+                    city: city,
+                    state: state,
+                    street: street
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Address saved successfully');
+                    return response.json();
+                } else {
+                    throw new Error('Failed to save address');
+                }
+            })
+            .then(data => {
+                if (data && data.data) {
+                        Swal.fire({
+                        icon: 'success',
+                        title: 'Address saved',
+                        showConfirmButton: false,
+                        timer: 2500
+                    }).then((result) => {
+                        window.location = "/profile";
+                    });
+                } else {
+                    toastr.error('Failed to save address.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                toastr.error('An error occurred while saving the address.');
+            });
+        });
+    });
+</script>
+
+
+
+
+          <script> 
 
             // Get the modal
 const modals = document.getElementById('ChangeModal');
@@ -527,13 +889,11 @@ spans.onclick = function() {
         });
     });
 
-    // Function to validate email format
     function isValidEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     }
 
-    // Function to validate phone number format
     function isValidPhoneNumber(phonenumber) {
         const phoneNumberRegex = /^\d{10}$/;
         return phoneNumberRegex.test(phonenumber);

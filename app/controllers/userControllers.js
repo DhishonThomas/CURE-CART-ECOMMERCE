@@ -5,8 +5,10 @@ const Product = require("../models/product");
 const mongoose = require("mongoose");
 const UserCart = require("../models/cartItem");
 const userAddress = require("../models/userAddress");
-
+const Wallet = require("../models/wallet")
 const cartController = require("./cartController");
+const Wishlist = require("../models/wishlist");
+const { wallet } = require("./orderController");
 
 const userControllers = {
   home: async (req, res) => {
@@ -148,9 +150,9 @@ const userControllers = {
 shop: async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const perPage = 10;
+        const perPage = 6;
 
-        let query = { isListed: true }; // Default query
+        let query = { isListed: true }; // Default  query
 
         // Check if category filter is applied
         if (req.query.category) {
@@ -203,17 +205,19 @@ shop: async (req, res) => {
       // }
       const userId = res.locals.user;
       const product = await Product.findOne({ _id: productId });
+
       const cart = await UserCart.findOne({ userId: userId }).exec();
       console.log(cart);
-      const foundProduct = cart.cartItems.find(
+   
+      const foundProduct =cart? cart.cartItems.find(
         (item) => item.productId == productId
-      );
+      ): null;
       console.log("foundProduct", foundProduct);
       if (foundProduct == null) {
         return res.render("user/singleProduct", { product, foundProduct: "" });
       }
       if (!product) {
-        console.log("Product not found");
+        console.log("Product not found"); 
         return res.status(404).render("error/404");
       }
 
@@ -397,7 +401,14 @@ shop: async (req, res) => {
     const userId = new mongoose.Types.ObjectId(res.locals.user);
     const user = await User.findOne({ _id: userId });
     const userAddresses = await userAddress.findOne({ userId: userId });
-    let addresses = []; // Initialize addresses array
+   const RazUser = await User.findById(userId);
+  
+  
+   let Wallets     = await Wallet.findOne({ user: userId });
+
+  
+  console.log("wihishfjuiasfhduifhdsiudsafh", Wallets);
+   let addresses = []; // Initialize addresses array
     if (userAddresses && userAddresses.addresses) {
       addresses = userAddresses.addresses;
     }
@@ -405,6 +416,8 @@ shop: async (req, res) => {
     res.render("user/userProfile", {
       user: user,
       addresses: addresses,
+      RazUser,
+      Wallets,
     });
   },
 
@@ -461,7 +474,7 @@ shop: async (req, res) => {
     } catch (error) {
       console.log(error);
     }
-  },
+  }, 
 
   addressEdit: async (req, res) => {
     let addressId = req.params.id;
@@ -597,15 +610,6 @@ shop: async (req, res) => {
     }
   },
 
-
-
- 
-
-
-
-
-  
- 
 
 };
 module.exports = userControllers;

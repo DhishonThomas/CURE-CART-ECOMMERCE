@@ -53,18 +53,20 @@ if(!user){
     return res.status(400).send("Invalid or expired token")
 }
 
-        res.render("user/resetPassword",{user})
+        res.render("user/resetPassword",{token:token});
     }catch(error){
         console.log(error);
     }
 }
 
 const resetPassword = async(req,res)=>{
-    const  newPassword = req.body.password;        
-    const token = req.params.token;
+    const  newPassword = req.body.password;      
+    const token = req.body.token  
+    // const token = req.params.token;
+    console.log(newPassword + "  " + token );
     if (!newPassword || !token) {
       return res.redirect(
-        "/login?message=" + encodeURIComponent("Missing fields")
+        "/signin?message=" + encodeURIComponent("Missing fields")
       );
     }
 

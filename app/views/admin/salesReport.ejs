@@ -1,0 +1,156 @@
+<%- include('../partials/header'); -%>
+
+<section class="content-main">
+  <div class="content-header">
+    <div>
+      <h2 class="content-title card-title">Sales Report</h2>
+      <!-- <p>Lorem ipsum dolor sit amet.</p> -->
+    </div>
+     <div class="col-lg-8 col-5 text-end">
+<button class="btn btn-primary" id="downloadBtn">
+<i class="text-muted material-icons md-post_add"></i>Download
+            report
+</button>
+        </div>
+  </div>
+  <div class="card mb-4">
+    <header class="card-header">
+        <form action="/admin/sales" method="post">
+      <div class="row gx-3">
+        <!-- <div class="col-lg-4 col-md-6 me-auto">
+                                <input type="text" placeholder="Search..." class="form-control" />
+                            </div> -->
+    
+
+            <div class="col-lg-2 col-6">
+          <input type="date" class="form-control" name="fromDate" />
+        </div>
+        <div class="col-lg-2 col-6">
+          <input type="date" class="form-control" name="toDate" />
+        </div>
+         <div class="col-lg-2 col-6">
+          <button class="btn btn-primary" type="submit">
+            <i class="text-muted material-icons md-post_add "></i>Generate
+            report
+          
+          </button>
+        </div>    
+
+              </div>
+
+       </form>
+      
+    </header>
+    <!-- card-header end// -->
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th scope="col">Delivery Address</th>
+              <th scope="col">Products</th>
+              <th scope="col">Total</th>
+              <th scope="col">Products Count</th>
+              <th scope="col">Order Date</th>
+              <th scope="col" class="text-end">Payment Method</th>
+            </tr>
+          </thead>
+          <% orders.forEach(order => { %> 
+<% order.items.forEach(item => { %>
+ 
+
+          <tbody>
+            <tr>
+                <input type="hidden" value="<%= dates %>" id="dates">
+              <td>
+                <span class="badge alert-danger"><%= order.orderId %></span>
+              </td>
+              <td style="width: 20%; color: aquamarine">
+                Name:&nbsp;&nbsp;&nbsp;<%= order.shippingAddress.name%> <br />
+                Mobile:&nbsp;&nbsp;&nbsp;<%= order.shippingAddress.mobile%>
+                <br />
+                Address:&nbsp;&nbsp;&nbsp;<%= order.shippingAddress.address%>
+                <br />
+                Pincode:&nbsp;&nbsp;&nbsp;<%= order.shippingAddress.pinCode%>
+                <br />
+                Street:&nbsp;&nbsp;&nbsp;<%= order.shippingAddress.street%>
+                <br />
+                City:&nbsp;&nbsp;&nbsp;<%= order.shippingAddress.city%> <br />
+                State:&nbsp;&nbsp;&nbsp;<%= order.shippingAddress.state%> <br />
+              </td>
+              <td style="width: 20%; color: aqua">
+                <%= item.product.productName %>
+              </td>
+              <td>
+                <span class="badge alert-warning"
+                  >&#8377;&nbsp;<%= item.price %>
+                </span>
+              </td>
+              <td>
+                &nbsp;&nbsp;<span class="badge alert-success"
+                  ><%= item.quantity
+                  %>
+                </span>
+              </td>
+              <td>
+                <span class="badge alert-info"
+                  ><%= new Date(order.createdAt).toISOString().split('T')[0]
+                  %>
+                  </span>
+              </td>
+              <td class="text-end">
+                <span class="badge alert-primary">
+                  <%= order.paymentMethod %>
+                </span>
+              </td>
+            </tr>
+          </tbody>
+          <% }) %> <% }) %>
+        </table>
+      </div>
+      <!-- table-responsive //end -->
+    </div>
+    <!-- card-body end// -->
+  </div>
+  <!-- card end// -->
+  <div class="pagination-area mt-15 mb-50">
+    <nav aria-label="Page navigation example">
+      <ul class="pagination justify-content-start ">
+    <% for (let i = 1; i <= totalPages; i++) { %>
+        <li class="page-item <%= currentPage === i ? 'active' : 'active' %>">
+            <a class="page-link" href="/admin/salesReport?page=<%= i %>"><%= i %></a>
+        </li>
+    <% } %>
+</ul>   
+    </nav>
+  </div>
+</section>
+<%- include('../partials/footer'); -%>
+<script>
+        document.getElementById("downloadBtn").addEventListener("click", function() {
+                        const timestamp = new Date().getTime();
+                        const dates = document.getElementById('dates').value
+
+            fetch(`/admin/salesReportDownload?dates=${dates}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `report_${timestamp}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+        });
+    </script>

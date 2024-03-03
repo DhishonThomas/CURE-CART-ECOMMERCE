@@ -130,11 +130,17 @@
         <a href="/wishList" title="Wishlist">
             <div class="icon">
                 <i class="icon-heart-o"></i>
-                <span class="wishlist-count badge"><%= userWishlistNumber.products.length %></span>
-            </div>
+                <% if (userWishlistNumber===null) { %>
+
+                                 <span class="wishlist-count badge">0</span>
+<% } else { %>
+                 <span class="wishlist-count badge"><%= userWishlistNumber.products.length %></span>
+   </div>
             <p>Wishlist</p>
         </a>
     </div><!-- End .wishlist -->
+                <% } %>
+         
     <% } else { %>
        <div class="wishlist">
         <a href="wishlist.html" title="Wishlist">
@@ -159,7 +165,7 @@
                 <span class="cart-count">0</span>
 
                     <% } else { %>
-                                        <span class="cart-count"><%= userCartNumber.cartItems.length %></span>
+                      <span class="cart-count"><%= userCartNumber.cartItems.length %></span>
 
                  
                 <% } %>

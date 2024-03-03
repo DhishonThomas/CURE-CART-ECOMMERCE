@@ -2,9 +2,10 @@
 const express = require("express");
 const router = express.Router();
 const adminController = require("../app/controllers/adminController");
+const couponController = require("../app/controllers/couponController")
 const adminAuthMiddileware = require("../app/middilewares/adminAuth");
 const path = require('path')
-
+const adminDashboardController = require("../app/controllers/adminDashboardController")
 const adminOrderController = require("../app/controllers/adminOrderController");
 
 router.get("/admin", adminAuthMiddileware,adminController.admin);
@@ -78,4 +79,46 @@ router.get(
 
 router.post("/cancel-order", adminAuthMiddileware, adminOrderController.orderCancel);
 
-module.exports = router; 
+router.post("/place-order",adminAuthMiddileware, adminOrderController.orderPlaced)
+
+router.post(
+  "/accpetReturn-order",
+  adminAuthMiddileware,
+  adminOrderController.returnOrder
+);
+
+router.get("/coupon", adminAuthMiddileware, couponController.coupon)
+
+router.post("/coupon", adminAuthMiddileware, couponController.addCoupon);
+
+router.delete("/coupon", adminAuthMiddileware, couponController.couponDelete);
+
+
+router.get(
+  "/couponUpdate/:id",
+  adminAuthMiddileware,
+  couponController.couponEdit
+);
+
+router.post("/couponUpdate/:id", adminAuthMiddileware, couponController.couponUpdate);
+
+router.get("/couponUlist/:id", adminAuthMiddileware, couponController.couponUlist);
+
+
+router.get("/salesReport", adminAuthMiddileware,adminDashboardController.salesReport)
+
+
+router.post("/sales",adminAuthMiddileware, adminDashboardController.sales)
+
+router.get(
+  "/status",
+  adminAuthMiddileware,
+  adminOrderController.status
+);
+
+router.get(
+  "/salesReportDownload",
+  adminAuthMiddileware,
+  adminDashboardController.salesReportDownload
+);
+module.exports = router;
