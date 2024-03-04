@@ -368,7 +368,7 @@ shop: async (req, res) => {
 
       const userAddresses = await userAddress.findOne({ userId: userId });
       console.log("userAddress::", userAddresses);
-
+      const wallet = await Wallet.findOne({user: userId});
       const result = await cartController.getCart(userId);
 
       console.log(result);
@@ -384,6 +384,7 @@ shop: async (req, res) => {
           cartItems,
           cartTotal,
           RazUser,
+          wallet,
         });
         // res.render("user/cart", {
         //   cartItems,

@@ -9,6 +9,7 @@ const resetPasswordController = require("../app/controllers/resetPasswordControl
 const wishListController = require("../app/controllers/wishlistController");
 const orderController = require("../app/controllers/orderController");
 const validateController = require("../app/controllers/validateController")
+const userCouponController = require("../app/controllers/userCouponController")
 
 // const { file } = require("pdfkit");
 
@@ -119,6 +120,9 @@ router.post("/validate", validateController.addressValidate);
 
 router.post("/wallet-callback", orderController.walletCallback);
 router.post("/wallet", orderController.wallet);
+
+
+router.post("/apply-coupon", userCouponController.applyCoupon);
 
 
 module.exports = router;

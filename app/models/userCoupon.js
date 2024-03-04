@@ -19,6 +19,6 @@ const couponUserSchema = new mongoose.Schema({
 })
 
 
-const CouponUsage = mongoose.model.("CouponUsage",couponUserSchema)
+const CouponUsage = mongoose.model("CouponUsage",couponUserSchema)
 
 module.exports = CouponUsage

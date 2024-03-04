@@ -12,9 +12,29 @@ const User = require("../models/user");
 const mongoose = require("mongoose");
 const Order = require("../models/order");
 const { error, log } = require("console");
+const Wallet = require("../models/wallet")
+
+
+async function refundOrder(order) {
+  try {
+    const totalAmount = order.totalAmount;
 
 
 
+    const userId = order.user;
+    console.log(userId,"userIdfvffbhfhg");
+    const userWallet = await Wallet.findOne({ user: userId }).exec();
+
+    if (!userWallet) {
+      throw new Error("User wallet not found");
+    }
+
+    userWallet.balance += totalAmount;
+    await userWallet.save();
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 
 const orderList = async (req, res) => {
@@ -68,7 +88,8 @@ const orderCancel = async(req,res)=>{
      const itemToUpdate = order.items.find(
        (item) => item.product.toString() === productId
      );
-console.log("eut9e8ruteriy8fhjehu7ewui",order.paymentStatus);
+
+await refundOrder(order);
     itemToUpdate.orderStatus = "OrderCanceled";
       const updatedOrder = await order.save();
 
@@ -110,7 +131,10 @@ const itemToUpdate = order.items.find((item)=>item.product.toString()===productI
 
 
 itemToUpdate.orderStatus = "ReturnOk"
+
+await refundOrder(order);
  const updatedOrder = await order.save();
+
  res.json({
    message: "Order cancelled successfully",
    order: updatedOrder,

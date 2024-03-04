@@ -92,6 +92,53 @@
         .btn-primary:hover {
             background-color: #0056b3;
         }
+        
+        .coupon-box,
+.wallet-box {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.coupon-box h3,
+.wallet-box h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.coupon-input-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.available-coupons {
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+#coupon-message,
+#wallet-balance {
+  font-weight: bold;
+}
+
+
+
+.heading {
+      text-align: center;
+      color: #333;
+      background-color: #ffc107;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+
+
+/* Add additional styles as desired */
+
 
 </style>
 
@@ -103,15 +150,15 @@
         </div><!-- End .container -->
     </div><!-- End .page-header -->
 
-    <nav aria-label="breadcrumb" class="breadcrumb-nav">
+    <!-- <nav aria-label="breadcrumb" class="breadcrumb-nav">
         <div class="container">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="index.html">Home</a></li>
                 <li class="breadcrumb-item"><a href="#">Shop</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Checkout</li>
             </ol>
-        </div><!-- End .container -->
-    </nav><!-- End .breadcrumb-nav -->
+        </div>End .container
+    </nav> -->
     
         <div class="text-center mt-3">
             <!-- <a href="/"> -->
@@ -174,13 +221,14 @@
 
    
 
-<div class="page-content">
+<div class="page-conte  nt">
     <div class="container">
         <div class="row">
-            <div class="col-lg-3 order-lg-last">
+            <div class="col-lg-5 order-lg-last">
+                <br>
                 <form id="checkout-form">
                     <div class="summary">
-                        <h3 class="summary-title">Your Order</h3><!-- End .summary-title -->
+                        <h3 class="summary-title">Your Order</h3>   
                         <table class="table table-summary">
                             <thead>
                                 <tr>
@@ -191,7 +239,7 @@
                             <tbody>
                                 <% cartItems.forEach(cartItem => { %>
                                 <tr>
-                                    <td><a><%= cartItem.productId.productName %></a></td>
+                                    <td><a style="font-weight: bold;"><%= cartItem.productId.productName %></a></td>
                                     <%= console.log(cartItem.productId); %>
                                     <td>₹<%= (cartItem.productId.price * cartItem.quantity) %></td>
                                 </tr>
@@ -199,21 +247,40 @@
                                 <tr class="summary-subtotal">
                                     <td>Subtotal:</td>
                                     <td>&#8377;<%= cartTotal.totalAmount %></td>
-                                </tr><!-- End .summary-subtotal -->
+                                </tr>
                                 <tr>
                                     <td>Shipping:</td>
                                     <td>Free shipping</td>
                                 </tr>
-                                <tr class="summary-total">
+                                <tr class="summary-total">  
                                     <td>Total:</td>
                                         <input type="hidden" id="amount" name="amount" value="<%= cartTotal.totalAmount %>">
+                                        <input type="hidden" id="new-amount" name="new-amount">
+                                        <input type="hidden" id="couponCode-amount" name="couponCode-amount">
 
-                                    <td>&#8377;<%= cartTotal.totalAmount %></td>
-                                </tr><!-- End .summary-total -->
+                                    <td id="total-amount">&#8377;<%= cartTotal.totalAmount %></td>
+                                </tr>
                             </tbody>
-                        </table><!-- End .table table-summary -->
-                        <!-- Payment options -->
+                        </table>
+                        
                         <div class="accordion-summary" id="accordion-payment">
+        <div class="coupon-box">
+  <h6>Have a coupon?</h6>
+  <div class="coupon-input-container">
+    <input type="text" id="coupon-code" style="width: 50%; height: 25px; padding: 0px;" placeholder="Enter your coupon code">
+<button type="button" style="width: 60px; height: 30px; padding: 0px; border-radius: 5px; color:#fff; background-color:#3b5998" id="apply-coupon">Apply</button>
+  </div>
+  <p class="available-coupons">Available coupons: <b>(None)</b></p>
+  <span id="coupon-message"></span>
+</div>
+
+<div class="wallet-box">
+  <h6>Use your wallet balance</h6>
+  <p id="wallet-balance">₹ <%= wallet.balance%></p>
+  <input type="checkbox" id="use-wallet"> <label for="use-wallet">Use wallet balance</label>
+</div>
+
+
                             <div class="card">
                                 <div class="card-header" id="heading-3">
                                     <h2 class="card-title">
@@ -236,15 +303,17 @@
 
                         <button type="submit" class="btn btn-outline-primary-2 btn-order btn-block">
                             <span class="btn-text">Place Order</span>
-                            <span class="btn-hover-text">Proceed to Checkout</span>
+                            <span class="btn-hover-text">Place Order</span>
                         </button>
                     </div><!-- End .summary -->
                 </form>
             </div><!-- End .col-lg-3 -->
-            <div class="col-lg-9">
+            <div class="col-lg-7">
                 <div id="address-container">
-                    <h2>Select Address</h2>
-                    <div class="row">
+                    <br>
+ <div class="heading">
+    <h2>Select Address</h2>
+  </div>                    <div class="row">
                         <% userAddress.forEach(address => { %>
                         <div class="col-md-6 mb-3">
                             <div class="address-box" data-address-id="<%= address._id %>">
@@ -269,6 +338,40 @@
 
 
 </main><!-- End .main -->
+<script>
+    document.getElementById('apply-coupon').addEventListener('click', async () => {
+        const couponCode = document.getElementById('coupon-code').value;
+    document.getElementById('couponCode-amount').value = couponCode;
+        try {
+            const response = await fetch('/apply-coupon', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ couponCode })
+            });
+            const data = await response.json();
+
+            if(data.success){
+                console.log(data);
+            document.getElementById('total-amount').innerText = `₹ ${data.updatedTotalAmount}`;
+    document.getElementById('new-amount').value = data.updatedTotalAmount;
+
+            }else{
+                console.log(data);
+            }
+        } catch (error) {
+            console.error('Error applying coupon:', error);
+        }
+    });
+</script>
+<!-- 
+<script>
+  document.getElementById('apply-coupon').addEventListener('click', function() {
+    var couponCode = document.getElementById('coupon-code').value;
+
+    console.log('Coupon code:', couponCode);
+    
+  });
+</script> -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
  <script>
@@ -342,13 +445,13 @@ console.log(validationResult);
              errorDiv.textContent = validationResult.message;
 errorDiv.style.color = 'red';
 
-                form.querySelector('button[type="submit"]').disabled = true; // Disable submit button
+                form.querySelector('button[type="submit"]').disabled = true; 
             } else {
                  errorDiv.textContent = ''; 
 
 // errorDiv.textContent = '\u2714'; 
 // errorDiv.style.color = 'green';
-     form.querySelector('button[type="submit"]').disabled = false; // Disable submit button
+     form.querySelector('button[type="submit"]').disabled = false; 
 
             }
         })
@@ -492,7 +595,6 @@ toastr.error('All fields are required.');
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM content loaded");
-
     var addressBoxes = document.querySelectorAll('.address-box');
     var checkoutForm = document.getElementById('checkout-form');
 
@@ -527,7 +629,12 @@ document.addEventListener('DOMContentLoaded', function() {
             var selectedPaymentOption = document.querySelector('input[name="payment-option"]:checked').value;
 console.log("selectedAddressId",selectedAddressId);
 if(selectedAddressId){
+    var couponCode = document.getElementById("couponCode-amount").value;
+                    var amount = $('#amount').val();
+                    var total = document.getElementById('new-amount').value
+                    console.log(total);
 
+const totalAmount = total?total:amount;
 
             fetch('/orders', {
                 method: 'POST',
@@ -536,7 +643,9 @@ if(selectedAddressId){
                 },
                 body: JSON.stringify({ 
                     selectedAddressId: selectedAddressId,
-                    selectedPaymentOption: selectedPaymentOption
+                    selectedPaymentOption: selectedPaymentOption,
+                    totalAmountCoupon:totalAmount,
+                    couponCode:couponCode
                 })
             })
             .then(response => response.json())
@@ -550,7 +659,7 @@ if(selectedAddressId){
 
                     var amount = $('#amount').val();
                     console.log(amount);
-
+// const totalAmount = total?total:amount;
                     console.log("success worked");
 
                     var orderId = data.orderId;
@@ -629,6 +738,7 @@ if(selectedAddressId){
                 }
             }else{
                   if (data) {
+                
                                         Swal.fire({
                                             icon: 'success',
                                             title: 'Order Placed Successfully',
@@ -651,7 +761,7 @@ if(selectedAddressId){
             .catch(error => {
                 console.error('Error placing order:', error);
                 Swal.fire({
-                    icon: 'error',
+                    icon: 'error',  
                     title: 'Error',
                     text: 'Failed to place the order. Please try again later.'
                 });

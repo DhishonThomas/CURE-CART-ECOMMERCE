@@ -12,6 +12,9 @@ const Transaction = require("../models/transaction")
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
 
+const  Coupon = require("../models/coupon")
+
+const CouponUsage = require("../models/userCoupon")
 
 const cron = require('node-cron')
 
@@ -45,41 +48,40 @@ async function generatePDF(orderDetails, filePath) {
     doc.text(`Total: ${item.total}`).moveDown();
   });
 
-  // Add total amount
   doc.text(`Total Amount: ${orderDetails.totalAmount}`).moveDown();
 
-  // Finalize the PDF
   doc.end();
 }
 
 module.exports = generatePDF;
 
 
+const razorpay = new Razorpay({
+  key_id: "rzp_test_SsymjD3eNkPA50",
+  key_secret: "Z22hM97tCz6grYcH1sJpXjxG",
+});
+
+
 async function refundOrder(order) {
-  if (order.paymentMethod === "Razorpay") {
-    const totalAmount = order.totalAmount;
+  try{
+const totalAmount = order.totalAmount;
 
-    const refundResponse = await razorpay.refundOrder(
-      order.razorpayOrderId,
-      totalAmount
-    );
-    console.log("Razorpay refund response:", refundResponse);
+const userId = order.user;
+const userWallet = await Wallet.findOne({ user: userId }).exec();
 
-    if (!refundResponse.success) {
-      throw new Error("Razorpay refund failed");
-    }
-
-    const userId = order.user;
-    const userWallet = await Wallet.findOne({ user: userId }).exec();
-
-    if (!userWallet) {
-      throw new Error("User wallet not found");
-    }
-
-    userWallet.balance += totalAmount;
-    await userWallet.save();
-  }
+if (!userWallet) {
+  throw new Error("User wallet not found");
 }
+
+userWallet.balance += totalAmount;
+await userWallet.save();
+  }catch(error){
+console.log(error);
+  }
+    
+  }
+
+
 
 async function walletCredit(addMoney,
           user,
@@ -208,10 +210,6 @@ async function orderPlaced(
   }
 }
 
-const razorpay = new Razorpay({
-  key_id: "rzp_test_SsymjD3eNkPA50",
-  key_secret: "Z22hM97tCz6grYcH1sJpXjxG",
-});
 
 
 
@@ -292,26 +290,51 @@ const orderController = {
     }
   },
   order: async (req, res) => {
-    const { selectedAddressId, selectedPaymentOption } = req.body;
+    const {
+      selectedAddressId,
+      selectedPaymentOption,
+      totalAmountCoupon,
+      couponCode,
+    } = req.body;
+    console.log(req.body);
     console.log(selectedAddressId, "selectedAddressId");
     const user = res.locals.user;
+          const userCart = await UserCart.findOne({ userId: user });
+
     if (selectedPaymentOption === "Razorpay") {
-      const userCart = await UserCart.findOne({ userId: user });
+
+if(couponCode){
+
+  const coupon = await Coupon.findOne({
+    code: couponCode,
+    validUntil: { $gte: new Date() },
+  });
+  const newUsage = new CouponUsage({
+    coupon: coupon._id,
+    user: res.locals.user,
+  });
+
+  userCart.totalAmount = totalAmountCoupon;
+
+  await newUsage.save();
+}
+
+
       if (!userCart) {
         return res.status(404).json({ message: "User cart not found" });
       }
       console.log("usercart end");
-      const { totalAmount } = userCart;
+      // const { totalAmount } = userCart;
+
       console.log("Razorpay worked");
 
       const razorpayOrderOptions = {
-        amount: totalAmount * 100,
+        amount: totalAmountCoupon * 100,
         currency: "INR",
         receipt: "order_rcptid_" + Math.floor(Math.random() * 1000),
       };
 
       const razorpayOrder = await razorpay.orders.create(razorpayOrderOptions);
-      console.log("ra", razorpayOrder);
 
       return res.status(200).json({
         success: true,
@@ -320,10 +343,26 @@ const orderController = {
         amount: razorpayOrder.amount,
       });
     } else {
+     if (couponCode) {
+       const coupon = await Coupon.findOne({
+         code: couponCode,
+         validUntil: { $gte: new Date() },
+       });
+       const newUsage = new CouponUsage({
+         coupon: coupon._id,
+         user: res.locals.user,
+       });
+
+       userCart.totalAmount = totalAmountCoupon;
+
+       await newUsage.save();
+     }
+
       const order_id = await orderPlaced(
         selectedAddressId,
         selectedPaymentOption,
-        user
+        user,
+        totalAmountCoupon,
       );
       console.log(order_id, "order id");
       res.status(200).json({
@@ -469,18 +508,17 @@ console.log(order);
         (item) => item.product.toString() === productId
       );
 
-      // Refund the order amount if payment method is Razorpay
-      // if (order.paymentMethod === "Razorpay") {
-      //   await refundOrder(order);
-      // }
+      if (order.paymentMethod === "Razorpay") {
+
+        console.log("Razorpay is worked");
+        await refundOrder(order);
+      }
       itemToUpdate.reason = reason;
 
       itemToUpdate.orderStatus = "OrderCanceled";
 
-      // Save the updated order
       const updatedOrder = await order.save();
 
-      // Update the order status to reflect the cancellation
       // const updatedOrder = await Order.findOneAndUpdate(
       //   { _id: orderId },
       //   { status },
