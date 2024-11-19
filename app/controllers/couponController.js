@@ -13,7 +13,15 @@ const CouponController = {
     try {
       const { code, discountPercentage, validForm, validUntil, maxUsageCount } =
         req.body;
+let trimCode =code.trim(" ")
+console.log(trimCode);
+const existCoupon = await Coupon.findOne({ code: { $regex: new RegExp(trimCode, "i") } });
 
+console.log(existCoupon);
+if(existCoupon){
+ return  res.json({success:false,message:"Coupon already exsist"})
+}
+ 
       console.log(req.body);
       const discountAmount = parseInt(discountPercentage, 10);
       console.log(discountAmount);
@@ -69,7 +77,14 @@ const CouponController = {
         maxUsageCount,
         couponId,
       } = req.body;
+      let trimCode=code
+      const existCoupon = await Coupon.findOne({ code: { $regex: new RegExp(trimCode, "i") } });
 
+      console.log(existCoupon);
+      if(existCoupon){
+       return  res.json({success:false,message:"Coupon already exsist"})
+      }
+      
       const coupon = await Coupon.findOneAndUpdate(
         { _id: couponId },
         {

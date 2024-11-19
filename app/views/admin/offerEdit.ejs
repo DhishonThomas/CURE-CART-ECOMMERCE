@@ -1,0 +1,184 @@
+<%- include('../partials/header'); -%>
+<!-- Include the script before using it -->
+
+ <section class="content-main">
+                <div class="content-header">
+                    <div>
+                        <h2 class="content-title card-title">Edit Offer</h2>
+                        <!-- <p>Add, edit or delete Coupon</p> -->
+                    </div>
+                    <div>
+                        <input type="text" placeholder="Search Categories" class="form-control bg-white" />
+                    </div>
+                </div>
+             <div class="card col-md-5 ">
+  <div class="card-body d-flex flex-column justify-content-center align-items-center">
+    <div class="row">
+      <div class="col-md-15">
+        <form id="formblock">
+          <div class="mb-4">
+            <div class="message-container">
+              </div>
+<input type="hidden" value="<%= offer._id %>" name="offerId" id="offerId">
+
+            <label for="product_name" class="form-label">Coupon Name</label>
+            <input type="text" placeholder="Enter Offer Name" class="form-control" value="<%= offer.offerName %>" id="offerName" name="offerName" />
+
+            <label class="form-label">Discount</label>
+            <input type="number" placeholder="Enter Discount" class="form-control" value="<%= offer.discountPercentage %>" id="discountPercentage" name="discountPercentage" />
+            <label class="form-label">Valid On</label>
+            <input type="date" placeholder="Enter Valid On" class="form-control" value="<%= offer.validFrom ? new Date(offer.validFrom).toISOString().split('T')[0] : '' %>" id="validFrom" name="validFrom" />                    
+            <label class="form-label">Valid To</label>
+            <input type="date" placeholder="Enter Valid To" class="form-control" value="<%= offer.validUntil ? new Date(offer.validUntil).toISOString().split('T')[0] : '' %>" id="validUntil" name="validUntil" />           </div>
+          <div class="d-grid">
+            <button class="btn btn-primary" onclick="return validateForm(event)">Update Offer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+                <!-- card .// -->
+            </section>
+
+         <script>
+           
+function validateForm(event) {
+    event.preventDefault(); 
+    var offerName = document.getElementById('offerName').value;
+    var discountPercentage = document.getElementById('discountPercentage').value;
+    var validFrom = document.getElementById('validFrom').value;
+    var validUntil = document.getElementById('validUntil').value;
+    var dateFormat = /^\d{4}-\d{2}-\d{2}$/;
+    if (offerName.trim() === '' || discountPercentage.trim() === '' || validFrom.trim() === '' || validUntil.trim() === '') {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'All fields are required!'
+        });
+        return false;
+    }
+
+    if (isNaN(discountPercentage)) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Discount must be a number!'
+        });
+        return false;
+    }
+
+    if (discountPercentage < 0 || discountPercentage > 100) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Discount must be between 0 and 100!'
+        });
+        return false;
+    }
+
+    if (!validFrom.match(dateFormat) || !validUntil.match(dateFormat)) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Invalid date format. Date must be in YYYY-MM-DD format!'
+        });
+        return false;
+    }
+
+    if (validFrom >= validUntil) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Valid Until date must be after Valid From date!'
+        });
+        return false;
+    }
+
+
+    // if (code.length !== 6) {
+    //     Swal.fire({
+    //         icon: 'error',
+    //         title: 'Oops...',
+    //         text: 'Coupon name must have exactly 6 characters!'
+    //     });
+    //     return false;
+    // }
+
+    submitForm();
+}
+
+async function submitForm() {
+    var offerName = document.getElementById('offerName').value;
+    var discountPercentage = document.getElementById('discountPercentage').value;
+    var validFrom = document.getElementById('validFrom').value;
+    var validUntil = document.getElementById('validUntil').value;
+    var offerId = document.getElementById('offerId').value 
+
+    var formData = {
+        offerName: offerName,
+        discountPercentage: discountPercentage,
+        validFrom: validFrom,
+        validUntil: validUntil,
+        offerId:offerId
+    };
+
+    console.log(formData);
+
+    try {
+        fetch(`/admin/offerUpdate`, {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData),
+        })
+        .then(response => response.json())
+        .then(data => {
+
+if(data.success===false){
+    const messageOffername = document.getElementById("messageOffername")
+    const messageDiscount = document.getElementById("messageDiscount")
+
+
+                if(data.messageName){
+                    messageOffername.textContent=data.messageName
+                    messageDiscount.textContent=""
+
+
+                }
+                if(data.messageDis){
+                    messageOffername.textContent=""
+                    messageDiscount.textContent = data.messageDis
+
+                }
+                
+            }else{
+                Swal.fire({
+            icon: 'success',
+            title: 'Coupon Created Successfully',
+            showConfirmButton: false,
+            timer: 1500
+        }).then(data=>{
+            window.location.reload()
+
+        })
+
+            }
+          });
+
+
+                    } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'An unexpected error occurred. Please try again later!'
+        });
+    }
+}
+</script>
+
+         
+               <%- include('../partials/footer'); -%>

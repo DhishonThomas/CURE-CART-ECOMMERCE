@@ -1,8 +1,21 @@
 <%- include('../partialsUser/header'); -%>
 
 <style>
+  .card-box {
+    background-color: #f0f0f0; /* Example background color */
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Example shadow */
+  }
 
+  .no-products {
+    font-size: 20px;
+    color: #133086; /* Example calming color */
+    font-family: "Open Sans", sans-serif; /* Example font */
+    font-weight: bold;
+  }
 </style>
+
 <main class="main">
 	<%
   function escapeSingleQuotes(str) {
@@ -15,22 +28,18 @@
         			<h1 class="page-title">Cure Cart<span>Cart</span></h1>
         		</div><!-- End .container -->
         	</div><!-- End .page-header -->
-            <nav aria-label="breadcrumb" class="breadcrumb-nav">
-                <div class="container">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Shop</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Shopping Cart</li>
-                    </ol>
-                </div><!-- End .container -->
-            </nav><!-- End .breadcrumb-nav -->
+<br>
 
             <div class="page-content">
             	<div class="cart">
 	                <div class="container">
 	                	<div class="row">
 	                		<div class="col-lg-9">
+                        <% if (cartItems.length > 0) { %>
+
 	                			<table class="table table-cart table-mobile">
+
+
     <thead>
         <tr>
             <th>Product</th>
@@ -53,7 +62,8 @@
                         </figure>
 
                         <h3 class="product-title">
-                            <a href="#"><%= cartItem.productId.productName %></a>
+                            <a href="#"><%let productName = cartItem.productId.productName.substring(0,90).trim("")+"...." %></a>
+                            <%= productName %>
                         </h3><!-- End .product-title -->
                     </div><!-- End .product -->
                 </td>
@@ -73,7 +83,8 @@
 onchange="handleQuantityChange('<%= locals.user %>', '<%= cartItem._id %>')"
 >                    </div><!-- End .cart-product-quantity -->
                 </td>
-<td class="total-col" id="total_<%= cartItem._id %>">₹<%= (cartItem.productId.price * cartItem.quantity) %></td>
+                
+<td class="total-col" id="total_<%= cartItem._id %>">₹<%= (cartItem.price * cartItem.quantity) %></td>
 				
                 <td class="remove-col">
 <button class="btn-remove" onclick="confirmDelete('<%=cartItem._id%>', '<%= escapeSingleQuotes(cartItem.productId.productName) %>')"><i class="icon-close"></i></button>
@@ -82,21 +93,14 @@ onchange="handleQuantityChange('<%= locals.user %>', '<%= cartItem._id %>')"
      <% }) %>
     </tbody>
 </table><!-- End .table table-wishlist -->
-  
+   
+  <% } %>
 
-	                			<div class="cart-bottom">
-			            			<div class="cart-discount">
-			            				<form action="#">
-			            					<div class="input-group">
-				        						<input type="text" class="form-control" required placeholder="coupon code">
-				        						<div class="input-group-append">
-													<button class="btn btn-outline-primary-2" type="submit"><i class="icon-long-arrow-right"></i></button>
-												</div><!-- .End .input-group-append -->
-			        						</div><!-- End .input-group -->
-			            				</form>
-			            			</div><!-- End .cart-discount -->
 
-			            			<a href="#" class="btn btn-outline-dark-2"><span>UPDATE CART</span><i class="icon-refresh"></i></a>
+	                			<div class="cart-bottom" >
+			        
+
+			            			<a href="/cart" class="btn btn-outline-dark-2" style="margin-left: 63%;"><span>UPDATE CART</span><i class="icon-refresh"></i></a>
 		            			</div><!-- End .cart-bottom -->
 	                		</div><!-- End .col-lg-9 -->
 						
@@ -142,13 +146,30 @@ onchange="handleQuantityChange('<%= locals.user %>', '<%= cartItem._id %>')"
             <a href="/checkOut" class="btn btn-outline-primary-2 btn-order btn-block">PROCEED TO CHECKOUT</a>
         </div><!-- End .summary -->
 
-        <a href="category.html" class="btn btn-outline-dark-2 btn-block mb-3"><span>CONTINUE SHOPPING</span><i class="icon-refresh"></i></a>
+        <a href="/shop" class="btn btn-outline-dark-2 btn-block mb-3"><span>CONTINUE SHOPPING</span><i class="icon-refresh"></i></a>
     </aside><!-- End .col-lg-3 -->
 
 <% } else { %>
-    <div class="alert alert-warning" role="alert">
-        Your cart is empty. Please add items to proceed to checkout.
-    </div>
+  <div>
+    
+  </div>
+  <div
+  class="card-box"
+  style="
+    height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 15%;
+
+  "
+>
+  <p class="no-products">
+    <span class="icon"><i class="fas fa-heart"></i></span> Your Cart
+    is currently empty. Start building it by browsing our amazing
+    products!
+  </p>
+</div>
 <% } %>
 
 	                	</div><!-- End .row -->
@@ -183,7 +204,6 @@ onchange="handleQuantityChange('<%= locals.user %>', '<%= cartItem._id %>')"
           return response.json();
         })
         .then(data => {
-          // Handle success
           console.log(productName);
 		       Swal.fire({
           icon: 'success',

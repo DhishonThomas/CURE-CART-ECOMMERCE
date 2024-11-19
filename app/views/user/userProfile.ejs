@@ -379,12 +379,13 @@
 document.getElementById('addMoney').addEventListener('click', async () => {
     const addMoney = document.getElementById('addMoneyInput').value;
 const walletBalance  = document.getElementById('walletBalance')
-    // Validate if amount to add is a positive number
     if (isNaN(addMoney) || addMoney <= 0) {
-        alert('Please enter a valid amount to add');
-        return;
-    }
-
+        Swal.fire({
+                icon: 'error',
+                title: 'Invalid Amount',
+                text: 'Please enter a valid amount greater than 0.'
+            });                 
+        }
     fetch('/wallet', {
         method: 'POST',
         headers: {

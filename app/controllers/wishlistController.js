@@ -4,11 +4,19 @@ const Wishlist = require("../models/wishlist");
 const wishList = {
   wishlist: async (req, res) => {
     try {
+      const page = parseInt(req.query.page) || 1;
+      const perPage = 6;
+      const totalProducts = await Wishlist.find().countDocuments()
+      const totalPages = Math.ceil(totalProducts / perPage);
+
+
       const userId = res.locals.user;
       const wishList = await Wishlist.findOne({ user: userId })
         .populate("products.productId")
+        .skip((page - 1) * perPage)
+        .limit(perPage)
         .exec();
-      res.render("user/wishList", { wishList });
+      res.render("user/wishList", { wishList,totalPages, currentPage: page });
     } catch (error) {
       console.log(error);
     }

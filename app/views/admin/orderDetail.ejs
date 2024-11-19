@@ -28,10 +28,10 @@ button:disabled {
                     <header class="card-header">
                         <div class="row align-items-center">
                             <div class="col-lg-6 col-md-6 mb-lg-0 mb-15">
-                                <span> <i class="material-icons md-calendar_today"></i> <b>Wed, Aug 13, 2020, 4:34PM</b> </span> <br />
+                                <span> <i class="material-icons md-calendar_today"></i> <b>Wed, Mar 13, 2024, 4:34PM</b> </span> <br />
                                 <small class="text-muted">Order ID: 3453012</small>
                             </div>
-                            <div class="col-lg-6 col-md-6 ms-auto text-md-end">
+                            <!-- <div class="col-lg-6 col-md-6 ms-auto text-md-end">
                                 <select class="form-select d-inline-block mb-lg-0 mr-5 mw-200">
                                     <option>Change status</option>
                                     <option>Awaiting payment</option>
@@ -41,7 +41,7 @@ button:disabled {
                                 </select>
                                 <a class="btn btn-primary" href="#">Save</a>
                                 <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>
-                            </div>
+                            </div> -->
                         </div>
                     </header>
                     <!-- card-header end// -->
@@ -118,7 +118,11 @@ button:disabled {
                                                 <td>&#8377; <%= item.product.price %></td>
 
                                                 <td><%= item.quantity %></td>
-                                                <% if (item.orderStatus==="Pending") { %>
+                                                <% if (item.orderStatus==="Order") { %>
+                                                 
+                                                    <td> <button id="cancelButton" data-product-id="<%= item.product._id %>"  data-order-id="<%= orders._id %>">Cancel Order</button></td>   
+
+                                                <% } else if (item.orderStatus==="Pending") { %>
        <td> <button id="cancelButton" data-product-id="<%= item.product._id %>"  data-order-id="<%= orders._id %>">Cancel Order</button></td>   
 <% } else if (item.orderStatus==="OrderCanceled") { %>
                <td> <button  disabled >Order Canceled</button></td>
@@ -130,8 +134,11 @@ button:disabled {
       <td> <button  disabled >Return Accepted</button></td>
 
                <% } %>
+               <% if (item.orderStatus==="Order") { %>
+                
+                <td> <button id="shippedButton"  data-product-id="<%= item.product._id %>"  data-order-id="<%= orders._id %>" >Ship order</button></td>
 
-                                                <% if (item.orderStatus==="Pending") { %>
+               <% } else if (item.orderStatus==="Pending") { %>
                                                                   <td> <button id="placedButton"  data-product-id="<%= item.product._id %>"  data-order-id="<%= orders._id %>" >Place order</button></td>
 <% } else if (item.orderStatus==="OrderCanceled") { %>
                                                                    <td> <button  disabled >Canceled</button></td>
@@ -256,6 +263,46 @@ document.addEventListener('DOMContentLoaded', async () => {
             swal({
                 title: 'Error',
                 text: 'Failed to cancel order. Please try again later.',
+                icon: 'error',
+            })
+        }
+    };
+
+    const handleShipOrder = async (orderId,productId) => {
+      
+      try {
+            const response = await fetch('/admin/ordered-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ orderId,productId })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                
+                    Swal.fire({
+                        title: '<span style="color: red;">Shipping Order</span>',
+                              background: 'RGB(46, 46, 46)',
+                        text: 'Order has been successfully Shippeed.',
+                        icon: 'success',
+                    })
+                    .then(data=>{
+                        window.location.reload()
+                    })
+                } else {
+                    throw new Error(data.message);
+                }
+            } else {
+                throw new Error('Failed to cancel order');
+            }
+        } catch (error) {
+            console.error('Error canceling order:', error);
+            swal({
+                title: 'Error',
+                text: 'Failed to Ship order. Please try again later.',
                 icon: 'error',
             })
         }
@@ -401,6 +448,41 @@ document.addEventListener('DOMContentLoaded', async () => {
     const returnButton = document.getElementById('returnButton');
     const acceptReturn = document.getElementById('acceptReturn');
        const placedButton = document.getElementById('placedButton');
+       const shippedButton = document.getElementById('shippedButton');
+if(shippedButton){
+
+    shippedButton.addEventListener('click',async ()=>{
+        const orderId = shippedButton.dataset.orderId;
+        const productId =  shippedButton.dataset.productId;
+
+        console.log("Order Id",productId);
+  if (orderId && productId) {
+            const confirmPlaced = await Swal.fire({
+                 title: '<span style="color: red;">Ship Order</span>',
+    text: 'Are you sure you want to Place this order?',
+         html: '<span style="color: white;">You won\'t be able to revert this!</span>',
+
+    icon: 'warning',
+    showCancelButton: true,
+     background: 'RGB(46, 46, 46)',
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes',
+    cancelButtonText: 'No'
+            });
+
+            if (confirmPlaced.isConfirmed) {
+                handleShipOrder(orderId,productId);
+
+            }
+        } else {
+            console.error('Order ID not found');
+        } 
+})
+
+
+}
+
 if (acceptReturn) {
     
 

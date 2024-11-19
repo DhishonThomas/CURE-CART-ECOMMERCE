@@ -5,11 +5,13 @@ const Product = require("../models/product");
 const mongoose = require("mongoose");
 const UserCart = require("../models/cartItem");
 const userAddress = require("../models/userAddress");
-const Wallet = require("../models/wallet")
+const Wallet = require("../models/wallet");
 const cartController = require("./cartController");
 const Wishlist = require("../models/wishlist");
 const { wallet } = require("./orderController");
-
+const Coupon = require("../models/coupon");
+const CouponUsage = require("../models/userCoupon");
+const Offer = require("../models/offer");
 const userControllers = {
   home: async (req, res) => {
     try {
@@ -19,7 +21,6 @@ const userControllers = {
       const cartItems = await UserCart.findOne(userId).populate(
         "cartItems.productId"
       );
-      
 
       console.log(cartItems);
       // console.log(cartItems.totalAmount);
@@ -30,7 +31,6 @@ const userControllers = {
           user: req.session.isUserAuth,
           cartItems,
           user,
-          
         });
       } else {
         res.render("user/home", { products, user: null });
@@ -147,48 +147,85 @@ const userControllers = {
 
   // <..........................................................................................................>
 
-shop: async (req, res) => {
+  shop: async (req, res) => {
     try {
-        const page = parseInt(req.query.page) || 1;
-        const perPage = 6;
 
-        let query = { isListed: true }; // Default  query
+      const page = parseInt(req.query.page) || 1;
+      const perPage = 6;
 
-        // Check if category filter is applied
-        if (req.query.category) {
-            query.category = req.query.category;
-            console.log(query);
+      let query = { isListed: true };
 
-              const totalProducts = await Product.countDocuments({
-                category: query.category,
-              });
-              const totalPages = Math.ceil(totalProducts / perPage);
+      if (req.query.category) {
+        query.category = req.query.category;
 
-              const products = await Product.find({category:query.category})
-                .skip((page - 1) * perPage)
-                .limit(perPage);
+        const totalProducts = await Product.countDocuments({
+          category: query.category,
+        });
 
-              res.render("user/shop", {
-                products,
-                totalPages,
-                currentPage: page,
-              });
-        } else{
+        const totalPages = Math.ceil(totalProducts / perPage);
+
+        const products = await Product.find({ category: query.category })
+          .populate({
+            path: "category",
+            populate: {
+              path: "offer",
+            },
+          }) 
+          .populate("offer")
+          .skip((page - 1) * perPage)
+          .limit(perPage);
+
+        res.render("user/shop", {
+          products,
+          totalPages,
+          currentPage: page,
+        });
+      }  else if (req.body.search) { 
+        const searchQuery = req.body.search; 
+        console.log("gfugfudsguysfdgjhdsgudsydsfhjb",searchQuery);
+
+        const totalProducts = await Product.countDocuments({ productName: { $regex: '^' + searchQuery, $options: 'i' } });
+
+        const totalPages = Math.ceil(totalProducts / perPage);
+
+        const products = await Product.find({ productName: { $regex: '^' + searchQuery, $options: 'i' } })
+            .populate({
+                path: "category",
+                populate: {
+                    path: "offer",
+                },
+            })
+            .populate("offer")
+            .skip((page - 1) * perPage)
+            .limit(perPage);
+
+        res.render("user/shop", {
+            products,
+            totalPages,
+            currentPage: page,
+        });
+    }
+      else{
         const totalProducts = await Product.countDocuments(query);
         const totalPages = Math.ceil(totalProducts / perPage);
 
         const products = await Product.find(query)
-          .skip((page - 1) * perPage)
-          .limit(perPage);
+          .populate({
+            path: "category",
+            populate: {
+              path: "offer",
+            },
+          })
+          .populate("offer")
+          .skip((page - 1) * perPage);
 
         res.render("user/shop", { products, totalPages, currentPage: page });
-        }
-
+      }
     } catch (error) {
-        console.error("Error fetching products:", error);
-        res.status(500).send("Internal Server Error");
+      console.error("Error fetching products:", error);
+      res.status(500).send("Internal Server Error");
     }
-},
+  },
 
   // <..........................................................................................................>
 
@@ -204,20 +241,27 @@ shop: async (req, res) => {
       //   return res.redirect("/");
       // }
       const userId = res.locals.user;
-      const product = await Product.findOne({ _id: productId });
+      const product = await Product.findOne({ _id: productId })
+      .populate({
+        path: "category",
+        populate: {
+          path: "offer",
+        },
+      })
+      .populate("offer")
 
       const cart = await UserCart.findOne({ userId: userId }).exec();
       console.log(cart);
-   
-      const foundProduct =cart? cart.cartItems.find(
-        (item) => item.productId == productId
-      ): null;
+
+      const foundProduct = cart
+        ? cart.cartItems.find((item) => item.productId == productId)
+        : null;
       console.log("foundProduct", foundProduct);
       if (foundProduct == null) {
         return res.render("user/singleProduct", { product, foundProduct: "" });
       }
       if (!product) {
-        console.log("Product not found"); 
+        console.log("Product not found");
         return res.status(404).render("error/404");
       }
 
@@ -239,7 +283,6 @@ shop: async (req, res) => {
 
     const productId = req.params.id;
     const userId = res.locals.user;
-    
 
     try {
       if (req.session.isUserAuth) {
@@ -278,7 +321,7 @@ shop: async (req, res) => {
         const cartTotal = result.userCart;
         console.log("cartTotal:", cartTotal);
 
-        const product = await Product.find();
+        const product = await Product.find()
 
         res.render("user/cart", {
           cartItems,
@@ -366,25 +409,44 @@ shop: async (req, res) => {
 
       const RazUser = await User.findById(userId);
 
-      const userAddresses = await userAddress.findOne({ userId: userId });
-      console.log("userAddress::", userAddresses);
-      const wallet = await Wallet.findOne({user: userId});
+      let userAddresses = await userAddress.findOne({ userId: userId });
+
+      // console.log("userAddress::", userAddresses);
+      const wallet = await Wallet.findOne({ user: userId });
       const result = await cartController.getCart(userId);
 
-      console.log(result);
+      const availableCoupons = await Coupon.find({
+        validUntil: { $gte: new Date() },
+        maxUsageCount: { $gt: 0 },
+        isListed: true,
+      });
+
+
+      const unusedCoupons = [];
+
+      for (const coupon of availableCoupons) {
+        const usageCount = await CouponUsage.countDocuments({
+          coupon: coupon._id,
+        });
+        if (usageCount < coupon.maxUsageCount) {
+          unusedCoupons.push(coupon);
+        }
+      }
+
 
       if (result && result.cartItems) {
         const cartItems = result.cartItems;
         const cartTotal = result.userCart;
-        console.log("cartTotal:", cartTotal);
+
 
         const product = await Product.find();
         res.render("user/checkOut", {
-          userAddress: userAddresses.addresses,
+          userAddress: userAddresses ? userAddresses.addresses : null,
           cartItems,
           cartTotal,
           RazUser,
           wallet,
+          coupons: unusedCoupons,
         });
         // res.render("user/cart", {
         //   cartItems,
@@ -402,14 +464,12 @@ shop: async (req, res) => {
     const userId = new mongoose.Types.ObjectId(res.locals.user);
     const user = await User.findOne({ _id: userId });
     const userAddresses = await userAddress.findOne({ userId: userId });
-   const RazUser = await User.findById(userId);
-  
-  
-   let Wallets     = await Wallet.findOne({ user: userId });
+    const RazUser = await User.findById(userId);
 
-  
-  console.log("wihishfjuiasfhduifhdsiudsafh", Wallets);
-   let addresses = []; // Initialize addresses array
+    let Wallets = await Wallet.findOne({ user: userId });
+
+    console.log("wihishfjuiasfhduifhdsiudsafh", Wallets);
+    let addresses = []; 
     if (userAddresses && userAddresses.addresses) {
       addresses = userAddresses.addresses;
     }
@@ -475,7 +535,7 @@ shop: async (req, res) => {
     } catch (error) {
       console.log(error);
     }
-  }, 
+  },
 
   addressEdit: async (req, res) => {
     let addressId = req.params.id;
@@ -611,6 +671,21 @@ shop: async (req, res) => {
     }
   },
 
+  search:async(req,res)=>{
+    const searchQuery = req.query.search;
+    console.log("log worked",searchQuery);
+    Product.find({ $text: { $search: searchQuery } })
+        .then(products => {
+            res.json({ products });
+        })
+        .catch(error => {
+            console.error('Error fetching products:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        });
+    },
 
+ 
+  
 };
 module.exports = userControllers;
+ 

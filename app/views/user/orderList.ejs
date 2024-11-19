@@ -1,4 +1,3 @@
-
 <%- include('../partialsUser/header'); -%>
 
 <style>
@@ -85,99 +84,119 @@
     <h1>Here's your order list, buddy!</h1>
 
     <% if (orders.length === 0) { %>
-      <p class="no-orders">Looks like you haven't ordered anything yet. Hop to it!</p>
+    <p class="no-orders">
+      Looks like you haven't ordered anything yet. Hop to it!
+    </p>
     <% } else { %>
-      <div class="table-responsive">
-        <table class="table table-bordered order-list">
-          <thead>
-            <tr>
-              <th>Product Pic</th>
-              <th class="product-name-bold">Product Name</th>
-              <th>Qty</th>
-              <th>Price</th>
-              <th>Total</th>
-              <th>Order Status</th>
-              <th>Ordered Date</th>
-            </tr>
-          </thead>
-         <!-- Constructing product detail links in your frontend template -->
-<tbody id="orderList">
-    <% orders.forEach(order => { %>
-        <% order.items.forEach(item => { %>
-            <tr class="order-row" data-order-id="<%= order._id %>" data-product-id="<%= item.product._id %>">
-                <%= console.log("dgfdfsgwuyeguyqwegfuyqewgf",item.product._id); %>
+    <div class="table-responsive">
+      <table class="table table-bordered order-list">
+        <thead>
+          <tr>
+            <th>Product Pic</th>
+            <th class="product-name-bold">Product Name</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Total</th>
+            <th>Order Status</th>
+            <th>Ordered Date</th>
+          </tr>
+        </thead>
+        <!-- Constructing product detail links in your frontend template -->
+        <tbody id="orderList">
+          <% orders.forEach(order => { %>
+            <% order.items.forEach(item => { %>
+              <tr
+                class="order-row"
+                data-order-id="<%= order._id %>"
+                data-product-id="<%= item.product._id %>"
+              >
                 <td class="product-image-cell">
-                    <% if (item.product && item.product.images && item.product.images.length > 0) { %>
-                        <img src="<%= item.product.images[0] %>" alt="<%= item.product.productName %>" class="product-image">
-                    <% } else { %>
-                        <div class="no-image-placeholder">No pic yet</div>
-                    <% } %>
+                  <% if (item.product && item.product.images && item.product.images.length > 0) { %>
+                    <img
+                      src="<%= item.product.images[0] %>"
+                      alt="<%= item.product.productName %>"
+                      class="product-image"
+                    />
+                  <% } else { %>
+                    <div class="no-image-placeholder">No pic yet</div>
+                  <% } %>
                 </td>
-              <td class="product-name" style="font-weight: bold; color: blue;">
-    <b><%= item.product ? item.product.productName : 'Product Not Found' %></b>
-</td>
-<td class="quantity" style="font-weight: bold; color: green;"><%= item.quantity %></td>
-<td class="price" style="font-weight: bold; color: red;">&#8377; <%=item.price %></td>
-<td class="total-amount" style="font-weight: bold; color: purple;">&#8377; <%= item.quantity * item.price %></td>
-<td class="payment-status-bold" style="font-weight: bold; color: #dc3545;"><%= item.orderStatus %></td>
-<td class="demo-date" style="font-weight: bold; color: orange;">
-    <%= order.createdAt %>
-</td>
-            </tr>
-        <% }); %>
-    <% }); %>
-</tbody>
-
-
-
-
-
-
-        </table>
-      </div>
+                <td class="product-name" style="font-weight: bold; color: blue">
+                  <b><%= item.product ? item.product.productName : 'Product Not Found' %></b>
+                </td>
+                <td class="quantity" style="font-weight: bold; color: green">
+                  <%= item.quantity %>
+                </td>
+                <td class="price" style="font-weight: bold; color: red">
+                  &#8377; <%= item.price %>
+                </td>
+                <td class="total-amount" style="font-weight: bold; color: purple">
+                  &#8377; <%= item.quantity * item.price %>
+                </td>
+                <td class="payment-status-bold" style="font-weight: bold; color: #dc3545">
+                  <% let orderStatus = item.orderStatus %>
+                  <% let orderStatusOn %>
+                  <% if (orderStatus === "Order") { %>
+                    <% orderStatusOn = "Pending" %>
+                  <% } else if (orderStatus === "Pending") { %>
+                    <% orderStatusOn = "Shipped" %>
+                  <% } else if (orderStatus === "OrderCanceled") { %>
+                    <% orderStatusOn = "Order Canceled" %>
+                  <% } else if (orderStatus === "Delivered") { %>
+                    <% orderStatusOn = "Delivered" %>
+                  <% } else if (orderStatus === "Return") { %>
+                    <% orderStatusOn = "Return Requested" %>
+                  <% } else if (orderStatus === "ReturnOk") { %>
+                    <% orderStatusOn = "Return Accepted" %>
+                  <% } %>
+                  <%= orderStatusOn %>
+                </td>
+                <td class="demo-date" style="font-weight: bold; color: orange">
+                  <%= order.createdAt %>
+                </td>
+              </tr>
+            <% }); %>
+          <% }); %>
+        </tbody>
+        
+      </table>
+    </div>
     <% } %>
-     <nav aria-label="Page navigation">
-							   <ul class="pagination justify-content-start ">
-    <% for (let i = 1; i <= totalPages; i++) { %>
+    <nav aria-label="Page navigation">
+      <ul class="pagination justify-content-start">
+        <% for (let i = 1; i <= totalPages; i++) { %>
         <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-            <a class="page-link" href="/order-list?page=<%= i %>"><%= i %></a>
+          <a class="page-link" href="/order-list?page=<%= i %>"><%= i %></a>
         </li>
-    <% } %>
-</ul>
-							</nav>
+        <% } %>
+      </ul>
+    </nav>
   </div>
-
- 
 </main>
-
 
 <%- include('../partialsUser/footer'); -%>
 
 <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const orderRows = document.querySelectorAll(".order-row");
 
+    orderRows.forEach((row) => {
+      row.addEventListener("click", function () {
+        const orderId = row.dataset.orderId;
+        const productId = row.dataset.productId;
 
-    document.addEventListener('DOMContentLoaded', function() {
-    const orderRows = document.querySelectorAll('.order-row');
-
-    orderRows.forEach(row => {
-        row.addEventListener('click', function() {
-            const orderId = row.dataset.orderId;
-            const productId = row.dataset.productId;
-            
-            window.location.href = `/order-details/${orderId}/${productId}`;
-        });
+        window.location.href = `/order-details/${orderId}/${productId}`;
+      });
     });
-});
-
+  });
 </script>
 
 <script>
-  $(document).ready(function() {
-  $('.order-list').on('click', 'tr[data-order-id]', function() {
-    const orderId = $(this).data('order-id');
-    const productId = $(this).data('product-id')
-    window.location.href = `/order-details/${orderId}/${productId}`;
+  $(document).ready(function () {
+    $(".order-list").on("click", "tr[data-order-id]", function () {
+      const orderId = $(this).data("order-id");
+      const productId = $(this).data("product-id");
+      window.location.href = `/order-details/${orderId}/${productId}`;
+    });
   });
-});
-
 </script>

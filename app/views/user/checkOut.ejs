@@ -128,8 +128,8 @@
 
 .heading {
       text-align: center;
-      color: #333;
-      background-color: #ffc107;
+      color: #3c258e;
+      background-color: #e6edff;
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -239,13 +239,16 @@
                             <tbody>
                                 <% cartItems.forEach(cartItem => { %>
                                 <tr>
-                                    <td><a style="font-weight: bold;"><%= cartItem.productId.productName %></a></td>
+                                    <td><a style="font-weight: bold;"><%let productName = cartItem.productId.productName.substring(0,90).trim("")+"...." %>
+                                    <%= productName %>
+                                    </a></td>
                                     <%= console.log(cartItem.productId); %>
                                     <td>₹<%= (cartItem.productId.price * cartItem.quantity) %></td>
                                 </tr>
                                 <% }) %>
                                 <tr class="summary-subtotal">
                                     <td>Subtotal:</td>
+                                    <input type="hidden" value="<%= cartTotal.totalAmount %>" id="cartTotal">
                                     <td>&#8377;<%= cartTotal.totalAmount %></td>
                                 </tr>
                                 <tr>
@@ -269,20 +272,26 @@
   <div class="coupon-input-container">
     <input type="text" id="coupon-code" style="width: 50%; height: 25px; padding: 0px;" placeholder="Enter your coupon code">
 <button type="button" style="width: 60px; height: 30px; padding: 0px; border-radius: 5px; color:#fff; background-color:#3b5998" id="apply-coupon">Apply</button>
+<button type="button" style="width: 60px; height: 30px; padding: 0px; border-radius: 5px; color:#fff; background-color:#e62525" id="cancel-coupon" disabled>Cancel</button>
+
   </div>
-  <p class="available-coupons">Available coupons: <b>(None)</b></p>
+  <p class="available-coupons">Available coupons: 
+    <% coupons.forEach(coupon => { %>
+        <br>
+        <b><%= coupon.code %></b></p>
+    <% }) %>
   <span id="coupon-message"></span>
 </div>
-
+<div class="card">
+    <div class="card-header" id="heading-3">
 <div class="wallet-box">
   <h6>Use your wallet balance</h6>
-  <p id="wallet-balance">₹ <%= wallet.balance%></p>
-  <input type="checkbox" id="use-wallet"> <label for="use-wallet">Use wallet balance</label>
-</div>
+  <p id="wallet-balance">₹ <%= wallet?wallet.balance:0%></p>
+  <input type="radio" id="wallet" name="payment-option" value="wallet">
+  <label for="wallet">Use wallet</label></div>
 
 
-                            <div class="card">
-                                <div class="card-header" id="heading-3">
+                         
                                     <h2 class="card-title">
                                         <input type="radio" id="cash-on-delivery" name="payment-option" value="cash">
                                         <label for="cash-on-delivery">Cash on delivery</label>
@@ -308,6 +317,8 @@
                     </div><!-- End .summary -->
                 </form>
             </div><!-- End .col-lg-3 -->
+            <% if (userAddress) { %>
+             
             <div class="col-lg-7">
                 <div id="address-container">
                     <br>
@@ -320,7 +331,15 @@
                                 <div class="address-details">
                                     <p><strong>Name:</strong> <%= address.name %></p>
                                     <p><strong>Mobile:</strong> <%= address.mobile %></p>
-                                    <p><strong>Address:</strong> <%= address.address %></p>
+                                    <p><strong>Addres  <div id="myModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <div id="offerDetails"></div>
+                        <button id="addOffer">Add Offer</button>
+                        <button id="removeOffer" style="display:none;">Remove Offer</button>
+                    </div>
+                </div>
+            </div>s:</strong> <%= address.address %></p>
                                     <p><strong>Street:</strong> <%= address.street %></p>
                                     <p><strong>City:</strong> <%= address.city %></p>
                                     <p><strong>State:</strong> <%= address.state %></p>
@@ -332,6 +351,8 @@
                     <input type="hidden" id="selected-address-id" name="selected-address-id" value="">
                 </div><!-- End #address-container -->
             </div><!-- End .col-lg-9 -->
+            <% } %>
+
         </div><!-- End .row -->
     </div><!-- End .container -->
 </div><!-- End .page-content -->
@@ -339,9 +360,29 @@
 
 </main><!-- End .main -->
 <script>
+    document.getElementById('cancel-coupon').addEventListener('click',async () =>{
+        const cancelCouponButton = document.getElementById('cancel-coupon'); 
+const cartTotal = document.getElementById("cartTotal").value
+cancelCouponButton.disabled = true;
+        document.getElementById('total-amount').innerText = `₹ ${cartTotal}`;
+        document.getElementById('new-amount').value = cartTotal
+    
+            Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Coupon Canceled successfully!',
+                });
+
+        })
+
+
+</script>
+<!-- ///////////////////COUPON///////////////////COUPON////////////////////////COUPON//////////////////// -->
+<script>
     document.getElementById('apply-coupon').addEventListener('click', async () => {
         const couponCode = document.getElementById('coupon-code').value;
-    document.getElementById('couponCode-amount').value = couponCode;
+        const cancelCouponButton = document.getElementById('cancel-coupon');
+        document.getElementById('couponCode-amount').value = couponCode;
         try {
             const response = await fetch('/apply-coupon', {
                 method: 'POST',
@@ -350,12 +391,24 @@
             });
             const data = await response.json();
 
-            if(data.success){
-                console.log(data);
-            document.getElementById('total-amount').innerText = `₹ ${data.updatedTotalAmount}`;
-    document.getElementById('new-amount').value = data.updatedTotalAmount;
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Offer applied successfully!',
+                });
 
-            }else{
+                document.getElementById('total-amount').innerText = `₹ ${data.updatedTotalAmount}`;
+                document.getElementById('new-amount').value = data.updatedTotalAmount;
+                cancelCouponButton.disabled = false
+
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Invalid coupon code or something went wrong!',
+                });
+
                 console.log(data);
             }
         } catch (error) {
@@ -363,6 +416,7 @@
         }
     });
 </script>
+
 <!-- 
 <script>
   document.getElementById('apply-coupon').addEventListener('click', function() {
@@ -402,6 +456,7 @@ span.onclick = function() {
 // }
 
         </script>
+
             <script>
    document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('addAddress');
@@ -593,7 +648,7 @@ toastr.error('All fields are required.');
 
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {-
     console.log("DOM content loaded");
     var addressBoxes = document.querySelectorAll('.address-box');
     var checkoutForm = document.getElementById('checkout-form');
@@ -635,6 +690,14 @@ if(selectedAddressId){
                     console.log(total);
 
 const totalAmount = total?total:amount;
+if(totalAmount>=1000&&selectedPaymentOption==="cash"){
+   return Swal.fire({
+                    icon: 'info',
+                    title: 'Error',
+                text: 'Payments more than 1000 need online'
+                });
+
+}
 
             fetch('/orders', {
                 method: 'POST',
@@ -658,12 +721,12 @@ const totalAmount = total?total:amount;
                     console.log("Payment form worked");
 
                     var amount = $('#amount').val();
-                    console.log(amount);
-// const totalAmount = total?total:amount;
+               
                     console.log("success worked");
 
                     var orderId = data.orderId;
                     var amount = data.amount;
+                    var couponCode = data.couponCode
 
                     // Call Razorpay checkout method
                     var options = {
@@ -682,8 +745,9 @@ const totalAmount = total?total:amount;
                                 razorpay_payment_id: response.razorpay_payment_id,
                                 razorpay_order_id: response.razorpay_order_id,
                                 selectedAddressId:selectedAddressId,
-                                selectedPaymentOption:selectedPaymentOption
-                            };
+                                selectedPaymentOption:selectedPaymentOption,
+                                couponCode:couponCode,
+                                totalAmountCoupon:totalAmount                            };
 
                             $.ajax({
                                 url: '/payment-callback',
@@ -707,7 +771,7 @@ const totalAmount = total?total:amount;
                                             title: 'Error',
                                             text: 'Failed to place the order'
                                         });
-                                    }
+                                    }pinCode
                                 },
                                 error: function(xhr, status, error) {
                                     console.error(error);
@@ -732,29 +796,53 @@ const totalAmount = total?total:amount;
                     rzp1.on('payment.failed', function(response) {
                         console.error(response.error.description);
                         alert('Payment failed! ' + response.error.description);
-                    });
+                        var requestData = {
+                                response: response,                            
+                                razorpay_order_id: orderId,
+                                selectedAddressId:selectedAddressId,
+                                selectedPaymentOption:selectedPaymentOption,
+                                couponCode:couponCode,
+                                totalAmountCoupon:totalAmount                            };
+
+                        fetch("/retryOrderCheckout",{
+                            method:"POST",
+                            headers: {
+                    'Content-Type': 'application/json'
+                },
+                            body:JSON.stringify(requestData)
+                        })
+
+                    })
 
                     rzp1.open();
                 }
             }else{
-                  if (data) {
-                
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: 'Order Placed Successfully',
-                                            showConfirmButton: false,
-                                            timer: 2500
-                                        }).then((result) => {
-                                            const order_id = data.order_id
-                                            window.location = `/orderPlaced?order_id=${order_id}`;
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: 'Error',
-                                            text: 'Failed to place the order'
-                                        });
-                                    }
+                if (data) {
+    if (data.wallet) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Insufficient amount in the wallet'
+        });
+    } else {
+        Swal.fire({
+            icon: 'success',
+            title: 'Order Placed Successfully',
+            showConfirmButton: false,
+            timer: 2500
+        }).then((result) => {
+            const order_id = data.order_id;
+            window.location = `/orderPlaced?order_id=${order_id}`;
+        });
+    }
+} else {
+    Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to place the order'
+    });
+}
+
             }
             })
              
@@ -769,6 +857,7 @@ const totalAmount = total?total:amount;
         }else{
             SelectionError.innerText = 'Please select the address';
         }
+      
         });
     
     } else {

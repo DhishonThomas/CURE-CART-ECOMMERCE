@@ -9,26 +9,17 @@ const morgan = require("morgan");
 const userRoutes = require("./routes/userRoutes");
 const MongoStore = require("connect-mongo");
 const flash = require("express-flash");
+const dotenv=require("dotenv")
+dotenv.config()
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-
-const userSessionStore = MongoStore.create({
-  mongoUrl: "mongodb://localhost:27017/userSessions",
-  mongooseConnection: mongoose.connection,
-});
-
-const adminSessionStore = MongoStore.create({
-  mongoUrl: "mongodb://localhost:27017/adminSessions",
-  mongooseConnection: mongoose.connection,
-});
+const PORT = process.env.PORT || 13400;
 
 app.use(
   session({
     secret: "your-secret-key",
     resave: false,
     saveUninitialized: false,
-    store: userSessionStore,
     name: "isUserAuth",
   })
 );
@@ -38,17 +29,11 @@ app.use(
     secret: "admin-secret-key",
     resave: false,
     saveUninitialized: false,
-    store: adminSessionStore,
     name: "isAdminAuth",
   })
 );
 
-app.use(flash());
 
-app.use((req, res, next) => {
-  res.locals.messages = req.flash();
-  next();
-});
 
 app.use((req, res, next) => {
   res.setHeader("Cache-Control", "no-store, no-cache, private");
@@ -61,11 +46,11 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "app/views"));
 
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "/public")));
 app.use(express.static(path.join(__dirname, "node_modules")));
 app.use(bodyParser.json());
 
-mongoose.connect("mongodb://localhost:27017/Cure-Cart", {
+mongoose.connect(process.env.MONGODB_CURECART, {
   serverSelectionTimeoutMS: 5000,
 });
 

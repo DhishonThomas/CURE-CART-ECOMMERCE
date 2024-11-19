@@ -14,7 +14,7 @@ async function sendOTPByEmail(email, otp) {
         service: 'gmail',
         auth: {
             user: 'dhishonthomas6@gmail.com',
-            pass: 'qaui jtco wzrr emoa',
+            pass: 'pzij gfzk zzve vyxd',
         },
     });
 

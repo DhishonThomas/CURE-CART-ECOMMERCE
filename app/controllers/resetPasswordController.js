@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt")
 const crypto = require("crypto");
 const User = require("../models/user");
 const nodemailer = require("nodemailer")
+require('dotenv').config()
 
 
 async function sendOTPByEmail(email,token) {
@@ -10,10 +11,10 @@ async function sendOTPByEmail(email,token) {
   const mailTransporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: "dhishonthomas6@gmail.com",
-      pass: "qaui jtco wzrr emoa",
+      user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
     },
-  });
+  }); 
 
   const mailDetails = {
     from: "dhishonthomas6@gmail.com",

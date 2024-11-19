@@ -45,6 +45,8 @@ router.post("/verifyOtp", otpController.verifyOtp);
 //////////////////////////////////////////////////////////////////////////////
 
 router.get("/shop", userControllers.shop);
+ 
+router.post("/shop",userControllers.shop)
 
 router.get("/product/:id", userControllers.singleProduct);
 
@@ -124,5 +126,14 @@ router.post("/wallet", orderController.wallet);
 
 router.post("/apply-coupon", userCouponController.applyCoupon);
 
+router.get("/products",userControllers.search)
+
+router.post("/orderRetry",orderController.orderRetry)
+
+router.post("/retry-callback",orderController.retryCallback)
+
+router.post("/retryOrder",orderController.retryOrder)
+ 
+router.post("/retryOrderCheckout",orderController.retryOrderCheckout)
 
 module.exports = router;

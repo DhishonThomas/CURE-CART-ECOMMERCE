@@ -13,6 +13,7 @@ const User = require("../models/user")
 const mongoose = require("mongoose")
 const  Order = require("../models/order");
 const { error } = require("console");
+const Offer = require("../models/offer")
 // exports.adminSave = async(req,res)=>{
 //   const { email, password } = req.body;
 //   const hashPassword=await bcrypt.hash(password,10);
@@ -91,14 +92,93 @@ const uploadDir = path.join(__dirname, "../../public/uploads");
 // }
 
 // <....................................................................................................................>
+async function calculateWeeklySalesData() {
+  const currentDate = new Date();
+  const oneWeekAgo = new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000); 
+  const weeklySalesData = await Order.aggregate([
+      {
+          $match: {
+              createdAt: { $gte: oneWeekAgo }, 
+              "items.orderStatus": "Delivered" 
+          }
+      },
+      {
+          $group: {
+              _id: { $week: "$createdAt" }, 
+              totalSales: { $sum: "$totalAmount" } 
+          }
+      }
+  ]);
+
+  return weeklySalesData;
+}
+async function calculateMonthlySalesData() {
+  const currentDate = new Date();
+  const oneMonthAgo = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1); 
+  const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0); 
+
+  const monthlySalesData = await Order.aggregate([
+      {
+          $match: {
+              createdAt: { $gte: oneMonthAgo, $lte: lastDayOfMonth }, 
+              "items.orderStatus": "Delivered" 
+          }
+      },
+      {
+          $group: {
+              _id: { $month: "$createdAt" }, 
+              totalSales: { $sum: "$totalAmount" } 
+          }
+      }
+  ]);
+
+  return monthlySalesData;
+}
+async function calculateYearlySalesData() {
+  const currentDate = new Date();
+  const oneYearAgo = new Date(currentDate.getFullYear() - 1, 0, 1); 
+  const lastDayOfYear = new Date(currentDate.getFullYear(), 11, 31); 
+
+  const yearlySalesData = await Order.aggregate([
+      {
+          $match: {
+              createdAt: { $gte: oneYearAgo, $lte: lastDayOfYear }, 
+              "items.orderStatus": "Delivered" 
+          }
+      },
+      {
+          $group: {
+              _id: { $year: "$createdAt" }, 
+              totalSales: { $sum: "$totalAmount" } 
+          }
+      }
+  ]);
+
+  return yearlySalesData;
+}
+
+exports.admin = async(req, res) => {
+  try {
+    const weeklySalesData = await calculateWeeklySalesData();
+
+    const monthlySalesData = await calculateMonthlySalesData();
+
+    const yearlySalesData = await calculateYearlySalesData();
+console.log(weeklySalesData);
+    res.render("admin/adminDashboard", {
+        weeklySalesData,
+        monthlySalesData,
+        yearlySalesData
+    });
+
+} catch (error) {
+    console.error("Error rendering admin dashboard:", error);
+    res.status(500).send("Internal Server Error");
+}
 
 
-exports.admin = (req, res) => {
-  
-    res.render("admin/adminDashboard");
-   
 };
- 
+
 // <....................................................................................................................>
 
 exports.usersList = async (req, res) => {
@@ -188,13 +268,31 @@ exports.logout = (req, res) => {
   });
 }; 
 // <....................................................................................................................>
-exports.adminDashboard = (req, res) => {
-  res.render("admin/adminDashboard");
-};
+exports.adminDashboard = async(req, res) => {
+
+  try {
+    const weeklySalesData = await calculateWeeklySalesData();
+
+    const monthlySalesData = await calculateMonthlySalesData();
+
+    const yearlySalesData = await calculateYearlySalesData();
+console.log("weeklySalesData",weeklySalesData);
+console.log("monthlySalesData",monthlySalesData);
+
+    res.render("admin/adminDashboard", {
+        weeklySalesData:weeklySalesData,
+        monthlySalesData:monthlySalesData,
+        yearlySalesData:yearlySalesData
+    });
+
+} catch (error) {
+    console.error("Error rendering admin dashboard:", error);
+    res.status(500).send("Internal Server Error");
+}};
 // <....................................................................................................................>
 exports.addProduct = async (req, res) => {
   const category = await Category.find({ isListed: true });
-  res.render("admin/addProduct", { category });
+  res.render("admin/addProduct", { category ,});
 };
 // <....................................................................................................................>
 // exports.createProduct = async (req, res) => {
@@ -288,7 +386,8 @@ console.log(req.body.mycategory);
 
 exports.createCategory = async (req, res) => {
   const categories = await Category.find();
-  res.render("admin/categoryList", { categories, message: "" });
+  const offers = await Offer.find()
+  res.render("admin/categoryList", { categories, message: "" ,offers:offers});
 };
 // <....................................................................................................................>
 exports.newCategory = async (req, res) => {
@@ -340,7 +439,7 @@ exports.categoryDelete = async (req, res) => {
     const categoryDel = await Category.findByIdAndDelete(deleteId);
     console.log(categoryDel);
     if (categoryDel) {
-      res.redirect("/admin/categoryList");
+res.json({success:true,message:"ok done"})
     } else {
       res.redirect("/admin/categoryList");
     }
@@ -390,7 +489,7 @@ exports.categoryEditUpdate = async (req,res) =>{
      });
      const category = await Category.findById(categoryEditId);
      console.log(category);
-     res.redirect("/admin/categoryList");
+     res.redirect(`/admin/newCategory`);
    } catch (error) {
      console.log(error);
    }
@@ -399,13 +498,13 @@ exports.categoryEditUpdate = async (req,res) =>{
 // <.........................................................................................................>
 exports.categoryUlist = async (req, res) => {
   const categoryId = req.params.id;
-  try {
+  try { 
     const category = await Category.findById(categoryId);
     if (category) {
       category.isListed = !category.isListed;
       const updatedCategory = await category.save();
       if (updatedCategory) {
-        res.redirect("/admin/categoryList");
+        res.json({success:true,message:"ok done"})
       } else {
         res.status(500).send("Failed to update category");
       }
@@ -421,7 +520,7 @@ exports.categoryUlist = async (req, res) => {
 exports.productList = async (req, res) => {
 const page = parseInt(req.query.page)
 const perPage = 6;
-
+const offers = await Offer.find()
 const totalUsers = await Product.countDocuments()
 const totalPages = Math.ceil(totalUsers / perPage);
 
@@ -432,7 +531,7 @@ const totalPages = Math.ceil(totalUsers / perPage);
   //   const
   // }catch(error){
   // }
-  res.render("admin/productList", { products,totalPages, currentPage:page });
+  res.render("admin/productList", { products,totalPages, currentPage:page ,offers:offers});
 };
 // <.........................................................................................................>
 exports.productCategory = async (req, res) => {
@@ -595,7 +694,7 @@ exports.productListDelete = async (req, res) => {
         })
       );
     }
-    res.redirect("/admin/productList");
+    res.json({success:true,message:"ok done"})
   } catch (error) {
     console.error(error);
     res.redirect("/admin/productList");
@@ -623,7 +722,7 @@ exports.productListUlist = async (req, res) => {
       const updatedProduct = await productUlist.save();
       console.log(updatedProduct);
       if (updatedProduct) {
-        res.redirect("/admin/productList");
+        res.json({success:true,message:"ok done"})
       } else {
         res.status(500).send("Failed to update product");
       }

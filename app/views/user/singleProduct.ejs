@@ -81,8 +81,8 @@
                             <i class="icon-angle-right"></i>
                         </a>
                     </nav>End .pager-nav -->
-                <!-- </div><!-- End .container -->
-            <!-- </nav>End .breadcrumb-nav --> -->
+                <!-- </div>!-- End .container -->
+            <!-- </nav>End .breadcrumb-nav -->
 
             <div class="page-content">
                 <div class="container">
@@ -93,17 +93,18 @@
     <% if (product && product.images && product.images.length > 0) { %>
         <div class="product-gallery product-gallery-vertical">
             <div class="row">
-                <figure class="product-main-image" id="product-zoom-container">
+                <figure class="product-main-image" id="product-zoom-container" >
                     <img id="product-zoom" class="zoomable-image zoom" src="<%= product.images[0] %>" alt="product image">
                 </figure><!-- End .product-main-image -->
 
                 <div id="product-zoom-gallery" class="product-image-gallery">
                     <% product.images.forEach((imageUrl, index) => { %>
                         <a class="product-gallery-item" href="#" data-image="<%= imageUrl %>" data-zoom-image="<%= imageUrl %>">
-                            <img src="<%= imageUrl %>" alt="product side">
+                            <img style="width: 53%;" src="<%= imageUrl %>" alt="product side">
                         </a>
                     <% }); %>
                 </div><!-- End .product-image-gallery -->
+                
             </div><!-- End .row -->
         </div><!-- End .product-gallery -->
     <% } %>
@@ -129,9 +130,31 @@
                                         <!-- <a class="ratings-text" href="#product-review-link" id="review-link">( 2 Reviews )</a> -->
                                     </div><!-- End .rating-container -->
 
-                                    <div class="product-price">
-                                       &#8377;<%= product.price %>
-                                    </div><!-- End .product-price -->
+                                    <div >
+                                        <% if (product.offer||product.category.offer) { %>
+                                            <% console.log(product.category.offer); %>
+                                            <div class="offer-badge" style="color: blueviolet;">
+                                                <span class="offer-name "><%let productName = product.offer?product.offer.offerName:product.category.offer.offerName %>
+                                                
+                                                    <%= productName %></span>
+
+                                                <span class="offer-discount">
+
+                                                  <%let productDiscount =  product.offer?product.offer.discountPercentage:product.category.offer.discountPercentage %>
+                                                    <%= productDiscount %>% OFF
+                                                </span>
+                                                <span class="discounted-price ">
+                                                  &#8377;
+                                                  <%let productOfferPrice = product.offer?(product.price * (1 - product.offer.discountPercentage / 100)).toFixed(2):(product.price * (1 - product.category.offer.discountPercentage / 100)).toFixed(2) %>
+                                                       <%=productOfferPrice%> </span>
+                                              </div>
+                                              <del class="original-price product-price">&#8377; <%= product.price %></del>
+                                             <% } else { %>
+
+                                            <p class="product-price">&#8377; <%= product.price %></p>
+                                            
+                                        <% } %>
+                                    </div>
 
                                     <div class="product-content">
                                         <p><%= product.description %></p>
@@ -156,16 +179,16 @@
                                         <div class="product-details-quantity">
                                             <input type="number" id="qty" class="form-control" value="1" min="1" max="<%= product.quantity %>" step="1" data-decimals="0" required>
                                         </div>End .product-details-quantity
-                                    <!-- </div>End .details-filter-row --> 
+                                    </div>End .details-filter-row  -->
 <div class="product-details-action">
     <% if (product.quantity == 0) { %>
         <button class="btn btn-orange" disabled>No Stock</button>
     <% } else { %>
         <% console.log("Product id______=>>", foundProduct.productId, product._id); %>
         <% if (foundProduct.productId+"" === product._id+"") { %>
-            <button class="btn btn-goto-cart" data-gotoCart><span>Go to Cart</span></button>
+            <button class="btn btn-goto-cart" data-gotoCart style="border-radius: 8px;"><span>Go to Cart</span></button>
         <% } else { %>
-                        <button class="btn-add-cart" data-product-id="<%= product._id %>"><span>Add to Cart</span></button>
+                        <button class="btn-add-cart" data-product-id="<%= product._id %>" style="border-radius: 8px;"><span>Add to Cart</span></button>
 
         <% } %>
     <% } %>
@@ -176,7 +199,7 @@
 
 <div class="details-action-wrapper">       
   <% let isWishlist = false %>
-  <% if (user) { %>
+  <% if (user&&userWishlistNumber) { %>
     <% userWishlistNumber.products.forEach(element => { %>
       <% if (element.productId.toString() === product._id.toString()) { %>
         <% isWishlist = true %>
@@ -657,7 +680,6 @@ document.addEventListener("DOMContentLoaded", function (){
             window.location="/cart"
         })
       } else {
-        // Handle other cases as needed
         Swal.fire({
           icon: 'error',
           title: 'Error',

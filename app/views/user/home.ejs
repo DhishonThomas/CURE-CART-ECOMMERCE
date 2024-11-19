@@ -123,7 +123,9 @@
             </div>
             <!-- End .product-cat -->
             <h3 class="product-title">
-              <a href="product.html"><%= product.productName %></a>
+              <a href="product.html">
+                <% let productName =product.productName.substring(0, 40).trim()+"..." %>
+                <%= productName%></a>
             </h3>
             <!-- End .product-title -->
             <div class="product-price"><%= product.price %></div>
@@ -249,7 +251,9 @@
             </div>
             <!-- End .product-cat -->
             <h3 class="product-title">
-              <a href="product.html"><%= product.productName %></a>
+              <a href="product.html">
+                <% let productName =product.productName.substring(0, 40).trim()+"..." %>
+                <%= productName%></a>
             </h3>
             <!-- End .product-title -->
             <div class="product-price"><%= product.price %></div>
@@ -418,7 +422,9 @@
             </div>
             <!-- End .product-cat -->
             <h3 class="product-title">
-              <a href="product.html"><%= product.productName %></a>
+              <a href="product.html">
+                <% let productName =product.productName.substring(0, 40).trim()+"..." %>
+                <%= productName%></a>
             </h3>
             <!-- End .product-title -->
             <div class="product-price"><%= product.price %></div>

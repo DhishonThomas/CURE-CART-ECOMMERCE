@@ -1,7 +1,114 @@
 const Order = require("../models/order")
 const PDFDocument = require("pdfkit");
+const Product = require("../models/product");
+const Category = require("../models/category");
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+async function calculateWeeklySalesData() {
+  const currentDate = new Date();
+  console.log("currentDate",currentDate);
+  const oneWeekAgo = new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000); 
+  console.log("oneWeekAgo",oneWeekAgo);
+  const weeklySalesData = await Order.aggregate([
+      {
+          $match: {
+              createdAt: { $gte: oneWeekAgo }, 
+              "items.orderStatus": "Delivered" 
+          }
+      },
+      {
+          $group: {
+              _id: { $week: "$createdAt" }, 
+              totalSales: { $sum: "$totalAmount" } 
+          }
+      }
+  ]);
 
+  return weeklySalesData;
+}
+async function calculateMonthlySalesData() {
+  const currentDate = new Date();
+  const oneMonthAgo = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1); 
+  const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0); 
+
+  const monthlySalesData = await Order.aggregate([
+      {
+          $match: {
+              createdAt: { $gte: oneMonthAgo, $lte: lastDayOfMonth }, 
+              "items.orderStatus": "Delivered" 
+          }
+      },
+      {
+          $group: {
+              _id: { $month: "$createdAt" }, 
+              totalSales: { $sum: "$totalAmount" } 
+          }
+      }
+  ]);
+
+  return monthlySalesData;
+}
+async function calculateYearlySalesData() {
+  const currentDate = new Date();
+  const oneYearAgo = new Date(currentDate.getFullYear() - 1, 0, 1); 
+  const lastDayOfYear = new Date(currentDate.getFullYear(), 11, 31); 
+
+  const yearlySalesData = await Order.aggregate([
+      {
+          $match: {
+              createdAt: { $gte: oneYearAgo, $lte: lastDayOfYear }, 
+              "items.orderStatus": "Delivered" 
+          }
+      },
+      {
+          $group: {
+              _id: { $year: "$createdAt" }, 
+              totalSales: { $sum: "$totalAmount" } 
+          }
+      }
+  ]);
+
+  return yearlySalesData;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+async function calculateMonthlyEarnings() {
+  const currentDate = new Date();
+  const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+  const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+
+  const monthlyEarningsData = await Order.aggregate([
+      { $match: {
+          createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+          "items.orderStatus": "Delivered"
+      }},
+      { $group: { _id: null, monthlyEarnings: { $sum: "$totalAmount" }}}
+  ]);
+  return monthlyEarningsData.length > 0 ? monthlyEarningsData[0].monthlyEarnings : 0;
+}
+
+async function calculateTotalProductCount() {
+  const totalProductCount = await Product.countDocuments();
+  return totalProductCount;
+}
+ 
+async function calculatePendingOrders() {
+  const pendingOrdersCount = await Order.countDocuments({
+      "items.orderStatus": { $in: ["Order"] }
+  });
+  return pendingOrdersCount;
+}
+
+async function calculateTotalRevenue() {
+  const revenueData = await Order.aggregate([
+      { $match: { "items.orderStatus": "Delivered" }},
+      { $group: { _id: null, totalRevenue: { $sum: "$totalAmount" }}}
+  ]);
+  return revenueData.length > 0 ? revenueData[0].totalRevenue : 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const adminDashboardController = {
   salesReport: async (req, res) => {
     try {
@@ -42,7 +149,7 @@ const orders = await Order.find({ "items.orderStatus": "Delivered" })
 
         const totalOrders = await Order.find({
           "items.orderStatus": "Delivered",
-        }).countDocuments()
+        }).countDocuments() 
 
         const totalPages = Math.ceil(totalOrders / perPage);
 
@@ -159,7 +266,159 @@ salesReportDownload: async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 },
+salesData: async (req, res) => {
+  try {
+    const weeklySalesData = await calculateWeeklySalesData();
 
-};
+    const monthlySalesData = await calculateMonthlySalesData();
+
+    const yearlySalesData = await calculateYearlySalesData();
+console.log("weeklySalesData",weeklySalesData);
+console.log("monthlySalesData",monthlySalesData);
+
+    res.json({
+        weeklySalesData:weeklySalesData,
+        monthlySalesData:monthlySalesData,
+        yearlySalesData:yearlySalesData
+    });
+
+} catch (error) {
+    console.error("Error rendering admin dashboard:", error);
+    res.status(500).send("Internal Server Error");
+}
+
+},
+salesDataOnes:async(req,res)=>{
+  try {
+    const totalRevenue = await calculateTotalRevenue();
+    const pendingOrdersCount = await calculatePendingOrders();
+    const totalProductCount = await calculateTotalProductCount();
+    const monthlyEarnings = await calculateMonthlyEarnings();
+console.log("reached ro salesdata ones",totalRevenue);
+    res.json({
+        totalRevenue,
+        pendingOrdersCount,
+        totalProductCount,
+        monthlyEarnings
+    });
+} catch (error) {
+    console.error("Error fetching dashboard metrics:", error);
+    res.status(500).send("Internal Server Error");
+}
+},
+ topCounts:async (req, res) => {
+  try {
+    console.log("topCounts reached");
+
+    const productCounts = await Order.aggregate([
+      {
+        $unwind: "$items"
+      },
+      {
+        $match: {
+          "items.orderStatus": "Delivered" 
+        }
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "items.product",
+          foreignField: "_id",
+          as: "productInfo"
+        }
+      },
+      {
+        $unwind: "$productInfo"
+      },
+      {
+        $group: {
+          _id: "$productInfo.productName",
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+    
+
+    const categoryCounts = await Order.aggregate([
+      {
+        $unwind: "$items"
+      },
+      {
+        $match: {
+          "items.orderStatus": "Delivered" 
+        }
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "items.product",
+          foreignField: "_id",
+          as: "productInfo"
+        }
+      },
+      {
+        $unwind: "$productInfo"
+      },
+      {
+        $lookup: {
+          from: "categories", 
+          localField: "productInfo.category",
+          foreignField: "_id",
+          as: "categoryInfo"
+        }
+      },
+      {
+        $unwind: "$categoryInfo"
+      },
+      {
+        $group: {
+          _id: "$categoryInfo.category_name",
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+    
+    
+
+    const brandCounts = await Order.aggregate([
+      {
+        $unwind: "$items"
+      },
+      {
+        $match: {
+          "items.orderStatus": "Delivered"
+        }
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "items.product",
+          foreignField: "_id",
+          as: "productInfo"
+        }
+      },
+      {
+        $unwind: "$productInfo"
+      },
+      {
+        $group: {
+          _id: "$productInfo.brand",
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+    
+
+    const topProducts = productCounts.sort((a, b) => b.count - a.count).slice(0, 10);
+    const topCategories = categoryCounts.sort((a, b) => b.count - a.count).slice(0, 10);
+    const topBrands = brandCounts.sort((a, b) => b.count - a.count).slice(0, 10);
+
+    res.json({ success: true, topProducts, topCategories, topBrands });
+  } catch (error) {
+    console.error("Error in topCounts:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}
+}
 
 module.exports = adminDashboardController;

@@ -1,133 +1,182 @@
 <%- include('../partialsUser/header'); -%>
 
-     
-     
-     <main class="main">
-        	<div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
-        		<div class="container">
-        			<h1 class="page-title">Wishlist<span>Shop</span></h1>
-        		</div><!-- End .container -->
-        	</div><!-- End .page-header -->
-            <nav aria-label="breadcrumb" class="breadcrumb-nav">
-                <div class="container">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Shop</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Wishlist</li>
-                    </ol>
-                </div><!-- End .container -->
-            </nav><!-- End .breadcrumb-nav -->
+<style>
+  .card-box {
+    background-color: #f0f0f0; /* Example background color */
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Example shadow */
+  }
 
-            <div class="page-content">
-            	<div class="container">
-					<table class="table table-wishlist table-mobile">
-						<thead>
-							<tr>
-								<th>Product</th>
-								<th>Price</th>
-								<th>Stock Status</th>
-								<th></th>
-								<th></th>
-							</tr>
-						</thead>
+  .no-products {
+    font-size: 20px;
+    color: #133086; /* Example calming color */
+    font-family: "Open Sans", sans-serif; /* Example font */
+    font-weight: bold;
+  }
+</style>
 
-						<tbody>
-    <% wishList.products.forEach(product => { %>
-    <tr>
-        <td class="product-col">
-            <a href="/product/<%= product.productId._id %>">
-                <div class="product">
-                    <figure class="product-media">
-                        <img src="<%= product.productId.images[0] %>" alt="Product image">
-                    </figure>
-                    <h3 class="product-title">
-                        <%= product.productId.productName  %>
-                    </h3><!-- End .product-title -->
-                </div><!-- End .product -->
-            </a>
-        </td>
-        <td class="price-col"><%= product.productId.price  %></td>
-        <td class="stock-col"><span class="in-stock">In stock</span></td>
-           <td> <button class="btn-remove" data-product-id="<%= product.productId._id %>"><i class="icon-close"></i></button></td>
-    </tr>
-    <% }) %>
-</tbody>
+<main class="main">
+  <div
+    class="page-header text-center"
+    style="background-image: url('assets/images/page-header-bg.jpg')"
+  >
+    <div class="container">
+      <h1 class="page-title">Wishlist<span>Shop</span></h1>
+    </div>
+    <!-- End .container -->
+  </div>
+  <!-- End .page-header -->
+<br><br>
+  <!-- End .breadcrumb-nav -->
 
-					</table><!-- End .table table-wishlist -->
-	            	<div class="wishlist-share">
-	            		<div class="social-icons social-icons-sm mb-2">
-	            			<label class="social-label">Share on:</label>
-	    					<a href="#" class="social-icon" title="Facebook" target="_blank"><i class="icon-facebook-f"></i></a>
-	    					<a href="#" class="social-icon" title="Twitter" target="_blank"><i class="icon-twitter"></i></a>
-	    					<a href="#" class="social-icon" title="Instagram" target="_blank"><i class="icon-instagram"></i></a>
-	    					<a href="#" class="social-icon" title="Youtube" target="_blank"><i class="icon-youtube"></i></a>
-	    					<a href="#" class="social-icon" title="Pinterest" target="_blank"><i class="icon-pinterest"></i></a>
-	    				</div><!-- End .soial-icons -->
-	            	</div><!-- End .wishlist-share -->
-            	</div><!-- End .container -->
-            </div><!-- End .page-content -->
-        </main><!-- End .main -->
+  <div class="page-content">
+    <div class="container">
+      <% if (wishList.products.length>0) { %>
 
-        <%- include('../partialsUser/footer'); -%>
+      <table class="table table-wishlist table-mobile">
+        <thead>
+          <tr>
+            <th style="font-weight: bold;">Product</th>
+            <th style="font-weight: bold;">Price</th>
+            <th style="font-weight: bold;">Stock Status</th>
+            <th style="font-weight: bold;">Remove</th>
+            <th></th>
+          </tr>
+        </thead>
 
-        <script>
+        <tbody style="background-color: rgb(152, 201, 245);">
+          <% wishList.products.forEach(product => { %>
+          <tr>
+            <td class="product-col">
+              <a href="/product/<%= product.productId._id %>">
+                <div class="product" style="background-color: #cad4f1; border-radius: 8px;">
+                  <figure class="product-media" >
+                    <img
+                    style="border: #133086;"
+                      src="<%= product.productId.images[0] %>"
+                      alt="Product image"
+                    />
+                  </figure>
+                  <h3 class="product-title" style="color: blue;"> 
+                    <%let productName = product.productId.productName.substring(0,89).trim(' ')+"...."%>
+                    <%= productName %>
+                  </h3>
+                  <!-- End .product-title -->
+                </div>
+                <!-- End .product -->
+              </a>
+            </td>
+            <td class="price-col"><%= product.productId.price %></td>
+            <td class="stock-col"><span style="font-weight: bold;color: rgb(36, 231, 10);font-size: 20px;" class="in-stock">In stock</span></td>
+            <td>
+              <button
+              style="color: red;"
+                class="btn-remove"
+                data-product-id="<%= product.productId._id %>"
+              >
+                <i class="icon-close"></i>
+              </button>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+        <% } else { %>
+        <div
+          class="card-box"
+          style="
+            height: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          "
+        >
+          <p class="no-products">
+            <span class="icon"><i class="fas fa-heart"></i></span> Your wishlist
+            is currently empty. Start building it by browsing our amazing
+            products!
+          </p>
+        </div>
 
-const removeItemFromWishlist = async (productId) => {
+        <% } %>
+
+   
+        
+      </table>
+      <!-- End .table table-wishlist -->
+      <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-start">
+          <% for (let i = 1; i <= totalPages; i++) { %>
+            <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+              <a class="page-link" href="/wishlist?page=<%= i %>"><%= i %></a>
+            </li>
+          <% } %>
+        </ul>
+      </nav>
+    </div>
+    <!-- End .container -->
+    
+  </div>
+  <!-- End .page-content -->
+</main>
+<!-- End .main -->
+
+<%- include('../partialsUser/footer'); -%>
+
+<script>
+  const removeItemFromWishlist = async (productId) => {
     Swal.fire({
-        title: 'Are you sure?',
-        text: 'You are about to remove this item from your wishlist.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, remove it!',
-        cancelButtonText: 'Cancel'
+      title: "Are you sure?",
+      text: "You are about to remove this item from your wishlist.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, remove it!",
+      cancelButtonText: "Cancel",
     }).then(async (result) => {
-        if (result.isConfirmed) {
-            try {
-                const response = await fetch(`/wishlistRemove/${productId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch(`/wishlistRemove/${productId}`, {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
 
-                const data = await response.json();
+          const data = await response.json();
 
-                if (data.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Item Removed',
-                        text: 'The item has been removed from your wishlist.',
-                    }).then((result) => {
-                        // Optionally, you can update the UI here to reflect the removed item
-                        if (result.isConfirmed) {
-    location.reload();
-                        }
-                    });
-                } else {
-                    console.error('Failed to remove item from wishlist');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
+          if (data.success) {
+            Swal.fire({
+              icon: "success",
+              title: "Item Removed",
+              text: "The item has been removed from your wishlist.",
+            }).then((result) => {
+              // Optionally, you can update the UI here to reflect the removed item
+              if (result.isConfirmed) {
+                location.reload();
+              }
+            });
+          } else {
+            console.error("Failed to remove item from wishlist");
+          }
+        } catch (error) {
+          console.error("Error:", error);
         }
+      }
     });
-};
+  };
 
-document.addEventListener('DOMContentLoaded', () => {
-    const removeButtons = document.querySelectorAll('.btn-remove');
-console.log(removeButtons);
+  document.addEventListener("DOMContentLoaded", () => {
+    const removeButtons = document.querySelectorAll(".btn-remove");
+    console.log(removeButtons);
     removeButtons.forEach((button) => {
-        button.addEventListener('click', async (event) => {
-            event.preventDefault();
-            const productId = button.dataset.productId
-            console.log(productId);
-            await removeItemFromWishlist(productId);
-        });
+      button.addEventListener("click", async (event) => {
+        event.preventDefault();
+        const productId = button.dataset.productId;
+        console.log(productId);
+        await removeItemFromWishlist(productId);
+      });
     });
-});
-
-
-
-        </script>
+  });
+</script>

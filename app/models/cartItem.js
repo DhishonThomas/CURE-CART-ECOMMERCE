@@ -7,6 +7,7 @@ const cartItemSchema = new mongoose.Schema({
     required: true,
   },
   quantity: { type: Number, required: true },
+  price:{type:Number}
 });
 
 const userCartSchema = new mongoose.Schema({

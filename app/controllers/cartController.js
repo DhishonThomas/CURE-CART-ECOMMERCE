@@ -7,50 +7,64 @@ const { ObjectId } = require("mongoose").Types;
 class CartController {
   async addToCart(userId, productId, quantity) {
     try {
-      const producrIds = new ObjectId(productId);
+        const productIds = new ObjectId(productId);
 
-      const user = await User.findById(userId);
-      const product = await Product.findOne({ _id: producrIds });
+        const user = await User.findById(userId);
+        const product = await Product.findOne({ _id: productIds })
+            .populate({
+                path: 'category',
+                populate: {
+                    path: 'offer'
+                }
+            })
+            .populate('offer');
 
-      if (!user || !product) {
-        throw new Error("User or product not found");
-      }
+        if (!user || !product) {
+            throw new Error("User or product not found");
+        }
 
-      let userCart = await UserCart.findOne({ userId });
-      if (userCart == null) {
-        userCart = new UserCart({ userId, cartItems: [] });
-      }
+        let userCart = await UserCart.findOne({ userId });
+        if (!userCart) {
+            userCart = new UserCart({ userId, cartItems: [], totalAmount: 0 });
+        }
 
-      const productPrices = await Product.findOne({ _id: producrIds });
-      const productPrice = productPrices.price;
-      const productTotal = productPrice;
+        let productPrice;
 
-      userCart.totalAmount += productTotal;
-      await userCart.save();
+        if (product.offer) {
+            productPrice = (product.price * (1 - product.offer.discountPercentage / 100)).toFixed(2);
+        } else if (product.category && product.category.offer) {
+            productPrice = (product.price * (1 - product.category.offer.discountPercentage / 100)).toFixed(2);
+        } else {
+            productPrice = product.price.toFixed(2);
+        }
 
-      let cartItem = userCart.cartItems.find((item) =>
-        item.productId.equals(productId)
-      );
+        const productTotal = (parseFloat(productPrice) * quantity).toFixed(2);
+        userCart.totalAmount += parseFloat(productTotal);
 
-      if (cartItem) {
-        cartItem.quantity += quantity;
-      } else {
-        userCart.cartItems.push({ productId, quantity });
-      }
+        userCart.cartItems.push({ productId: product._id, quantity, price: productTotal });
 
-      await userCart.save();
-      return { message: "Item added to cart successfully" };
+        await userCart.save();
+        return { message: "Item added to cart successfully" };
     } catch (error) {
-      throw new Error("Error adding item to cart");
+        throw new Error("Error adding item to cart");
     }
-  }
+}
+
 
   async getCart(userId) {
     try {
       console.log("reached", userId);
-      const userCart = await UserCart.findOne({ userId }).populate(
-        "cartItems.productId"
-      );
+      const userCart = await UserCart.findOne({ userId }).populate({
+        path:"cartItems.productId",
+        populate:{
+          path:"offer"
+        }
+      })
+      .populate({path:"cartItems.productId.category",
+      populate:{
+        path:"offer"
+      }
+      })
 
       const cartItems = userCart ? userCart.cartItems : [];
       return { cartItems, userCart };
@@ -64,10 +78,11 @@ class CartController {
     async function calculateTotal(cartItems) {
       let total = 0;
       let itemTotals = [];
-
+console.log("uhyguydsgfuydghdsfydtsudsfguhys",cartItems);
       for (const cartItem of cartItems) {
         try {
           const product = await Product.findById(cartItem.productId);
+          // const productPrice = await UserCart.findById()
           console.log("product", product);
           if (!product) {
             console.error(`Product not found for ${cartItem.productId}`);
@@ -76,12 +91,9 @@ class CartController {
 
           const { quantity } = cartItem;
 
-          const { price } = product;
+          const { price } = cartItem;
           const itemTotal = quantity * price;
 
-          console.log(
-            `Product: ${product.productName}, Quantity: ${quantity}, Price: ${price}, Item Total: ${itemTotal}`
-          );
           console.log(itemTotal);
           total += itemTotal;
           itemTotals.push({ itemId: cartItem._id, itemTotal });
@@ -110,7 +122,7 @@ class CartController {
       );
 
       if (!cartItem) {
-        throw new Error("Cart item not found");
+        throw new Error("Cart item not found"); 
       }
 
       cartItem.quantity = newQuantity;
@@ -165,13 +177,14 @@ class CartController {
       const quantity = userCart.cartItems[itemIndex].quantity;
 
       const total = userCart.totalAmount;
-      const price = userCart.cartItems[itemIndex].productId.price;
+      const price = userCart.cartItems[itemIndex].price;
       // console.log("price:", price);
       const updateTotal = total - price * quantity;
       // console.log("quantity:",quantity);
       // console.log("updateTotal:", updateTotal);
       // console.log("total", total);
       userCart.totalAmount = updateTotal;
+      console.log("total removed from the cart",updateTotal);
       await userCart.save();
 
       const result = await UserCart.updateOne(filter, update);

@@ -5,10 +5,7 @@
         			<h1 class="page-title">Cure Cart<span>Shop</span></h1>
         		</div><!-- End .container -->
         	</div><!-- End .page-header -->
-            <nav aria-label="breadcrumb" class="breadcrumb-nav mb-2">
-                
-            </nav><!-- End .breadcrumb-nav -->
-
+    
             <div class="page-content">
                 <div class="container">
                 	<div class="row">
@@ -27,58 +24,56 @@
                             <div class="products mb-3">
                                 <div class="row justify-content-center">
                                     <% products.forEach(product => { %>
-                                    <div class="col-6 col-md-4 col-lg-4">
-
-                                        <div class="product product-7 text-center">
-                                            <figure class="product-media">
-                                                <span class="product-label label-new">New</span>
-                                                <a href="/product/<%= product._id %>">
-                                                    <img src="<%= product.images[0] %>" alt="Product image" class="product-image">
-                                                </a>
-
-                                                <div class="product-action-vertical">
-<a href="#" class="btn-product-icon btn-wishlist btn-expandable addToWishlist" data-product-id="<%= product._id %>"><span>Add to Wishlist</span></a>
-                                                    <!-- <a href="popup/quickView.html" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a> -->
-                                                    <!-- <a href="#" class="btn-product-icon btn-compare" title="Compare"><span>Compare</span></a> -->
-                                                </div><!-- End .product-action-vertical -->
-
-                                                <div class="product-action">
-                                                    <!-- <a href="#" class="btn-product btn-cart"><span>add to cart</span></a> -->
-                                                </div><!-- End .product-action -->
-                                            </figure><!-- End .product-media -->
-
-                                            <div class="product-body">
-                                                <div class="product-cat">
-                                                    <!-- <a href="#">Women</a> -->
-                                                </div><!-- End .product-cat -->
-                                                <h3 class="product-title"><a href="product.html"><%= product.productName %></a></h3><!-- End .product-title -->
-                                                <div class="product-price">
-                                                Price:   &#8377; <%= product.price %>
-
-                                                </div><!-- End .product-price -->
-                                              
-
-                                                <!-- <div class="product-nav product-nav-thumbs">
-                                                    <a href="#" class="active">
-                                                        <img src="assets/images/products/product-4-thumb.jpg" alt="product desc">
+                                        <div class="col-6 col-md-4 col-lg-4">
+                                            <div class="product product-7 text-center">
+                                                <figure class="product-media">
+                                                    <a href="/product/<%= product._id %>">
+                                                        <img src="<%= product.images[0] %>" alt="Product image" class="product-image">
                                                     </a>
-                                                    <a href="#">
-                                                        <img src="assets/images/products/product-4-2-thumb.jpg" alt="product desc">
-                                                    </a>
+                                                    <div class="product-action-vertical">
+                                                        <a href="#" class="btn-product-icon btn-wishlist btn-expandable addToWishlist" data-product-id="<%= product._id %>"><span>Add to Wishlist</span></a>
+                                                    </div>
+                                                </figure>
+                                                <div class="product-body">
+                                                 
+                                                    <h3 class="product-title">
+                                                        <a href="product.html">
+                                                            <% let productName = product.productName.substring(0, 50).trim() + "..." %>
+                                                            <%= productName %>
+                                                        </a>
+                                                    </h3>
+                                                    <div >
+                                                        <% if (product.offer||product.category.offer) { %>
+                                                            <% console.log(product.category.offer); %>
+                                                            <div class="offer-badge" style="color: blueviolet;">
+                                                                <span class="offer-name "><%let productName = product.offer?product.offer.offerName:product.category.offer.offerName %>
+                                                                
+                                                                    <%= productName %></span>
 
-                                                    <a href="#">
-                                                        <img src="assets/images/products/product-4-3-thumb.jpg" alt="product desc">
-                                                    </a>
-                                                </div>End .product-nav -->
-                                            </div><!-- End .product-body -->
-                                        </div><!-- End .product -->
-                                    </div><!-- End .col-sm-6 col-lg-4 -->
+                                                                <span class="offer-discount">
 
+                                                                  <%let productDiscount =  product.offer?product.offer.discountPercentage:product.category.offer.discountPercentage %>
+                                                                    <%= productDiscount %>% OFF
+                                                                </span>
+                                                                <span class="discounted-price ">
+                                                                  &#8377;
+                                                                  <%let productOfferPrice = product.offer?(product.price * (1 - product.offer.discountPercentage / 100)).toFixed(2):(product.price * (1 - product.category.offer.discountPercentage / 100)).toFixed(2) %>
+                                                                       <%=productOfferPrice%> </span>
+                                                              </div>
+                                                              <del class="original-price product-price">&#8377; <%= product.price %></del>
+                                                             <% } else { %>
+
+                                                            <p class="product-price">&#8377; <%= product.price %></p>
+                                                            
+                                                        <% } %>
+                                                    </div>
+                                                </div><!-- End .product-body -->
+                                            </div><!-- End .product -->
+                                        </div><!-- End .col-6 col-md-4 col-lg-4 -->
                                     <% }) %>
                                 </div><!-- End .row -->
                             </div><!-- End .products -->
-
-                			<nav aria-label="Page navigation">
+                                                                                    <nav aria-label="Page navigation">
 							   <ul class="pagination justify-content-start ">
     <% for (let i = 1; i <= totalPages; i++) { %>
         <li class="page-item <%= currentPage === i ? 'active' : '' %>">

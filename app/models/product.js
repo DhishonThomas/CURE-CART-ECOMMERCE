@@ -2,7 +2,7 @@
 const mongoose = require("mongoose");
 
 const Category = require("../models/category")
-
+const Offer = require("../models/offer");
 const productSchema = new mongoose.Schema({
   productName: {
     type: String,
@@ -34,8 +34,17 @@ const productSchema = new mongoose.Schema({
     required: true,
   },
   isListed: { type: Boolean, default: true },
+  offer:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref:"Offer",
+default:null,
+count:{
+  type:Number
+}
+  }
 });
 
 const Product = mongoose.model("Product", productSchema);
 
 module.exports = Product;
+  

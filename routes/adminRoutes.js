@@ -7,7 +7,7 @@ const adminAuthMiddileware = require("../app/middilewares/adminAuth");
 const path = require('path')
 const adminDashboardController = require("../app/controllers/adminDashboardController")
 const adminOrderController = require("../app/controllers/adminOrderController");
-
+const offerControllers = require("../app/controllers/offerControllers")
 router.get("/admin", adminAuthMiddileware,adminController.admin);
 
 router.get("/usersList", adminAuthMiddileware, adminController.usersList);
@@ -71,11 +71,15 @@ router.get("/productListUlist/:id",adminAuthMiddileware, adminController.product
 
 router.get("/order-List", adminAuthMiddileware, adminOrderController.orderList);
 
+router.post("/order-List", adminAuthMiddileware ,adminOrderController.orderList)
+
 router.get(
   "/order-details/:orderId",
   adminAuthMiddileware,
   adminOrderController.orderDetails
 );
+
+router.post("/ordered-order",adminAuthMiddileware , adminOrderController.ordered)
 
 router.post("/cancel-order", adminAuthMiddileware, adminOrderController.orderCancel);
 
@@ -121,4 +125,34 @@ router.get(
   adminAuthMiddileware,
   adminDashboardController.salesReportDownload
 );
+
+
+router.get("/sales-data",adminAuthMiddileware,adminDashboardController.salesData)
+
+router.get('/sales-data-ones',adminAuthMiddileware,adminDashboardController.salesDataOnes)
+
+router.get("/offer",adminAuthMiddileware, offerControllers.offer)
+
+router.post("/offer",adminAuthMiddileware, offerControllers.addOffer)
+
+router.get("/offer/:id",adminAuthMiddileware, offerControllers.offerUlist)
+
+router.get("/offerEdit/:id",adminAuthMiddileware, offerControllers.offerEdit)
+
+router.post("/offerUpdate",adminAuthMiddileware, offerControllers.offerUpdate)
+
+router.delete("/offer",adminAuthMiddileware,offerControllers.offerDelete)
+ 
+
+
+router.get("/categoryOffer",adminAuthMiddileware,offerControllers.offerCategory)
+
+router.get("/categoryOfferRmove/:categoryId",adminAuthMiddileware,offerControllers.offerCategoryRemove)
+
+router.get("/productOffer", adminAuthMiddileware, offerControllers.offerProduct)
+
+router.get("/productOfferRmove/:productId",adminAuthMiddileware, offerControllers.offerProductRemove)
+
+
+router.get("/topCounts",adminAuthMiddileware,adminDashboardController.topCounts)
 module.exports = router;
