@@ -1,4 +1,5 @@
 <%- include('../partialsUser/header'); -%>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <div class="container">
     <hr class="mb-4">
@@ -79,7 +80,7 @@
                                 }
                             }'
       >
-      <% products.forEach(product => { %>
+      <% aurevedic.forEach(product => { %>
        
       
         <div class="product product-2 ">
@@ -103,15 +104,33 @@
             <!-- End .product-action -->
 
             <div class="product-action">
-              <a href="#" class="btn-product btn-cart" title="Add to cart"
-                ><span>add to cart</span></a
-              >
-              <a
-                href="popup/quickView.html"
-                class="btn-product btn-quickview"
-                title="Quick view"
-                ><span>quick view</span></a
-              >
+              <% if (user) { %>
+                <a class="btn-product btn-cart" id="Wishlist" title="Add to cart">
+                  <span>add to cart</span>
+                </a>
+              <% } else { %>
+                <a class="btn-product btn-cart noWishlist" title="Add to cart">
+                  <span>add to cart</span>
+                </a>
+              <% } %>      
+              
+              <% if (user) { %>
+                <a
+                  href="/product/<%= product._id %>"
+                  class="btn-product btn-quickview"
+                  title="Quick view"
+                >
+                  <span>quick view</span>
+                </a>
+              <% } else { %>
+                <a
+                  href="/product/<%= product._id %>"
+                  class="btn-product btn-quickview"
+                  title="Quick view"
+                >
+                  <span>quick view</span>
+                </a>
+              <% } %>         
             </div>
             <!-- End .product-action -->
           </figure>
@@ -128,16 +147,10 @@
                 <%= productName%></a>
             </h3>
             <!-- End .product-title -->
-            <div class="product-price"><%= product.price %></div>
-            <!-- End .product-price -->
-            <div class="ratings-container">
-              <div class="ratings">
-                <div class="ratings-val" style="width: 100%"></div>
-                <!-- End .ratings-val -->
-              </div>
-              <!-- End .ratings -->
-              <!-- <span class="ratings-text">( 4 Reviews )</span> -->
-            </div>
+            <div>
+              <div style="color: blue; font-size: larger; font-weight: bold;">₹<%= product.price %></div> 
+
+             </div>
             <!-- End .rating-container -->
           </div>
           <!-- End .product-body -->
@@ -207,7 +220,7 @@
                                 }
                             }'
       >
-      <% products.forEach(product => { %>
+      <% allopathic.forEach(product => { %>
        
       
         <div class="product product-2">
@@ -229,18 +242,37 @@
               ></a>
             </div>
             <!-- End .product-action -->
-
+            
             <div class="product-action">
-              <a href="#" class="btn-product btn-cart" title="Add to cart"
-                ><span>add to cart</span></a
-              >
-              <a
-                href="popup/quickView.html"
-                class="btn-product btn-quickview"
-                title="Quick view"
-                ><span>quick view</span></a
-              >
+              <% if (user) { %>
+                <a class="btn-product btn-cart" id="Wishlist" title="Add to cart">
+                  <span>add to cart</span>
+                </a>
+              <% } else { %>
+                <a class="btn-product btn-cart noWishlist" title="Add to cart">
+                  <span>add to cart</span>
+                </a>
+              <% } %>      
+              
+              <% if (user) { %>
+                <a
+                  href="/product/<%= product._id %>"
+                  class="btn-product btn-quickview"
+                  title="Quick view"
+                >
+                  <span>quick view</span>
+                </a>
+              <% } else { %>
+                <a
+                  href="/product/<%= product._id %>"
+                  class="btn-product btn-quickview"
+                  title="Quick view"
+                >
+                  <span>quick view</span>
+                </a>
+              <% } %>         
             </div>
+            
             <!-- End .product-action -->
           </figure>
           <!-- End .product-media -->
@@ -256,16 +288,10 @@
                 <%= productName%></a>
             </h3>
             <!-- End .product-title -->
-            <div class="product-price"><%= product.price %></div>
-            <!-- End .product-price -->
-            <div class="ratings-container">
-              <div class="ratings">
-                <div class="ratings-val" style="width: 100%"></div>
-                <!-- End .ratings-val -->
-              </div>
-              <!-- End .ratings -->
-              <span class="ratings-text">( 4 Reviews )</span>
-            </div>
+             <div>
+              <div style="color: blue; font-size: larger; font-weight: bold;">₹<%= product.price %></div> 
+
+             </div>
             <!-- End .rating-container -->
           </div>
           <!-- End .product-body -->
@@ -298,51 +324,6 @@
     </div>
     <!-- End .heading-right -->
   </div>
-  	<div class="row justify-content-center">
-                		<div class="col-md-6 col-lg-4">
-                			<div class="banner">
-	                			<a href="#">
-	                				<img src="userCss/images/banners/3cols/banner-1.jpg" alt="Banner">
-	                			</a>
-
-	                			<div class="banner-content">
-	                				<h4 class="banner-subtitle">Quisque a lectus</h4><!-- End .banner-subtitle -->
-	                				<h3 class="banner-title">Praesent elementum <br>hendrerit tortor.</h3><!-- End .banner-title -->
-	                				<a href="#" class="banner-link">Click here</a>
-	                			</div><!-- End .banner-content -->
-                			</div><!-- End .banner -->
-                	   </div><!-- End .col-md-6 -->
-
-                		<div class="col-md-6 col-lg-4">
-                			<div class="banner">
-	                			<a href="#">
-	                				<img src="userCss/images/banners/3cols/banner-2.jpg" alt="Banner">
-	                			</a>
-
-	                			<div class="banner-content">
-	                				<h4 class="banner-subtitle">Quisque a lectus</h4><!-- End .banner-subtitle -->
-	                				<h3 class="banner-title">Donec consectetuer <br>ligula vulputate.</h3><!-- End .banner-title -->
-	                				<a href="#" class="banner-link">Click here</a>
-	                			</div><!-- End .banner-content -->
-                			</div><!-- End .banner -->
-                		</div><!-- End .col-md-6 -->
-
-                		<div class="col-md-6 col-lg-4">
-                			<div class="banner">
-	                			<a href="#">
-	                				<img src="userCss/images/banners/3cols/banner-3.jpg" alt="Banner">
-	                			</a>
-
-	                			<div class="banner-content">
-	                				<h4 class="banner-subtitle">Quisque a lectus</h4><!-- End .banner-subtitle -->
-	                				<h3 class="banner-title text-white">Phasellus ultrices <br>nulla quisnibh.</h3><!-- End .banner-title -->
-	                				<a href="#" class="banner-link">Click here</a>
-	                			</div><!-- End .banner-content -->
-                			</div><!-- End .banner -->
-                		</div><!-- End .col-md-6 -->
-                	</div><!-- End .row -->
-
-  
 
   <div class="tab-content tab-content-carousel just-action-icons-sm">
     <div
@@ -378,7 +359,7 @@
                                 }
                             }'
       >
-      <% products.forEach(product => { %>
+      <% homeopathic.forEach(product => { %>
        
       
         <div class="product product-2">
@@ -402,15 +383,33 @@
             <!-- End .product-action -->
 
             <div class="product-action">
-              <a href="#" class="btn-product btn-cart" title="Add to cart"
-                ><span>add to cart</span></a
-              >
-              <a
-                href="popup/quickView.html"
-                class="btn-product btn-quickview"
-                title="Quick view"
-                ><span>quick view</span></a
-              >
+              <% if (user) { %>
+                <a class="btn-product btn-cart" id="Wishlist" title="Add to cart">
+                  <span>add to cart</span>
+                </a>
+              <% } else { %>
+                <a class="btn-product btn-cart noWishlist" title="Add to cart">
+                  <span>add to cart</span>
+                </a>
+              <% } %>      
+              
+              <% if (user) { %>
+                <a
+                  href="/product/<%= product._id %>"
+                  class="btn-product btn-quickview"
+                  title="Quick view"
+                >
+                  <span>quick view</span>
+                </a>
+              <% } else { %>
+                <a
+                  href="/product/<%= product._id %>"
+                  class="btn-product btn-quickview"
+                  title="Quick view"
+                >
+                  <span>quick view</span>
+                </a>
+              <% } %>         
             </div>
             <!-- End .product-action -->
           </figure>
@@ -427,16 +426,10 @@
                 <%= productName%></a>
             </h3>
             <!-- End .product-title -->
-            <div class="product-price"><%= product.price %></div>
-            <!-- End .product-price -->
-            <div class="ratings-container">
-              <div class="ratings">
-                <div class="ratings-val" style="width: 100%"></div>
-                <!-- End .ratings-val -->
-              </div>
-              <!-- End .ratings -->
-              <span class="ratings-text">( 4 Reviews )</span>
-            </div>
+            <div>
+              <div style="color: blue; font-size: larger; font-weight: bold;">₹<%= product.price %></div> 
+
+             </div>
             <!-- End .rating-container -->
           </div>
           <!-- End .product-body -->
@@ -450,5 +443,20 @@
 <!-- End .container -->
 </div>
 </div></div>
+
+<script>
+   const noWishlistButtons = document.querySelectorAll(".noWishlist");
+
+noWishlistButtons.forEach(button => {
+  button.addEventListener('click', function () {
+    Swal.fire({
+      icon: 'info',
+      title: 'Login Required',
+      text: 'Please Login To Add Items To Wishlist',
+    });
+  });
+});
+
+</script>
 
 <%- include('../partialsUser/footer'); -%>

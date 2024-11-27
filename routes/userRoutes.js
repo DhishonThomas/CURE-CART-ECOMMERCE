@@ -44,6 +44,9 @@ router.post("/verifyOtp", otpController.verifyOtp);
 
 //////////////////////////////////////////////////////////////////////////////
 
+router.get("/contact", userControllers.contact);
+
+
 router.get("/shop", userControllers.shop);
  
 router.post("/shop",userControllers.shop)

@@ -17,13 +17,68 @@ const userControllers = {
     try {
       const userId = new mongoose.Types.ObjectId(res.locals.user);
       const user = await User.findOne(userId);
-      const products = await Product.find();
+      const products = await Product.find()
+     
+const aurevedic=await Product.aggregate([
+  {
+    $lookup:{
+      from:"categories",
+      localField:"category",
+      foreignField:"_id",
+      as:"categoryDetails"
+    }
+  },
+  {
+    $match:{
+      "categoryDetails.category_name":"Aurvedic"
+    }
+  },
+  {
+    $unwind:"$categoryDetails"
+  }
+])
+
+     const allopathic=await Product.aggregate([
+      {
+        $lookup:{
+          from:"categories",
+          localField:"category",
+          foreignField:"_id",
+          as:"categoryDetails"
+        },
+      },
+      {
+        $match:{
+          "categoryDetails.category_name":"Allopathic"
+        },
+      },
+      {
+        $unwind:"$categoryDetails"
+      }
+     ])
+
+     const homeopathic=await Product.aggregate([
+      {
+        $lookup:{
+          from:'categories',
+          localField:'category',
+          foreignField:'_id',
+          as:"categoryDetails"
+        },
+      },
+      {
+        $match:{
+          "categoryDetails.category_name":"Homeopathy"
+        }
+      },
+      {
+        $unwind:"$categoryDetails"
+      }
+     ])
+
       const cartItems = await UserCart.findOne(userId).populate(
         "cartItems.productId"
       );
-
-      console.log(cartItems);
-      // console.log(cartItems.totalAmount);
       if (req.session.isUserAuth) {
         console.log("home reached");
         res.render("user/home", {
@@ -33,7 +88,7 @@ const userControllers = {
           user,
         });
       } else {
-        res.render("user/home", { products, user: null });
+        res.render("user/home", { homeopathic,allopathic,aurevedic, user: null });
       }
       //  res.render("user/home", { products, user});
     } catch (error) {
@@ -229,17 +284,22 @@ const userControllers = {
 
   // <..........................................................................................................>
 
+  contact:async(req,res)=>{
+
+    try {
+      return res.render("user/contactAs");
+
+    } catch (error) {
+      console.log(error.message);
+      res.status(500).render("error/500");
+      
+    }
+  },
+
   singleProduct: async (req, res) => {
     try {
       const productId = req.params.id;
       console.log("Product ID:", productId);
-
-      // // Check if the productId is a valid ObjectId
-      // if (!mongoose.Types.ObjectId.isValid(productId)) {
-      //   // If not valid, redirect to the home page or handle it in your own way
-      //   console.log("Invalid product ID");
-      //   return res.redirect("/");
-      // }
       const userId = res.locals.user;
       const product = await Product.findOne({ _id: productId })
       .populate({
