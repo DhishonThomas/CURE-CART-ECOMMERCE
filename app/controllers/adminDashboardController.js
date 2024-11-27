@@ -9,66 +9,110 @@ async function calculateWeeklySalesData() {
   console.log("currentDate",currentDate);
   const oneWeekAgo = new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000); 
   console.log("oneWeekAgo",oneWeekAgo);
-  const weeklySalesData = await Order.aggregate([
+
+  try {
+    const weeklySales = await Order.aggregate([
       {
-          $match: {
-              createdAt: { $gte: oneWeekAgo }, 
-              "items.orderStatus": "Delivered" 
-          }
+        $unwind: "$items", // Break down orders to individual items
       },
       {
-          $group: {
-              _id: { $week: "$createdAt" }, 
-              totalSales: { $sum: "$totalAmount" } 
-          }
-      }
-  ]);
+        $group: {
+          _id: { 
+            year: { $year: "$createdAt" }, // Year
+            week: { $isoWeek: "$createdAt" } // ISO Week
+          },
+          totalSales: { $sum: "$items.price" }, // Sum the sales price of items
+        },
+      },
+      {
+        $sort: { "_id.year": 1, "_id.week": 1 }, // Sort by year and week
+      },
+      {
+        $project: {
+          year: "$_id.year",
+          week: "$_id.week",
+          totalSales: 1,
+          _id: 0,
+        },
+      },
+    ]);
 
-  return weeklySalesData;
+    return weeklySales; // Array of { year, week, totalSales }
+  } catch (err) {
+    console.error(err);
+  }
+
+
 }
 async function calculateMonthlySalesData() {
   const currentDate = new Date();
   const oneMonthAgo = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1); 
   const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0); 
 
-  const monthlySalesData = await Order.aggregate([
+  try {
+    const monthlySales = await Order.aggregate([
       {
-          $match: {
-              createdAt: { $gte: oneMonthAgo, $lte: lastDayOfMonth }, 
-              "items.orderStatus": "Delivered" 
-          }
+        $unwind: "$items", // Break down orders to individual items
       },
       {
-          $group: {
-              _id: { $month: "$createdAt" }, 
-              totalSales: { $sum: "$totalAmount" } 
-          }
-      }
-  ]);
+        $group: {
+          _id: { 
+            year: { $year: "$createdAt" }, // Year
+            month: { $month: "$createdAt" } // Month
+          },
+          totalSales: { $sum: "$items.price" }, // Sum the sales price of items
+        },
+      },
+      {
+        $sort: { "_id.year": 1, "_id.month": 1 }, // Sort by year and month
+      },
+      {
+        $project: {
+          year: "$_id.year",
+          month: "$_id.month",
+          totalSales: 1,
+          _id: 0,
+        },
+      },
+    ]);
 
-  return monthlySalesData;
+    return monthlySales; // Array of { year, month, totalSales }
+  } catch (err) {
+    console.error(err);
+  }
 }
 async function calculateYearlySalesData() {
   const currentDate = new Date();
   const oneYearAgo = new Date(currentDate.getFullYear() - 1, 0, 1); 
   const lastDayOfYear = new Date(currentDate.getFullYear(), 11, 31); 
 
-  const yearlySalesData = await Order.aggregate([
+  try {
+    const yearlySales = await Order.aggregate([
       {
-          $match: {
-              createdAt: { $gte: oneYearAgo, $lte: lastDayOfYear }, 
-              "items.orderStatus": "Delivered" 
-          }
+        $unwind: "$items", // Break down orders to individual items
       },
       {
-          $group: {
-              _id: { $year: "$createdAt" }, 
-              totalSales: { $sum: "$totalAmount" } 
-          }
-      }
-  ]);
+        $group: {
+          _id: { $year: "$createdAt" }, // Group by year
+          totalSales: { $sum: "$items.price" }, // Sum the sales price of items
+        },
+      },
+      {
+        $sort: { _id: 1 }, // Sort by year
+      },
+      {
+        $project: {
+          year: "$_id", // Rename _id to year
+          totalSales: 1,
+          _id: 0,
+        },
+      },
+    ]);
 
-  return yearlySalesData;
+    return yearlySales; // Array of { year, totalSales }
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
