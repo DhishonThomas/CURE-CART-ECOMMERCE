@@ -51,20 +51,17 @@ pipeline {
                                 transfers: [
                                     sshTransfer(
                                         execCommand: """
-                                            echo "Checking Docker version..."
-                                            docker --version || { echo "Docker not installed or not found"; exit 1; }
-
                                             echo "Pulling the latest Docker image..."
-                                            docker pull ${DOCKER_IMAGE} || { echo "Docker pull failed"; exit 1; }
+                                            docker pull ${DOCKER_IMAGE}
 
                                             echo "Stopping existing container (if running)..."
-                                            docker stop curecart || { echo "Failed to stop existing container"; exit 1; }
+                                            docker stop curecart || true
 
                                             echo "Removing existing container (if exists)..."
-                                            docker rm curecart || { echo "Failed to remove existing container"; exit 1; }
+                                            docker rm curecart || true
 
                                             echo "Running the new Docker container..."
-                                            docker run -d -p 3000:3000 --name curecart --env-file /app/CureCart/.env ${DOCKER_IMAGE} || { echo "Failed to run Docker container"; exit 1; }
+                                            docker run -d -p 3000:3000 --name curecart --env-file ./app/CureCart/.env ${DOCKER_IMAGE} || exit 1
 
                                             echo "Deployment completed successfully."
                                         """
