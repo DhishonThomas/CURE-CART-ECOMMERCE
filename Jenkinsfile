@@ -15,7 +15,7 @@ pipeline {
             steps {
                 script {
                     echo "Cloning GitHub repository..."
-                    git credentialsId: "${GITHUB_CREDENTIALS}", url: 'https://github.com/DhishonThomas/PANAX.git', branch: 'main'
+                    git credentialsId: "${GITHUB_CREDENTIALS}", url: 'https://github.com/DhishonThomas/CURE-CART-ECOMMERCE.git', branch: 'main'
                 }
             }
         }
