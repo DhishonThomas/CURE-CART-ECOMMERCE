@@ -10,4 +10,4 @@ COPY Cure-Cart-Ecommerce/ ./
 # Expose the port your backend uses
 EXPOSE 5001 
 # Command to run the app
-CMD ["npm", "start"]
+CMD ["npm", "start"] 
