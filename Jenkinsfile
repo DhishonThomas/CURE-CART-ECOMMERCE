@@ -8,7 +8,7 @@ pipeline {
         GITHUB_CREDENTIALS = "github-credentials"
         DOCKER_HUB_CREDENTIALS = "docker-hub-credentials"
     }
- 
+
     stages {
 
         stage('Clone Repository') {
