@@ -61,7 +61,7 @@ pipeline {
                                             docker rm curecart || true
 
                                             echo "Running the new Docker container..."
-                                            docker run -d -p 3000:3000 --name curecart --env-file ./app/CureCart/.env ${DOCKER_IMAGE} || exit 1
+                                            docker run -d -p 3000:3000 --restart unless-stopped --name curecart --env-file ./app/CureCart/.env ${DOCKER_IMAGE} || exit 1
 
                                             echo "Deployment completed successfully."
                                         """
