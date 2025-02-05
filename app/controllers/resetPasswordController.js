@@ -17,10 +17,10 @@ async function sendOTPByEmail(email,token) {
   }); 
 
   const mailDetails = {
-    from: "dhishonthomas6@gmail.com",
+    from: "dhishonthomas6@gmail.com", 
     to: email,
     subject: "Password Reset",
-    html: `<p>Please click <a href="http://localhost:3000/reset/${token}">here</a> to reset your password.</p>`,
+    html: `<p>Please click <a href="${process.env.SERVER_URL||"http://localhost:3000"}/reset/${token}">here</a> to reset your password.</p>`,
   }
 
   // Return a promise to handle success and error in the calling route
