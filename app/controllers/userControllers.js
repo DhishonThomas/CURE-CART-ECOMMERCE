@@ -17,7 +17,6 @@ const userControllers = {
     try {
       const userId = new mongoose.Types.ObjectId(res.locals.user);
       const user = await User.findOne(userId);
-      const products = await Product.find()
      
 const aurevedic=await Product.aggregate([
   {
@@ -80,9 +79,8 @@ const aurevedic=await Product.aggregate([
         "cartItems.productId"
       );
       if (req.session.isUserAuth) {
-        console.log("home reached");
         res.render("user/home", {
-          products,
+          homeopathic,allopathic,aurevedic,
           user: req.session.isUserAuth,
           cartItems,
           user,
@@ -122,19 +120,15 @@ const aurevedic=await Product.aggregate([
   signInAuth: async (req, res) => {
     try {
       const { email, password } = req.body;
-      console.log(req.body);
       const user = await User.findOne({ email });
 
       if (user) {
         if (!user.isBlocked) {
-          console.log(user.isBlocked);
           return res.json({ data: false, error: "User is blocked" });
         }
 
         if (await bcrypt.compare(password, user.password)) {
           req.session.isUserAuth = user._id;
-          console.log("password is correct", req.session.isUserAuth);
-          // res.locals.user = user;
           res.json({ data: true });
         } else {
           res.json({
@@ -159,7 +153,6 @@ const aurevedic=await Product.aggregate([
       console.log(req.body);
       const userOtp = await Userotp.findOne({ email: email });
 
-      console.log("useremail", userOtp);
 
       if (!userOtp) {
         return res.render("user/signUp", {
