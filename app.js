@@ -39,6 +39,7 @@ app.use((req, res, next) => {
   res.setHeader("Cache-Control", "no-store, no-cache, private");
   next();
 });
+
 // Uncomment the following line if you want to use morgan for logging
 // app.use(morgan("tiny"));
 
