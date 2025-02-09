@@ -443,38 +443,44 @@ fetch(`/admin/productListEdit/${productId}/images/${imageIndex}`, {
 
 
 <script>
-  function validateForm(){
-  const productName = document.getElementById("productName").value
-  const description  = document.getElementById("description").value
-  const brand = document.getElementById("brand").value
-  const price = document.getElementById("price").value
-  const quantity = document.getElementById("quantity").value
-   const images = document.getElementById("images").value
+function validateForm(selectedImages) {
+        const productName = document.getElementById("productName").value;
+        const description = document.getElementById("description").value;
+        const brand = document.getElementById("brand").value;
+        const price = document.getElementById("price").value;
+        const quantity = document.getElementById("quantity").value;
+        console.log(productName,description,brand,price,quantity,selectedImages.length);
 
+        if (!productName || !description || !brand || !price || !quantity || selectedImages.length === 0) {
+            alert("Please fill all the required fields and select at least one image");
+            return false;
+        }
 
-  
-  if(!/^(?!\s+$)[A-Za-z\d. ']+$/.test(productName)){
-    alert("Product name cannot contain spaces")
-    return false
-  }
+        if (!/^(?!\s+$)[A-Za-z\d. ']+$/.test(productName)) {
+            alert("Product name cannot contain spaces");
+            return false;
+        }
 
-   if(!/^(?!\s+$)[A-Za-z\d. ']+$/.test(description)){
-    alert("Description cannot contain spaces")
-    return false
-  }
-   if(!/^(?!\s+$)[A-Za-z\d. ']+$/.test(brand)){
-    alert("Brand cannot contain spaces")
-    return false
-  }
-     if(/\s/.test(price)){
-    alert("Price cannot contain spaces")
-    return false
-  }
-     if(/\s/.test(quantity)){
-    alert("Quantity cannot contain spaces")
-    return false
-  }
- 
+        if (!/^(?=.*\S)[\w\s.,!?()'-]+$/.test(description)) {
+            alert("Description cannot contain empty space");
+            return false;
+        }
+
+        if (!/^(?!\s+$)[A-Za-z\d. ']+$/.test(brand)) {
+            alert("Brand cannot contain spaces");
+            return false;
+        }
+
+        if (!/^(?!\s+$)[A-Za-z\d. ']+$/.test(price)) {
+            alert("Price cannot contain spaces");
+            return false;
+        }
+
+        if (/\s/.test(quantity)) {
+            alert("Quantity cannot contain spaces");
+            return false;
+        }
+
       document.getElementById("formblock").submit();
 
   }

@@ -341,8 +341,9 @@ exports.createProduct = async (req, res) => {
 
     try {
       const { productName, description, brand, price, quantity } = req.body;
-console.log(req.body.mycategory);
+console.log("req.body.mycat",req.body);
       const sharpPromises = req.files.map(async (file, index) => {
+        
         const filename = `image_${index + 1}.${file.originalname},${Date.now()}.jpg`;
         const imagePath = `public/uploads/${filename}`;
 
@@ -359,7 +360,7 @@ console.log(req.body.mycategory);
 
       await Promise.all(sharpPromises);
 
-      const categoryId = new mongoose.Types.ObjectId(req.body.mycategory);
+      const categoryId = new mongoose.Types.ObjectId(req.body.category);
       const product = new Product({
         productName,
         description,
@@ -372,9 +373,7 @@ console.log(req.body.mycategory);
 
       await product.save();
 
-     const products = await Product.find();
-
-     res.redirect("/admin/productList")
+     res.json({status:true,message:"successfull"})
     } catch (error) {
       console.error("Error:", error);
       res.status(500).send("Internal Server Error");

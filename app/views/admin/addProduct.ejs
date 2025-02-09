@@ -40,9 +40,7 @@
  <div class="col-md-15 mr-auto ">
   <form
     id="myForm"
-    action=""
-    method="post"
-    enctype="multipart/form-data"
+
   >
     <div class="row">
       <div class="col-6">
@@ -232,15 +230,33 @@
 </section>
 
 <script>
-function handleImage() {
+      var selectedImages = []; 
+
+      function handleImage() {
     var input = document.getElementById('images');
     var realTimePreviewContainer = document.getElementById('imagePreviewContainer');
-    var selectedImages = []; 
 
+    // Clear the preview container and selectedImages array
+    realTimePreviewContainer.innerHTML = '';
+    selectedImages = [];
+
+    // Loop through the selected files
     for (var i = 0; i < input.files.length; i++) {
+        var file = input.files[i];
+
+        // Validate if the file is an image
+        if (!file.type.startsWith('image/')) {
+            alert(`File ${file.name} is not an image. Please select only image files.`);
+            continue; // Skip non-image files
+        }
+
+        // Add the file to the selectedImages array
+        selectedImages.push(file);
+
+        // Create a preview for the image
         var reader = new FileReader();
 
-        reader.onload = (function (index) {
+        reader.onload = (function (file) {
             return function (e) {
                 var div = document.createElement('div');
                 div.className = 'image-box';
@@ -249,70 +265,73 @@ function handleImage() {
                 img.src = e.target.result;
                 img.className = 'img-fluid';
                 div.appendChild(img);
-                 selectedImages.push(img.src); // Add the selected image to the array
 
                 var deleteButton = document.createElement('button');
                 deleteButton.className = 'delete-button';
                 deleteButton.innerHTML = 'Delete';
                 deleteButton.onclick = function () {
-                    var deletedSrc = img.src;
-                    var index = selectedImages.indexOf(deletedSrc);
-                    console.log("deleted image",selectedImages);
+                    // Remove the file from the selectedImages array
+                    var index = selectedImages.indexOf(file);
                     if (index !== -1) {
-                        selectedImages.splice(index, 1); // Remove the selected image from the array
+                        selectedImages.splice(index, 1);
                     }
-                    div.remove(); // Remove the image box when the delete button is clicked
+                    div.remove(); // Remove the image box from the DOM
                 };
 
                 div.appendChild(deleteButton);
-
-               
-                console.log("selected ima", selectedImages);
                 realTimePreviewContainer.appendChild(div);
             };
-        })(i);
+        })(file);
 
-        reader.readAsDataURL(input.files[i]);
+        reader.readAsDataURL(file); // Read the file as a data URL for preview
     }
-
-    return selectedImages;
 }
+function sendForm() {
+    let form = document.getElementById('myForm');
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+    });
 
-</script>
+    console.log("Selected images:", selectedImages);
 
-<script>
-    function sendForm() {
-        const selectedImages = handleImage();
-        if (validateForm(selectedImages)) {
-            const productName = document.getElementById("productName").value;
-            const description = document.getElementById("description").value;
-            const brand = document.getElementById("brand").value;
-            const price = document.getElementById("price").value;
-            const quantity = document.getElementById("quantity").value;
+    if (validateForm(selectedImages)) {
+        var formData = new FormData();
 
-            fetch("/admin/createProduct", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    images: selectedImages,
-                    productName: productName,
-                    description: description,
-                    brand: brand,
-                    price: price,
-                    quantity: quantity
-                }),
-            })
+        // Append other form fields (e.g., productName, description, etc.)
+        formData.append('productName', document.getElementById('productName').value);
+        formData.append('description', document.getElementById('description').value);
+        formData.append('brand', document.getElementById('brand').value);
+        formData.append('price', document.getElementById('price').value);
+        formData.append('quantity', document.getElementById('quantity').value);
+      formData.append('category',document.getElementById('category').value)
+        // Append the selected image files
+        selectedImages.forEach((file, index) => {
+            formData.append('images', file); // Use 'images' as the field name
+        });
+
+        console.log(formData);
+
+        // Send the form data to the server
+        fetch("/admin/createProduct", {
+            method: 'POST',
+            body: formData, // Send FormData directly
+            // Do not set 'Content-Type' header manually; the browser will set it automatically
+        })
             .then(response => response.json())
             .then(data => {
                 console.log('Server response:', data);
+                if(data.status){
+                  window.location.reload()
+                  alert("Product saved successfully 😇 ")
+                }else{
+                  console.log("look at the server>>")
+                }
             })
             .catch(error => {
                 console.error('Error:', error);
             });
-        }
     }
+}
 </script>
 
 <script>
@@ -334,8 +353,8 @@ function handleImage() {
             return false;
         }
 
-        if (!/^(?!\s+$)[A-Za-z\d. ']+$/.test(description)) {
-            alert("Description cannot contain spaces");
+        if (!/^(?=.*\S)[\w\s.,!?()'-]+$/.test(description)) {
+            alert("Description cannot contain empty space");
             return false;
         }
 
@@ -354,109 +373,8 @@ function handleImage() {
             return false;
         }
 
-        // You can add more validation if needed
-
         return true;
     }
 </script>
-
-
-
-
-<!-- <script>
-  let cropper; // Define cropper as a global variable
-
-  function handleImage() {
-    const input = document.getElementById("image");
-    const file = input.files[0];
-    console.log("Selected file:", file);
-
-    if (file) {
-      const reader = new FileReader();
-
-      reader.onload = function (e) {
-        const imageUrl = e.target.result;
-
-        // Initialize CropperJS on the image element
-        cropper = new Cropper(document.getElementById("output"), {
-          aspectRatio: 0,
-          viewMode: 1,
-        });
-
-        // Set the source of the Cropper to the selected image
-        cropper.replace(imageUrl);
-
-        // Enable the Crop button
-        document.getElementById("cropImgBtn").disabled = false;
-      };
-
-      reader.readAsDataURL(file);
-    }
-  }
-
-
-
-document.getElementById("cropImgBtn").addEventListener("click", (event) => {
-    event.preventDefault();
-    
-    const croppedCanvas = cropper.getCroppedCanvas();
-    if (croppedCanvas) {
-      // Convert the cropped image data to a Blob
-      croppedCanvas.toBlob((blob) => {
-        const formData = new FormData();
-        formData.append("croppedImage", blob, "cropped-image.jpg");
-
-        // Display the cropped image
-        var croppedImage = croppedCanvas.toDataURL("image/jpeg");
-        document.getElementById("croppedOutput").src = croppedImage;
-
-        // Store the Blob in a hidden input field
-        document.getElementById("croppedImageData").value = blob;
-
-        console.log("Cropped image data stored.");
-      }, "image/jpeg");
-    } else {
-      // Handle case where no selection is made
-      console.error("No selection made.");
-    }
-  });
-  function submitForm() {
-
-        var croppedImage = document.getElementById("croppedImageData").value;
-
-    var productName = document.getElementById("productNmae").value;
-    var description = document.getElementById("description").value
-    var brand       = document.getElementById("brand").value
-    var price       = document.getElementById("price").value   
-    var category    = document.getElementById("category").value
-    var quantity    = document.getElementById("quantity").value
-
-    var formData = {
-  productName: productName,
-  description: description,
-  brand: brand,
-  price: price,
-  category: category,
-  quantity: quantity,
-  croppedImageData:croppedImage,
-};
-    
-// const croppedCanvas = cropper.getCroppedCanvas();
-// console.log("image when submit button clicked",croppedCanvas);
-    fetch('/admin/createProduct', {
-      method: 'POST',
-      body: JSON.stringify(formData),
-
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Success:', data);
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        // Handle errors
-      });
-  }
-</script> -->
 
 <%- include('../partials/footer'); -%>
